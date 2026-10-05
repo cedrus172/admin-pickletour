@@ -90,6 +90,8 @@ import {
   useLazyClipSplitPlanQuery,
   useStartClipSplitMutation,
   useLazyClipSplitStatusQuery,
+  useLazyMigratePlanQuery,
+  useStartMigrateMutation,
 } from "slices/clipSplitApiSlice";
 import { getTournamentNameDisplayMode, getTournamentPairName } from "utils/tournamentName";
 
@@ -509,6 +511,27 @@ export default function AdminBracketsPage() {
     setClipDlg(true);
     setClipPlan(null);
     await runClipSplit({ matchIds: [matchId] });
+  };
+
+  // Migrate recordings (ghi hình) của giải từ Drive → Telegram.
+  const [fetchMigratePlan] = useLazyMigratePlanQuery();
+  const [startMigrate, { isLoading: startingMigrate }] = useStartMigrateMutation();
+  const runMigrate = async () => {
+    try {
+      const plan = await fetchMigratePlan({ tournamentId }).unwrap();
+      if (!plan?.total) {
+        showSnack("info", "Giải này không có recording nào trên Drive cần migrate.");
+        return;
+      }
+      const gb = (Number(plan.bytes || 0) / 1073741824).toFixed(2);
+      // eslint-disable-next-line no-alert
+      if (!window.confirm(`Migrate ${plan.total} bản ghi (${gb} GB) từ Drive sang Telegram? (giữ Drive làm fallback)`))
+        return;
+      const res = await startMigrate({ tournamentId }).unwrap();
+      showSnack(res?.ok ? "success" : "info", res?.message || "Đã bắt đầu migrate");
+    } catch (e) {
+      showSnack("error", e?.data?.message || "Lỗi khi migrate");
+    }
   };
 
   /* =====================
@@ -2194,7 +2217,17 @@ export default function AdminBracketsPage() {
               color="info"
               onClick={openClipDialog}
             >
-              Cắt &amp; up từng trận (Drive)
+              Cắt &amp; up từng trận
+            </Button>
+            <Button
+              sx={{ mb: 3, ml: 2, color: "white !important" }}
+              startIcon={<CloudUploadIcon />}
+              variant="contained"
+              color="info"
+              disabled={startingMigrate}
+              onClick={runMigrate}
+            >
+              Chuyển recordings → Telegram
             </Button>
 
             {/* Danh sách Brackets & Matches (Accordion) */}

@@ -67,9 +67,12 @@ function CurrentActivity({ cur }) {
 
   let detail;
   if (cur.phase === "download") {
-    detail = `${phase} clip ${cur.videoId}: ${fmtBytes(cur.downloadedBytes)} / ${
+    const what = cur.videoId ? `clip ${cur.videoId}` : cur.title || "";
+    detail = `${phase} ${what}: ${fmtBytes(cur.downloadedBytes)} / ${
       cur.totalBytes ? fmtBytes(cur.totalBytes) : "?"
-    } · ${pct.toFixed(1)}% · ${fmtSpeed(cur.speed)} · ETA ${fmtEta(cur.eta)}`;
+    } · ${pct.toFixed(1)}%${cur.speed ? ` · ${fmtSpeed(cur.speed)}` : ""}${
+      cur.eta ? ` · ETA ${fmtEta(cur.eta)}` : ""
+    }`;
   } else if (cur.phase === "upload") {
     detail = `${phase} trận ${cur.segIndex}/${cur.segTotal}${
       cur.title ? ` · ${cur.title}` : ""
@@ -115,6 +118,11 @@ function JobCard({ job }) {
     <Card sx={{ p: 2, mb: 2 }}>
       <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
         <Chip size="small" color={color} label={STATE_LABEL[job.state] || job.state} />
+        <Chip
+          size="small"
+          variant="outlined"
+          label={job.kind === "migrate" ? "Drive→Telegram" : "Cắt clip"}
+        />
         <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
           {job.tournamentName || "(giải)"}
         </Typography>

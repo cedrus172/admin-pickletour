@@ -29,6 +29,18 @@ export const clipSplitApiSlice = apiSlice.injectEndpoints({
     clipSplitJobs: builder.query({
       query: () => ({ url: "/admin/clip-split/jobs" }),
     }),
+    // Migrate recordings Drive → Telegram (theo giải).
+    migratePlan: builder.query({
+      query: ({ tournamentId }) => ({
+        url: `/admin/tournaments/${tournamentId}/drive-migrate/plan`,
+      }),
+    }),
+    startMigrate: builder.mutation({
+      query: ({ tournamentId }) => ({
+        url: `/admin/tournaments/${tournamentId}/drive-migrate/start`,
+        method: "POST",
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -38,4 +50,6 @@ export const {
   useStartClipSplitMutation,
   useLazyClipSplitStatusQuery,
   useClipSplitJobsQuery,
+  useLazyMigratePlanQuery,
+  useStartMigrateMutation,
 } = clipSplitApiSlice;
