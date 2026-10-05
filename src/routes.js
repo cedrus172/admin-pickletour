@@ -21,6 +21,7 @@ import TournamentsListPage from "layouts/tournament/TournamentsListPage";
 import TournamentFormPage from "layouts/tournament/TournamentFormPage";
 import AdminTournamentRegistrations from "layouts/tournament/AdminTournamentRegistrations";
 import AdminBracketsPage from "layouts/tournament/AdminBracketsPage";
+import ClipSplitJobsPage from "layouts/clip-split/ClipSplitJobsPage";
 
 // 🆕 Trận đấu (admin)
 import AdminMatchesList from "layouts/match/AdminMatchesList";
@@ -434,6 +435,19 @@ const routes = [
     component: <AdminBracketsPage />,
     private: true,
     roles: ["admin"],
+  },
+
+  // Theo dõi cắt clip → Drive (tất cả giải)
+  {
+    type: "collapse",
+    name: "Cắt clip → Drive",
+    key: "clip-split-jobs",
+    icon: <Icon fontSize="small">content_cut</Icon>,
+    route: "/admin/clip-split",
+    component: <ClipSplitJobsPage />,
+    private: true,
+    roles: ["admin"],
+    show: true,
   },
 
   // Trận đấu (Admin)

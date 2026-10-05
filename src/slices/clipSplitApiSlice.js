@@ -25,6 +25,10 @@ export const clipSplitApiSlice = apiSlice.injectEndpoints({
         url: `/admin/tournaments/${tournamentId}/clip-split/status`,
       }),
     }),
+    // Tất cả job (mọi giải), đang chạy lên đầu.
+    clipSplitJobs: builder.query({
+      query: () => ({ url: "/admin/clip-split/jobs" }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -33,4 +37,5 @@ export const {
   useLazyClipSplitPlanQuery,
   useStartClipSplitMutation,
   useLazyClipSplitStatusQuery,
+  useClipSplitJobsQuery,
 } = clipSplitApiSlice;
