@@ -29,6 +29,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   FormGroup,
+  LinearProgress,
 } from "@mui/material";
 import SportsTennisIcon from "@mui/icons-material/SportsTennis";
 import { Paper } from "@mui/material";
@@ -49,6 +50,8 @@ import {
   OpenInNew as OpenInNewIcon,
   ContentCopy as ContentCopyIcon,
   Tune as TuneIcon,
+  ContentCut as ContentCutIcon,
+  CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -83,6 +86,11 @@ import {
   useUpdateGroupStructureMutation,
 } from "slices/tournamentsApiSlice";
 import { useGetUsersQuery } from "slices/adminApiSlice";
+import {
+  useLazyClipSplitPlanQuery,
+  useStartClipSplitMutation,
+  useLazyClipSplitStatusQuery,
+} from "slices/clipSplitApiSlice";
 import { getTournamentNameDisplayMode, getTournamentPairName } from "utils/tournamentName";
 
 /* ===== progression slice ===== */
@@ -443,6 +451,65 @@ export default function AdminBracketsPage() {
    * ===================== */
   const [snack, setSnack] = useState({ open: false, type: "success", msg: "" });
   const showSnack = (type, msg) => setSnack({ open: true, type, msg });
+
+  /* =====================
+   *  Cắt clip YouTube "xuyên suốt" → VOD từng trận → Google Drive
+   * ===================== */
+  const [clipDlg, setClipDlg] = useState(false);
+  const [clipPlan, setClipPlan] = useState(null); // { total, groups }
+  const [clipJob, setClipJob] = useState(null); // trạng thái job
+  const [fetchClipPlan, { isFetching: loadingClipPlan }] = useLazyClipSplitPlanQuery();
+  const [startClipSplit, { isLoading: startingClip }] = useStartClipSplitMutation();
+  const [fetchClipStatus] = useLazyClipSplitStatusQuery();
+
+  const openClipDialog = async () => {
+    setClipDlg(true);
+    setClipPlan(null);
+    try {
+      const res = await fetchClipPlan({ tournamentId }).unwrap();
+      setClipPlan(res);
+    } catch (e) {
+      showSnack("error", e?.data?.message || "Không tải được danh sách trận để cắt");
+    }
+    // kéo trạng thái job hiện tại (nếu đang chạy dở)
+    try {
+      const st = await fetchClipStatus({ tournamentId }).unwrap();
+      setClipJob(st?.job || null);
+    } catch {}
+  };
+
+  // Poll tiến độ khi job đang chạy.
+  useEffect(() => {
+    if (!clipJob || clipJob.state !== "running") return undefined;
+    const t = setInterval(async () => {
+      try {
+        const st = await fetchClipStatus({ tournamentId }).unwrap();
+        setClipJob(st?.job || null);
+      } catch {}
+    }, 3000);
+    return () => clearInterval(t);
+  }, [clipJob, tournamentId, fetchClipStatus]);
+
+  const runClipSplit = async ({ matchIds = null } = {}) => {
+    try {
+      const res = await startClipSplit({ tournamentId, matchIds }).unwrap();
+      setClipJob(res?.job || null);
+      if (res?.ok) {
+        showSnack("success", res?.message || "Đã bắt đầu cắt & up Drive");
+      } else {
+        showSnack("info", res?.message || "Không có trận nào để cắt");
+      }
+    } catch (e) {
+      showSnack("error", e?.data?.message || "Lỗi khi bắt đầu cắt clip");
+    }
+  };
+
+  // Nút "cắt 1 trận" ở hàng trận: mở dialog để theo dõi tiến độ + chạy luôn trận đó.
+  const cutSingleMatch = async (matchId) => {
+    setClipDlg(true);
+    setClipPlan(null);
+    await runClipSplit({ matchIds: [matchId] });
+  };
 
   /* =====================
    *  Helpers pow2 + rounds + paid
@@ -2120,6 +2187,15 @@ export default function AdminBracketsPage() {
             >
               Tạo sơ đồ giải
             </Button>
+            <Button
+              sx={{ mb: 3, ml: 2, color: "white !important" }}
+              startIcon={<ContentCutIcon />}
+              variant="contained"
+              color="info"
+              onClick={openClipDialog}
+            >
+              Cắt &amp; up từng trận (Drive)
+            </Button>
 
             {/* Danh sách Brackets & Matches (Accordion) */}
             <Stack spacing={2}>
@@ -2557,6 +2633,14 @@ export default function AdminBracketsPage() {
                                                     title="Copy link video"
                                                   >
                                                     <ContentCopyIcon fontSize="small" />
+                                                  </IconButton>
+                                                  <IconButton
+                                                    size="small"
+                                                    color="info"
+                                                    onClick={stop(() => cutSingleMatch(idOf(mt._id)))}
+                                                    title="Cắt đoạn trận này từ clip & up Google Drive"
+                                                  >
+                                                    <ContentCutIcon fontSize="small" />
                                                   </IconButton>
                                                 </Stack>
                                               ) : null}
@@ -4647,6 +4731,115 @@ export default function AdminBracketsPage() {
           {snack.msg}
         </Alert>
       </Snackbar>
+
+      {/* Dialog: cắt clip YouTube "xuyên suốt" → VOD từng trận → Google Drive */}
+      <Dialog open={clipDlg} onClose={() => setClipDlg(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Cắt &amp; up từng trận lên Google Drive</DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            Tải clip YouTube dài 1 lần, cắt theo mốc bắt đầu mỗi trận (
+            <i>videoStartSeconds</i>), up Google Drive (công khai) rồi gán link riêng cho
+            từng trận. Clip phải là của kênh hệ thống.
+          </Typography>
+
+          {loadingClipPlan ? (
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ my: 2 }}>
+              <CircularProgress size={18} />
+              <Typography variant="body2">Đang quét trận có clip…</Typography>
+            </Stack>
+          ) : clipPlan ? (
+            <Alert severity={clipPlan.total ? "info" : "warning"} sx={{ mb: 1.5 }}>
+              {clipPlan.total
+                ? `Sẽ cắt ${clipPlan.total} trận từ ${clipPlan.groups?.length || 0} clip.`
+                : "Không tìm thấy trận nào gán clip YouTube xuyên suốt để cắt."}
+            </Alert>
+          ) : null}
+
+          {clipJob ? (
+            <Box sx={{ mt: 1 }}>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                <Chip
+                  size="small"
+                  color={
+                    clipJob.state === "done"
+                      ? "success"
+                      : clipJob.state === "error"
+                      ? "error"
+                      : clipJob.state === "running"
+                      ? "info"
+                      : "default"
+                  }
+                  label={
+                    clipJob.state === "running"
+                      ? "Đang chạy"
+                      : clipJob.state === "done"
+                      ? "Hoàn tất"
+                      : clipJob.state === "error"
+                      ? "Lỗi"
+                      : clipJob.state || "—"
+                  }
+                />
+                <Typography variant="body2">
+                  {Number(clipJob.done || 0)}/{Number(clipJob.total || 0)} xong
+                  {clipJob.failed ? ` · ${clipJob.failed} lỗi` : ""}
+                </Typography>
+              </Stack>
+              {clipJob.total ? (
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min(
+                    100,
+                    Math.round(
+                      ((Number(clipJob.done || 0) + Number(clipJob.failed || 0)) /
+                        Number(clipJob.total || 1)) *
+                        100
+                    )
+                  )}
+                  sx={{ mb: 1 }}
+                />
+              ) : null}
+              {clipJob.error ? (
+                <Alert severity="error" sx={{ mb: 1 }}>
+                  {clipJob.error}
+                </Alert>
+              ) : null}
+              {Array.isArray(clipJob.logs) && clipJob.logs.length ? (
+                <Box
+                  sx={{
+                    maxHeight: 180,
+                    overflow: "auto",
+                    bgcolor: "grey.100",
+                    borderRadius: 1,
+                    p: 1,
+                    fontFamily: "monospace",
+                    fontSize: 12,
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {clipJob.logs.slice(-40).join("\n")}
+                </Box>
+              ) : null}
+            </Box>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setClipDlg(false)}>Đóng</Button>
+          <Button
+            variant="contained"
+            color="info"
+            startIcon={<CloudUploadIcon />}
+            disabled={
+              startingClip ||
+              clipJob?.state === "running" ||
+              (clipPlan && !clipPlan.total)
+            }
+            onClick={() => runClipSplit({})}
+          >
+            {clipJob?.state === "running" ? "Đang chạy…" : "Bắt đầu cắt cả giải"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Footer />
     </DashboardLayout>
   );
