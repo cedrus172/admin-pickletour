@@ -18,6 +18,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -57,26 +58,37 @@ const PHASE_LABEL = { download: "Đang tải", cut: "Đang cắt", upload: "Đan
 function CurrentActivity({ cur }) {
   if (!cur) return null;
   const phase = PHASE_LABEL[cur.phase] || cur.phase;
+  const pct = Math.max(0, Math.min(100, Number(cur.percent || 0)));
+
+  let detail;
   if (cur.phase === "download") {
-    const pct = Math.max(0, Math.min(100, Number(cur.percent || 0)));
-    return (
-      <Box sx={{ mt: 1 }}>
-        <Typography variant="caption" color="text.secondary">
-          {phase} clip {cur.videoId}: {fmtBytes(cur.downloadedBytes)} /{" "}
-          {cur.totalBytes ? fmtBytes(cur.totalBytes) : "?"} · {pct.toFixed(1)}% ·{" "}
-          {fmtSpeed(cur.speed)} · ETA {fmtEta(cur.eta)}
-        </Typography>
-        <LinearProgress variant="determinate" value={pct} sx={{ mt: 0.5 }} />
-      </Box>
-    );
+    detail = `${phase} clip ${cur.videoId}: ${fmtBytes(cur.downloadedBytes)} / ${
+      cur.totalBytes ? fmtBytes(cur.totalBytes) : "?"
+    } · ${pct.toFixed(1)}% · ${fmtSpeed(cur.speed)} · ETA ${fmtEta(cur.eta)}`;
+  } else if (cur.phase === "upload") {
+    detail = `${phase} trận ${cur.segIndex}/${cur.segTotal}${
+      cur.title ? ` · ${cur.title}` : ""
+    } · ${fmtBytes(cur.uploadedBytes)} / ${
+      cur.totalBytes ? fmtBytes(cur.totalBytes) : "?"
+    } · ${pct.toFixed(1)}% · ${fmtSpeed(cur.speed)} · ETA ${fmtEta(cur.eta)}`;
+  } else {
+    // cut
+    detail = `${phase} trận ${cur.segIndex}/${cur.segTotal}${
+      cur.title ? ` · ${cur.title}` : ""
+    } · ${pct.toFixed(1)}%`;
   }
-  // cut / upload
+
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
-      {phase} trận {cur.segIndex}/{cur.segTotal}
-      {cur.title ? ` · ${cur.title}` : ""}
-      {cur.phase === "upload" && cur.totalBytes ? ` · ${fmtBytes(cur.totalBytes)}` : ""}
-    </Typography>
+    <Box sx={{ mt: 1 }}>
+      <Typography variant="caption" color="text.secondary">
+        {detail}
+      </Typography>
+      <LinearProgress
+        variant={pct > 0 ? "determinate" : "indeterminate"}
+        value={pct}
+        sx={{ mt: 0.5 }}
+      />
+    </Box>
   );
 }
 
@@ -98,6 +110,9 @@ function JobCard({ job }) {
         <Box sx={{ flexGrow: 1 }} />
         <Typography variant="body2" color="text.secondary">
           {done}/{total} xong{failed ? ` · ${failed} lỗi` : ""}
+          {job.state === "running" && job.etaSec != null
+            ? ` · còn ~${fmtEta(job.etaSec)}`
+            : ""}
         </Typography>
         <Tooltip title="Mở trang giải">
           <IconButton
@@ -133,6 +148,62 @@ function JobCard({ job }) {
         <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
           {job.error}
         </Typography>
+      ) : null}
+
+      {Array.isArray(job.results) && job.results.length > 0 ? (
+        <Box sx={{ mt: 1.5 }}>
+          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+            Trận đã xong ({job.results.length}) — link Google Drive:
+          </Typography>
+          <Stack spacing={0.5}>
+            {job.results.map((r) => (
+              <Stack
+                key={r.fileId || r.matchId}
+                direction="row"
+                alignItems="center"
+                spacing={1}
+                sx={{ flexWrap: "wrap" }}
+              >
+                <Typography variant="body2" sx={{ flexGrow: 1, minWidth: 180 }}>
+                  {r.title || r.matchId}
+                  {r.sizeBytes ? (
+                    <Typography component="span" variant="caption" color="text.secondary">
+                      {" "}
+                      · {fmtBytes(r.sizeBytes)}
+                    </Typography>
+                  ) : null}
+                </Typography>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<OpenInNewIcon fontSize="small" />}
+                  component="a"
+                  href={r.viewUrl || `https://drive.google.com/file/d/${r.fileId}/view`}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Mở Drive
+                </Button>
+                <Tooltip title="Copy link">
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      try {
+                        navigator.clipboard.writeText(
+                          r.viewUrl || `https://drive.google.com/file/d/${r.fileId}/view`
+                        );
+                      } catch (e) {
+                        /* noop */
+                      }
+                    }}
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
       ) : null}
 
       <Collapse in={open} unmountOnExit>
