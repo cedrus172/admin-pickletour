@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import ReplayIcon from "@mui/icons-material/Replay";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
@@ -24,7 +25,11 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-import { useClipSplitJobsQuery } from "slices/clipSplitApiSlice";
+import {
+  useClipSplitJobsQuery,
+  useStartClipSplitMutation,
+  useStartMigrateMutation,
+} from "slices/clipSplitApiSlice";
 
 const fmtBytes = (n) => {
   const b = Number(n || 0);
@@ -114,6 +119,23 @@ function JobCard({ job }) {
   const overall = total ? Math.round(((done + failed) / total) * 100) : 0;
   const color = STATE_COLOR[job.state] || "default";
 
+  const [startClip, { isLoading: clipRetrying }] = useStartClipSplitMutation();
+  const [startMigrate, { isLoading: migRetrying }] = useStartMigrateMutation();
+  const retrying = clipRetrying || migRetrying;
+  // Còn trận chưa xong (lỗi/dang dở) + không đang chạy → cho chạy lại. Chạy lại =
+  // start lại KHÔNG truyền matchIds + force=false → tự BỎ QUA trận đã xong, chỉ cắt
+  // lại các trận còn thiếu (lỗi). Áp dụng cho cả cắt clip và migrate.
+  const hasPending = job.state === "error" || (total > 0 && done < total);
+  const canRetry = job.state !== "running" && hasPending;
+  const retryFailed = async () => {
+    try {
+      if (job.kind === "migrate") await startMigrate({ tournamentId: job.tournament }).unwrap();
+      else await startClip({ tournamentId: job.tournament, force: false }).unwrap();
+    } catch (e) {
+      // lỗi hiển thị qua polling state; không chặn UI
+    }
+  };
+
   return (
     <Card sx={{ p: 2, mb: 2 }}>
       <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
@@ -133,6 +155,23 @@ function JobCard({ job }) {
             ? ` · còn ~${fmtEta(job.etaSec)}`
             : ""}
         </Typography>
+        {canRetry ? (
+          <Tooltip title="Chạy lại các trận bị lỗi (bỏ qua trận đã xong)">
+            <span>
+              <Button
+                size="small"
+                variant="outlined"
+                color="warning"
+                startIcon={<ReplayIcon fontSize="small" />}
+                onClick={retryFailed}
+                disabled={retrying}
+                sx={{ textTransform: "none" }}
+              >
+                {retrying ? "Đang chạy lại…" : `Chạy lại trận lỗi${failed ? ` (${failed})` : ""}`}
+              </Button>
+            </span>
+          </Tooltip>
+        ) : null}
         <Tooltip title="Mở trang giải">
           <IconButton
             size="small"
