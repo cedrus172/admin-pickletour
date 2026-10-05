@@ -53,7 +53,12 @@ const STATE_LABEL = {
   error: "Lỗi",
   idle: "Chờ",
 };
-const PHASE_LABEL = { download: "Đang tải", cut: "Đang cắt", upload: "Đang up Drive" };
+const PHASE_LABEL = {
+  download: "Đang tải",
+  cut: "Đang cắt",
+  upload: "Đang up Drive",
+  "upload-tg": "Đang up Telegram",
+};
 
 function CurrentActivity({ cur }) {
   if (!cur) return null;
@@ -71,6 +76,12 @@ function CurrentActivity({ cur }) {
     } · ${fmtBytes(cur.uploadedBytes)} / ${
       cur.totalBytes ? fmtBytes(cur.totalBytes) : "?"
     } · ${pct.toFixed(1)}% · ${fmtSpeed(cur.speed)} · ETA ${fmtEta(cur.eta)}`;
+  } else if (cur.phase === "upload-tg") {
+    detail = `${phase} trận ${cur.segIndex}/${cur.segTotal}${
+      cur.title ? ` · ${cur.title}` : ""
+    }${cur.totalBytes ? ` · ${fmtBytes(cur.totalBytes)}` : ""}${
+      pct > 0 ? ` · ${pct.toFixed(1)}%` : ""
+    }`;
   } else {
     // cut
     detail = `${phase} trận ${cur.segIndex}/${cur.segTotal}${
@@ -173,25 +184,46 @@ function JobCard({ job }) {
                     </Typography>
                   ) : null}
                 </Typography>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<OpenInNewIcon fontSize="small" />}
-                  component="a"
-                  href={r.viewUrl || `https://drive.google.com/file/d/${r.fileId}/view`}
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Mở Drive
-                </Button>
-                <Tooltip title="Copy link">
+                {r.fileId ? (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<OpenInNewIcon fontSize="small" />}
+                    component="a"
+                    href={r.viewUrl || `https://drive.google.com/file/d/${r.fileId}/view`}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Drive
+                  </Button>
+                ) : null}
+                {r.telegramUrl ? (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="info"
+                    startIcon={<OpenInNewIcon fontSize="small" />}
+                    component="a"
+                    href={r.telegramUrl}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Telegram
+                  </Button>
+                ) : null}
+                <Tooltip title="Copy link (Drive ưu tiên, không có thì Telegram)">
                   <IconButton
                     size="small"
                     onClick={() => {
+                      const link =
+                        r.viewUrl ||
+                        (r.fileId
+                          ? `https://drive.google.com/file/d/${r.fileId}/view`
+                          : "") ||
+                        r.telegramUrl ||
+                        "";
                       try {
-                        navigator.clipboard.writeText(
-                          r.viewUrl || `https://drive.google.com/file/d/${r.fileId}/view`
-                        );
+                        navigator.clipboard.writeText(link);
                       } catch (e) {
                         /* noop */
                       }
