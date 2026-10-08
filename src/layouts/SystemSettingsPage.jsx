@@ -1623,6 +1623,7 @@ export default function SystemSettingsPage() {
     kyc: {
       enabled: !!source.kyc?.enabled,
       autoApprove: !!source.kyc?.autoApprove,
+      aiReview: !!source.kyc?.aiReview,
       faceMatchThreshold: source.kyc?.faceMatchThreshold ?? 0.78,
     },
     security: {
@@ -2332,6 +2333,13 @@ export default function SystemSettingsPage() {
                 <Typography>Tự động duyệt KYC</Typography>
               </Tooltip>
               <Switch checked={!!form.kyc?.autoApprove} onChange={onToggle("kyc.autoApprove")} />
+            </Stack>
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Tooltip title="Khi bật (cần 'Tự động duyệt KYC' cũng bật): dùng AI Claude nhìn ảnh CCCD để phán đoán duyệt/từ chối, thay cho so khớp chuỗi. AI không chắc chắn hoặc lỗi → giữ Chờ duyệt.">
+                <Typography>Duyệt KYC bằng AI (Claude)</Typography>
+              </Tooltip>
+              <Switch checked={!!form.kyc?.aiReview} onChange={onToggle("kyc.aiReview")} />
             </Stack>
 
             <TextField
