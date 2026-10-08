@@ -1624,6 +1624,7 @@ export default function SystemSettingsPage() {
       enabled: !!source.kyc?.enabled,
       autoApprove: !!source.kyc?.autoApprove,
       aiReview: !!source.kyc?.aiReview,
+      disableOcr: !!source.kyc?.disableOcr,
       faceMatchThreshold: source.kyc?.faceMatchThreshold ?? 0.78,
     },
     security: {
@@ -2340,6 +2341,13 @@ export default function SystemSettingsPage() {
                 <Typography>Duyệt KYC bằng AI (Claude)</Typography>
               </Tooltip>
               <Switch checked={!!form.kyc?.aiReview} onChange={onToggle("kyc.aiReview")} />
+            </Stack>
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Tooltip title="Khi bật: bỏ qua bước OCR đọc CCCD (chỉ dùng AI Claude tự đọc ảnh). Giảm thời gian & nhiễu khi OCR đọc sai. Nên bật kèm 'Duyệt KYC bằng AI'.">
+                <Typography>Tắt OCR đọc CCCD</Typography>
+              </Tooltip>
+              <Switch checked={!!form.kyc?.disableOcr} onChange={onToggle("kyc.disableOcr")} />
             </Stack>
 
             <TextField
