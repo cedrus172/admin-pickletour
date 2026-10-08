@@ -2336,7 +2336,7 @@ export default function SystemSettingsPage() {
             </Stack>
 
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Tooltip title="Khi bật (cần 'Tự động duyệt KYC' cũng bật): dùng AI Claude nhìn ảnh CCCD để phán đoán duyệt/từ chối, thay cho so khớp chuỗi. AI không chắc chắn hoặc lỗi → giữ Chờ duyệt.">
+              <Tooltip title="Khi bật: AI Claude nhìn ảnh CCCD tự duyệt/từ chối (tự đủ, không cần bật thêm 'Tự động duyệt KYC'). AI không chắc chắn hoặc lỗi → giữ Chờ duyệt.">
                 <Typography>Duyệt KYC bằng AI (Claude)</Typography>
               </Tooltip>
               <Switch checked={!!form.kyc?.aiReview} onChange={onToggle("kyc.aiReview")} />
