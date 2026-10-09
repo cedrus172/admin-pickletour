@@ -145,6 +145,9 @@ const hydrateFormState = (source) => ({
   checkpoint: {
     enabled: source?.checkpoint?.enabled ?? true,
   },
+  liveCourtMonitor: {
+    enabled: source?.liveCourtMonitor?.enabled ?? true,
+  },
   referee: {
     matchControlLockEnabled: source?.referee?.matchControlLockEnabled ?? true,
   },
@@ -1620,6 +1623,9 @@ export default function SystemSettingsPage() {
     checkpoint: {
       enabled: source?.checkpoint?.enabled !== false,
     },
+    liveCourtMonitor: {
+      enabled: source?.liveCourtMonitor?.enabled !== false,
+    },
     kyc: {
       enabled: !!source.kyc?.enabled,
       autoApprove: !!source.kyc?.autoApprove,
@@ -2918,6 +2924,24 @@ export default function SystemSettingsPage() {
                 ? "Checkpoint đang tắt ở mức hệ thống. User sẽ không bị ép vào luồng checkpoint cho đến khi bật lại."
                 : "Checkpoint đang bật ở mức hệ thống. Policy checkpoint hiện tại vẫn quyết định khi nào cần xác minh."}
             </Alert>
+          </Section>
+
+          <Section
+            title="Quản lý live sân"
+            desc="Bật/tắt nút 'Quản lý live sân' (theo dõi app live mobile) ở trang Quản lý giải."
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Box sx={{ pr: 2 }}>
+                <Typography fontWeight={700}>Bật Quản lý live sân</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Tắt khi không dùng app live mobile nữa — nút sẽ bị ẩn ở mọi trang Quản lý giải.
+                </Typography>
+              </Box>
+              <Switch
+                checked={form.liveCourtMonitor?.enabled !== false}
+                onChange={onToggle("liveCourtMonitor.enabled")}
+              />
+            </Stack>
           </Section>
 
           <Section
