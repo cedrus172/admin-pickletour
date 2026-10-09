@@ -9,7 +9,7 @@ import {
   Card, CardContent, Grid, Typography, Chip, Button, IconButton,
   Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, MenuItem, Select, InputLabel,
-  FormControl, Alert, Box, Stack, Tooltip, Divider, Collapse,
+  FormControl, FormHelperText, Alert, Box, Stack, Tooltip, Divider, Collapse,
   FormControlLabel, Checkbox,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -619,6 +619,7 @@ function StartDialog({ tournamentId, court, onClose }) {
   const [venueId, setVenueId] = useState("");
   const [srcType, setSrcType] = useState("imou"); // imou | url
   const [sourceUrl, setSourceUrl] = useState("");
+  const [rtspTransport, setRtspTransport] = useState("tcp"); // tcp|udp|udp_multicast|http
   const [layout, setLayout] = useState({ scoreboard: "top-left", brand: "top-right", sponsor: "bottom-right" });
   const [destinations, setDestinations] = useState([]);
   const [perMatchLive, setPerMatchLive] = useState(false); // false = 1 live xuyên suốt mọi trận
@@ -661,6 +662,7 @@ function StartDialog({ tournamentId, court, onClose }) {
     const s = rtspSources.find((x) => x._id === id);
     if (s) {
       setSourceUrl(s.url || "");
+      setRtspTransport(s.transport || "tcp");
       if (s.layout) setLayout({ scoreboard: s.layout.scoreboard, brand: s.layout.brand, sponsor: s.layout.sponsor });
     }
   };
@@ -671,9 +673,9 @@ function StartDialog({ tournamentId, court, onClose }) {
     if (!sourceUrl.trim()) { setErr("Chưa có link RTSP để lưu"); return; }
     try {
       if (savedSrcId) {
-        await updateRtspSource({ id: savedSrcId, label, url: sourceUrl.trim(), layout }).unwrap();
+        await updateRtspSource({ id: savedSrcId, label, url: sourceUrl.trim(), transport: rtspTransport, layout }).unwrap();
       } else {
-        const created = await createRtspSource({ label, url: sourceUrl.trim(), layout }).unwrap();
+        const created = await createRtspSource({ label, url: sourceUrl.trim(), transport: rtspTransport, layout }).unwrap();
         if (created?._id) setSavedSrcId(created._id);
       }
       setSaveOpen(false); setSaveLabel("");
@@ -747,6 +749,7 @@ function StartDialog({ tournamentId, court, onClose }) {
         imouDeviceId: srcType === "imou" ? deviceId : "",
         venueId: (srcType === "imou" || srcType === "dahua") ? venueId : "",
         sourceUrl: srcType === "url" ? sourceUrl.trim() : "",
+        rtspTransport: srcType === "url" ? rtspTransport : undefined,
         dahuaP2p: srcType === "dahua"
           ? { channel: Number(dahuaChannel) || 1, subtype: Number(dahuaSubtype) }
           : undefined,
@@ -850,6 +853,22 @@ function StartDialog({ tournamentId, court, onClose }) {
                 onChange={(e) => { setSourceUrl(e.target.value); }}
                 helperText="RTSP/HLS/RTMP. Nguồn nội bộ (LAN) mượt & trễ thấp nhất. Chọn nguồn đã lưu sẽ tự điền cả vị trí overlay."
               />
+              <FormControl size="small" fullWidth>
+                <InputLabel>RTSP transport</InputLabel>
+                <Select
+                  label="RTSP transport"
+                  value={rtspTransport}
+                  onChange={(e) => setRtspTransport(e.target.value)}
+                >
+                  <MenuItem value="tcp">TCP (mặc định)</MenuItem>
+                  <MenuItem value="udp">UDP</MenuItem>
+                  <MenuItem value="udp_multicast">UDP multicast</MenuItem>
+                  <MenuItem value="http">HTTP (tunnel)</MenuItem>
+                </Select>
+                <FormHelperText>
+                  Đầu thu/relay chỉ phục vụ RTP/UDP (vd RTSP cổng :8554) thì chọn UDP — TCP sẽ báo &quot;461 Unsupported Transport&quot;. Lưu cùng nguồn.
+                </FormHelperText>
+              </FormControl>
               {!saveOpen ? (
                 <Stack direction="row" spacing={1}>
                   <Button
