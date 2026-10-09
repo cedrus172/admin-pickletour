@@ -43,25 +43,35 @@ import {
   useStartGroupDrawMutation,
   useStartPoDrawMutation,
 } from "slices/bracketsApiSlice";
-import { useGetRegistrationsQuery } from "slices/tournamentsApiSlice";
+import {
+  useGetRegistrationsQuery,
+  useGetTournamentQuery,
+} from "slices/tournamentsApiSlice";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 const keyOf = (poolKey, slotIndex) => `${poolKey}:${slotIndex}`;
 const safe = (s) => (s && String(s).trim()) || "";
-const pNick = (p) => safe(p?.nickName);
+// Tên hiển thị theo chế độ của giải: "fullName" = Họ và tên, ngược lại = Nickname.
+const pName = (p, mode) => {
+  const full = safe(p?.fullName);
+  const nick = safe(p?.nickName);
+  return mode === "fullName" ? full || nick : nick || full;
+};
 const pScore = (p) => (typeof p?.score === "number" ? p.score : null);
 const pAvatar = (p) => safe(p?.avatar);
 
-function makeRegView(reg) {
+function makeRegView(reg, nameMode = "nickname") {
   const p1 = reg?.player1 || null;
   const p2 = reg?.player2 || null;
   const isDouble = !!p2;
 
-  const nick1 = pNick(p1);
-  const nick2 = p2 ? pNick(p2) : "";
-  const label = isDouble ? [nick1 || "?", nick2 || "?"].join(" & ") : nick1 || "(chưa có nickname)";
+  const nick1 = pName(p1, nameMode);
+  const nick2 = p2 ? pName(p2, nameMode) : "";
+  const label = isDouble
+    ? [nick1 || "?", nick2 || "?"].join(" & ")
+    : nick1 || "(chưa có tên)";
 
   const s1 = pScore(p1);
   const s2 = pScore(p2);
@@ -244,6 +254,10 @@ export default function GroupPreassignBoard({ bid: bidProp }) {
     refetch: refetchRegs,
   } = useGetRegistrationsQuery(tid, { skip: !tid });
 
+  const { data: tournament } = useGetTournamentQuery(tid, { skip: !tid });
+  const nameMode =
+    tournament?.nameDisplayMode === "fullName" ? "fullName" : "nickname";
+
   const [bulkAssign, { isLoading: savingGroup }] = useBulkAssignSlotPlanMutation();
   const [startGroupDraw, { isLoading: startingGroup }] = useStartGroupDrawMutation();
   const [startPoDraw, { isLoading: startingPo }] = useStartPoDrawMutation();
@@ -257,7 +271,10 @@ export default function GroupPreassignBoard({ bid: bidProp }) {
   // PO
   const [poPlan, setPoPlan] = useState([]);
 
-  const regOptions = useMemo(() => registrations.map(makeRegView), [registrations]);
+  const regOptions = useMemo(
+    () => registrations.map((r) => makeRegView(r, nameMode)),
+    [registrations, nameMode],
+  );
   const optById = useMemo(() => {
     const m = new Map();
     regOptions.forEach((o) => m.set(String(o.id), o));
