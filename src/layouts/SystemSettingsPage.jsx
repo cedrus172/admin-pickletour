@@ -866,8 +866,10 @@ function EventLiveSection() {
           </Typography>
         </Divider>
         <Alert severity="info">
-          Dành cho sân KHÔNG có video YouTube — dán link .m3u8 (HLS) hoặc mp4.
-          Hiển thị song song với luồng YouTube trên web &amp; app.
+          Dành cho sân KHÔNG có video YouTube — dán link .m3u8 (HLS), mp4, hoặc
+          link Facebook (video/live: facebook.com/…/videos/…, watch/?v=…, /live,
+          fb.watch…). Link Facebook sẽ tự nhúng qua trình phát Facebook. Hiển thị
+          song song với luồng YouTube trên web &amp; app.
         </Alert>
 
         {manualStreams.map((m, idx) => (
@@ -890,8 +892,8 @@ function EventLiveSection() {
                 </IconButton>
               </Stack>
               <TextField
-                label="URL luồng (.m3u8 / mp4)"
-                placeholder="https://.../index.m3u8?sign=..."
+                label="URL luồng (.m3u8 / mp4 / link Facebook)"
+                placeholder="https://.../index.m3u8  hoặc  https://facebook.com/.../videos/..."
                 fullWidth
                 size="small"
                 value={m.url}
