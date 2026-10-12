@@ -3,7 +3,7 @@
 // Mỗi court có 1 phiên (tối đa) — hàng court chọn cam Imou + destination(s)
 // (FB pages + YT + custom RTMP) → Start. Bảng list phiên đang chạy: status,
 // currentMatch, uptime, nút Stop / xem log.
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card, CardContent, Grid, Typography, Chip, Button, IconButton,
@@ -24,6 +24,7 @@ import {
   useListAutoLiveSessionsQuery,
   useStartAutoLiveMutation,
   useStopAutoLiveMutation,
+  useSetOverlayDelayMutation,
   useListTournamentCourtsForAutoLiveQuery,
   useListAdminFbPagesQuery,
   useListAvailableCamsQuery,
@@ -57,6 +58,37 @@ function fmtUptime(startedAt) {
   const m = Math.floor(ms / 60000);
   const h = Math.floor(m / 60);
   return h > 0 ? `${h}h${m % 60}m` : `${m}m`;
+}
+
+// Ô chỉnh ĐỘ TRỄ OVERLAY (giây) RIÊNG cho 1 phiên đang live — tua tỉ số cho khớp độ trễ
+// camera của sân đó. Trống = dùng mặc định chung (.env). Áp khi Enter/rời ô (ăn ngay vì
+// overlay render ở backend). Nhập theo GIÂY cho dễ.
+function OverlayDelayField({ session }) {
+  const [setOverlayDelay, { isLoading }] = useSetOverlayDelayMutation();
+  const serverSec =
+    session?.overlayDelayMs == null ? "" : String(Math.round(Number(session.overlayDelayMs) / 1000));
+  const [val, setVal] = useState(serverSec);
+  useEffect(() => { setVal(serverSec); }, [serverSec]);
+  const apply = async () => {
+    const s = String(val).trim();
+    const ms = s === "" ? null : Math.max(0, Math.min(60, Number(s) || 0)) * 1000;
+    try { await setOverlayDelay({ id: session._id, ms }).unwrap(); } catch { /* bỏ qua */ }
+  };
+  return (
+    <TextField
+      size="small"
+      label="Trễ overlay (s)"
+      type="number"
+      value={val}
+      disabled={isLoading}
+      onChange={(e) => setVal(e.target.value)}
+      onBlur={apply}
+      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); apply(); } }}
+      placeholder="mặc định"
+      inputProps={{ min: 0, max: 60, step: 1, style: { width: 64 } }}
+      sx={{ width: 120 }}
+    />
+  );
 }
 
 export default function AutoLivePage() {
@@ -230,10 +262,13 @@ export default function AutoLivePage() {
                       <TableCell>{running ? fmtUptime(running.startedAt) : "—"}</TableCell>
                       <TableCell align="right">
                         {running ? (
-                          <Button
-                            size="small" variant="outlined" color="error"
-                            startIcon={<StopIcon />} onClick={() => doStop(running._id)}
-                          >Dừng</Button>
+                          <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
+                            <OverlayDelayField session={running} />
+                            <Button
+                              size="small" variant="outlined" color="error"
+                              startIcon={<StopIcon />} onClick={() => doStop(running._id)}
+                            >Dừng</Button>
+                          </Stack>
                         ) : (
                           <Button
                             size="small" variant="contained"

@@ -19,6 +19,11 @@ export const tournamentAutoLiveApiSlice = apiSlice.injectEndpoints({
       query: (id) => ({ url: `/tournament-auto-live/${id}/stop`, method: "POST" }),
       invalidatesTags: ["AutoLive"],
     }),
+    // Chỉnh độ trễ overlay RIÊNG của phiên khi đang live (ms; null = về mặc định chung).
+    setOverlayDelay: builder.mutation({
+      query: ({ id, ms }) => ({ url: `/tournament-auto-live/${id}/overlay-delay`, method: "PATCH", body: { ms } }),
+      invalidatesTags: ["AutoLive"],
+    }),
     // Court + cam Imou cho giải đấu (reuse endpoint từ live-app để lấy court +
     // metadata, backend đã có sẵn cho native-live-app).
     listTournamentCourtsForAutoLive: builder.query({
@@ -73,6 +78,7 @@ export const {
   useListAutoLiveSessionsQuery,
   useStartAutoLiveMutation,
   useStopAutoLiveMutation,
+  useSetOverlayDelayMutation,
   useListTournamentCourtsForAutoLiveQuery,
   useListAdminFbPagesQuery,
   useListAvailableCamsQuery,
