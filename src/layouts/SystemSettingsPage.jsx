@@ -1646,6 +1646,8 @@ export default function SystemSettingsPage() {
     uploads: {
       maxAvatarSizeMB: source.uploads?.maxAvatarSizeMB ?? 5,
       avatarLogoEnabled: !!source.uploads?.avatarLogoEnabled,
+      avatarAiModeration: source.uploads?.avatarAiModeration !== false,
+      avatarMaxPeople: source.uploads?.avatarMaxPeople ?? 5,
     },
     notifications: {
       telegramEnabled: !!source.notifications?.telegramEnabled,
@@ -3056,6 +3058,26 @@ export default function SystemSettingsPage() {
               inputProps={{ min: 1, max: 50 }}
               value={form.uploads?.maxAvatarSizeMB ?? 5}
               onChange={onNumber("uploads.maxAvatarSizeMB", { min: 1, max: 50 })}
+              fullWidth
+            />
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Tooltip title="Khi bật, mỗi lần user đổi ảnh đại diện sẽ được Claude (AI) kiểm duyệt: phải thấy rõ khuôn mặt, không quá nhiều người, không dùng ảnh trẻ con cho tài khoản người lớn, nội dung lành mạnh. Khoan dung — chỉ chặn khi vi phạm rõ ràng; lỗi/không chắc vẫn cho qua.">
+                <Typography>Kiểm duyệt ảnh đại diện bằng AI (Claude)</Typography>
+              </Tooltip>
+              <Switch
+                checked={form.uploads?.avatarAiModeration !== false}
+                onChange={onToggle("uploads.avatarAiModeration")}
+              />
+            </Stack>
+
+            <TextField
+              label="Số người tối đa trong 1 ảnh đại diện"
+              type="number"
+              inputProps={{ min: 1, max: 20 }}
+              value={form.uploads?.avatarMaxPeople ?? 5}
+              onChange={onNumber("uploads.avatarMaxPeople", { min: 1, max: 20 })}
+              helperText="Ảnh có nhiều người hơn mức này sẽ bị từ chối."
               fullWidth
             />
           </Section>
