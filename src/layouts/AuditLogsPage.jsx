@@ -181,6 +181,45 @@ const fmtVal = (v) => {
   }
 };
 
+/* ---- image diff helpers ---- */
+const ASSET_ORIGIN = (() => {
+  try {
+    return new URL(process.env.REACT_APP_API_URL || "").origin;
+  } catch {
+    return "";
+  }
+})();
+
+const IMAGE_EXT_RE = /\.(png|jpe?g|webp|gif|avif|bmp|svg)(\?|#|$)/i;
+const IMAGE_FIELD_RE = /(avatar|cover|cccd|image|photo|banner|logo|poster|thumb)/i;
+
+function resolveAssetUrl(v) {
+  const s = String(v || "").trim();
+  if (!s) return "";
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith("/uploads/")) return ASSET_ORIGIN ? `${ASSET_ORIGIN}${s}` : s;
+  if (s.startsWith("uploads/")) return ASSET_ORIGIN ? `${ASSET_ORIGIN}/${s}` : `/${s}`;
+  return "";
+}
+
+// Lấy danh sách URL ảnh từ giá trị thay đổi (string / array / object)
+function extractImageUrls(field, val) {
+  const fieldIsImage = IMAGE_FIELD_RE.test(String(field || ""));
+  const out = [];
+  const push = (x) => {
+    const u = resolveAssetUrl(x);
+    if (u && (IMAGE_EXT_RE.test(u) || fieldIsImage)) out.push(u);
+  };
+  const walk = (v) => {
+    if (!v) return;
+    if (typeof v === "string") push(v);
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (typeof v === "object") Object.values(v).forEach(walk);
+  };
+  walk(val);
+  return [...new Set(out)];
+}
+
 const getActionIcon = (action) => {
   switch (action) {
     case "UPDATE":
@@ -1280,16 +1319,7 @@ function LogCard({ log }) {
                       >
                         ❌ Trước
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontFamily: "monospace",
-                          wordBreak: "break-word",
-                          color: theme.palette.error.dark,
-                        }}
-                      >
-                        {fmtVal(c.from)}
-                      </Typography>
+                      <DiffValue field={c.field} value={c.from} tone="error" />
                     </Stack>
                   </Grid>
 
@@ -1310,16 +1340,7 @@ function LogCard({ log }) {
                       >
                         ✅ Sau
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontFamily: "monospace",
-                          wordBreak: "break-word",
-                          color: theme.palette.success.dark,
-                        }}
-                      >
-                        {fmtVal(c.to)}
-                      </Typography>
+                      <DiffValue field={c.field} value={c.to} tone="success" />
                     </Stack>
                   </Grid>
                 </Grid>
@@ -1329,5 +1350,81 @@ function LogCard({ log }) {
         </Stack>
       </Collapse>
     </TimelineCard>
+  );
+}
+
+/* ================= Image thumbnail (click mở full) ================= */
+function ImageThumb({ url }) {
+  const theme = useTheme();
+  const [err, setErr] = useState(false);
+
+  if (err) {
+    return (
+      <Box
+        sx={{
+          width: 110,
+          height: 110,
+          borderRadius: 1.5,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          p: 1,
+          bgcolor: alpha(theme.palette.grey[500], 0.08),
+          border: `1px dashed ${alpha(theme.palette.grey[600], 0.4)}`,
+        }}
+      >
+        <Typography variant="caption" color="text.secondary" fontWeight={700}>
+          🖼️ Ảnh không tải được
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <a href={url} target="_blank" rel="noreferrer" title="Mở ảnh gốc">
+      <Box
+        component="img"
+        src={url}
+        alt=""
+        loading="lazy"
+        onError={() => setErr(true)}
+        sx={{
+          width: 110,
+          height: 110,
+          objectFit: "cover",
+          display: "block",
+          borderRadius: 1.5,
+          bgcolor: "white",
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
+          cursor: "zoom-in",
+        }}
+      />
+    </a>
+  );
+}
+
+/* ================= Diff value (ảnh inline + text) ================= */
+function DiffValue({ field, value, tone }) {
+  const theme = useTheme();
+  const color = tone === "error" ? theme.palette.error.dark : theme.palette.success.dark;
+  const imgs = useMemo(() => extractImageUrls(field, value), [field, value]);
+
+  return (
+    <>
+      {imgs.length > 0 && (
+        <Stack direction="row" flexWrap="wrap" useFlexGap rowGap={1} columnGap={1} sx={{ mb: 1 }}>
+          {imgs.map((u) => (
+            <ImageThumb key={u} url={u} />
+          ))}
+        </Stack>
+      )}
+      <Typography
+        variant="body2"
+        sx={{ fontFamily: "monospace", wordBreak: "break-word", color }}
+      >
+        {fmtVal(value)}
+      </Typography>
+    </>
   );
 }
