@@ -55,10 +55,13 @@ const TIERS = ["Platinum", "Gold", "Silver", "Bronze", "Partner", "Media", "Othe
 const ICON_UNCHECK = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const ICON_CHECKED = <CheckBoxIcon fontSize="small" />;
 
-// ⚙️ cấu hình riêng cho logo nhà tài trợ dùng trên live overlay
-const SPONSOR_LOGO_MAX_W = 100;
-const SPONSOR_LOGO_MAX_H = 80;
-const SPONSOR_LOGO_QUALITY = 100;
+// ⚙️ cấu hình logo nhà tài trợ: GIỮ ẢNH CHẤT LƯỢNG CAO lúc upload (không nén nhỏ
+// về 100×80 nữa gây mờ) — việc thu nhỏ để dùng trên live do chính overlay live
+// xử lý (scale theo khung hiển thị). Ở đây chỉ chuyển sang webp + cap kích thước
+// đủ lớn cho mọi độ phân giải live (fit-inside, không phóng to ảnh nhỏ).
+const SPONSOR_LOGO_MAX_W = 1600;
+const SPONSOR_LOGO_MAX_H = 1600;
+const SPONSOR_LOGO_QUALITY = 92;
 
 // Ô logo nhỏ 16:9 cho DataGrid
 function LogoCell({ src }) {
@@ -254,7 +257,7 @@ export default function AdminSponsorsPage() {
     [updateSponsor, toast, refetch]
   );
 
-  // Upload handler – ép logo sponsor nhỏ lại cho overlay (webp 640x360)
+  // Upload handler – giữ ảnh chất lượng cao (webp, cap lớn); live tự thu nhỏ
   const onPickFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -559,8 +562,9 @@ export default function AdminSponsorsPage() {
               {/* Preview 16:9 */}
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  Logo 16:9 (preview) – sẽ được nén về {SPONSOR_LOGO_MAX_W}×{SPONSOR_LOGO_MAX_H}{" "}
-                  WebP để dùng trên live
+                  Logo 16:9 (preview) – lưu ảnh CHẤT LƯỢNG CAO (WebP, tối đa{" "}
+                  {SPONSOR_LOGO_MAX_W}px); phần thu nhỏ để hiển thị do live tự xử lý nên
+                  không bị mờ.
                 </Typography>
                 <Box
                   sx={{
