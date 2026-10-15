@@ -90,6 +90,197 @@ function LogoCell({ src }) {
 }
 LogoCell.propTypes = { src: PropTypes.string };
 
+/* ===== Crop ảnh logo (tự viết, không thêm thư viện) ===== */
+function ImageCropDialog({ open, file, uploading, onCancel, onConfirm }) {
+  const [imgUrl, setImgUrl] = useState("");
+  const [nat, setNat] = useState({ w: 0, h: 0 });
+  const [crop, setCrop] = useState(null); // toạ độ theo pixel GỐC {x,y,w,h}
+  const imgRef = useRef(null);
+  const dragRef = useRef(null);
+  const DISP_W = 560;
+  const DISP_H = 400;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  useEffect(() => {
+    setCrop(null);
+    setNat({ w: 0, h: 0 });
+    if (!file) {
+      setImgUrl("");
+      return undefined;
+    }
+    const url = URL.createObjectURL(file);
+    setImgUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const scale = nat.w && nat.h ? Math.min(DISP_W / nat.w, DISP_H / nat.h, 1) : 1;
+
+  const onImgLoad = (e) => {
+    const w = e.target.naturalWidth || 0;
+    const h = e.target.naturalHeight || 0;
+    setNat({ w, h });
+    const cw = Math.round(w * 0.9);
+    const ch = Math.round(h * 0.9);
+    setCrop({ x: Math.round((w - cw) / 2), y: Math.round((h - ch) / 2), w: cw, h: ch });
+  };
+
+  useEffect(() => {
+    const onMove = (ev) => {
+      const d = dragRef.current;
+      if (!d) return;
+      const dx = (ev.clientX - d.sx) / scale;
+      const dy = (ev.clientY - d.sy) / scale;
+      let { x, y, w, h } = d.c;
+      const MIN = 16;
+      if (d.mode === "move") {
+        x = clamp(x + dx, 0, nat.w - w);
+        y = clamp(y + dy, 0, nat.h - h);
+      } else {
+        if (d.mode.includes("w")) {
+          const nx = clamp(x + dx, 0, x + w - MIN);
+          w += x - nx;
+          x = nx;
+        }
+        if (d.mode.includes("e")) w = clamp(w + dx, MIN, nat.w - x);
+        if (d.mode.includes("n")) {
+          const ny = clamp(y + dy, 0, y + h - MIN);
+          h += y - ny;
+          y = ny;
+        }
+        if (d.mode.includes("s")) h = clamp(h + dy, MIN, nat.h - y);
+      }
+      setCrop({ x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
+    };
+    const onUp = () => {
+      dragRef.current = null;
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+  }, [scale, nat]);
+
+  const startDrag = (mode) => (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (!crop) return;
+    dragRef.current = { mode, sx: ev.clientX, sy: ev.clientY, c: crop };
+  };
+
+  const doCrop = () => {
+    if (!crop || !imgRef.current || !nat.w) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = crop.w;
+    canvas.height = crop.h;
+    const cx = canvas.getContext("2d");
+    cx.drawImage(imgRef.current, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+        const base = String(file?.name || "sponsor").replace(/\.[^.]+$/, "");
+        onConfirm(new File([blob], `${base}-crop.png`, { type: "image/png" }));
+      },
+      "image/png"
+    );
+  };
+
+  const dispW = Math.round(nat.w * scale);
+  const dispH = Math.round(nat.h * scale);
+  const box = crop
+    ? { left: crop.x * scale, top: crop.y * scale, width: crop.w * scale, height: crop.h * scale }
+    : null;
+  const handleSx = {
+    position: "absolute",
+    width: 14,
+    height: 14,
+    bgcolor: "#fff",
+    border: "2px solid #1976d2",
+    borderRadius: "50%",
+    boxSizing: "border-box",
+  };
+
+  return (
+    <Dialog open={open} onClose={onCancel} maxWidth="md">
+      <DialogTitle>Cắt ảnh logo</DialogTitle>
+      <DialogContent>
+        <Typography variant="caption" color="text.secondary">
+          Kéo khung để di chuyển, kéo 4 góc để chỉnh kích thước. Chỉ vùng trong khung được dùng.
+        </Typography>
+        <Box
+          sx={{
+            mt: 1.5,
+            display: "flex",
+            justifyContent: "center",
+            bgcolor: "#111",
+            borderRadius: 1,
+            p: 1,
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
+              width: dispW || 200,
+              height: dispH || 120,
+              touchAction: "none",
+              userSelect: "none",
+            }}
+          >
+            {imgUrl && (
+              <img
+                ref={imgRef}
+                src={imgUrl}
+                onLoad={onImgLoad}
+                draggable={false}
+                alt=""
+                style={{ width: dispW || "auto", height: dispH || "auto", display: "block" }}
+              />
+            )}
+            {box && (
+              <Box
+                onPointerDown={startDrag("move")}
+                sx={{
+                  position: "absolute",
+                  left: box.left,
+                  top: box.top,
+                  width: box.width,
+                  height: box.height,
+                  border: "2px solid #1976d2",
+                  boxShadow: "0 0 0 9999px rgba(0,0,0,0.45)",
+                  cursor: "move",
+                  boxSizing: "border-box",
+                }}
+              >
+                <Box onPointerDown={startDrag("nw")} sx={{ ...handleSx, left: -8, top: -8, cursor: "nwse-resize" }} />
+                <Box onPointerDown={startDrag("ne")} sx={{ ...handleSx, right: -8, top: -8, cursor: "nesw-resize" }} />
+                <Box onPointerDown={startDrag("sw")} sx={{ ...handleSx, left: -8, bottom: -8, cursor: "nesw-resize" }} />
+                <Box onPointerDown={startDrag("se")} sx={{ ...handleSx, right: -8, bottom: -8, cursor: "nwse-resize" }} />
+              </Box>
+            )}
+          </Box>
+        </Box>
+        {crop && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
+            Khung cắt: {crop.w}×{crop.h}px
+          </Typography>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onCancel} disabled={uploading}>
+          Huỷ
+        </Button>
+        <Button onClick={() => onConfirm(file)} disabled={uploading}>
+          Dùng ảnh gốc
+        </Button>
+        <Button variant="contained" onClick={doCrop} disabled={uploading || !crop}>
+          Cắt &amp; dùng
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function AdminSponsorsPage() {
   // ===== Filters & pagination =====
   const [search, setSearch] = useState("");
@@ -152,6 +343,8 @@ export default function AdminSponsorsPage() {
   // Preview
   const [previewUrl, setPreviewUrl] = useState("");
   const fileInputRef = useRef(null);
+  const [cropFile, setCropFile] = useState(null);
+  const [cropOpen, setCropOpen] = useState(false);
   useEffect(() => () => previewUrl && URL.revokeObjectURL(previewUrl), [previewUrl]);
 
   const openCreate = useCallback(() => {
@@ -257,11 +450,18 @@ export default function AdminSponsorsPage() {
     [updateSponsor, toast, refetch]
   );
 
-  // Upload handler – giữ ảnh chất lượng cao (webp, cap lớn); live tự thu nhỏ
-  const onPickFile = async (e) => {
+  // Chọn file → mở hộp CẮT ẢNH trước khi upload (thay vì upload ngay).
+  const onPickFile = (e) => {
     const file = e.target.files?.[0];
+    if (e.target) e.target.value = ""; // cho phép chọn lại cùng 1 file
     if (!file) return;
+    setCropFile(file);
+    setCropOpen(true);
+  };
 
+  // Upload 1 file logo – giữ ảnh chất lượng cao (webp, cap lớn); live tự thu nhỏ.
+  const uploadLogoFile = async (file) => {
+    if (!file) return;
     const blobUrl = URL.createObjectURL(file);
     setPreviewUrl(blobUrl);
 
@@ -759,6 +959,21 @@ export default function AdminSponsorsPage() {
             {snack.message}
           </Alert>
         </Snackbar>
+
+        <ImageCropDialog
+          open={cropOpen}
+          file={cropFile}
+          uploading={uploading}
+          onCancel={() => {
+            setCropOpen(false);
+            setCropFile(null);
+          }}
+          onConfirm={(f) => {
+            setCropOpen(false);
+            setCropFile(null);
+            uploadLogoFile(f);
+          }}
+        />
       </Box>
     </DashboardLayout>
   );
