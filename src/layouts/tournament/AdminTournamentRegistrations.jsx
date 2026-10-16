@@ -59,6 +59,8 @@ import {
 } from "slices/tournamentsApiSlice";
 import { useGetUsersQuery } from "slices/adminApiSlice";
 import RosterImportDialog from "./RosterImportDialog";
+import ABPairDrawDialog from "./ABPairDrawDialog";
+import CasinoIcon from "@mui/icons-material/Casino";
 import { getTournamentNameDisplayMode, getTournamentPlayerName } from "utils/tournamentName";
 
 const PLACE = "";
@@ -139,6 +141,7 @@ export default function AdminTournamentRegistrations() {
   const eventType = normType(tournament?.eventType);
   const isSingles = eventType === "single";
   const [importOpen, setImportOpen] = useState(false);
+  const [abOpen, setAbOpen] = useState(false);
   const displayMode = getTournamentNameDisplayMode(tournament);
   const isFreeTournament = tournament?.isFreeRegistration === true;
 
@@ -802,6 +805,15 @@ export default function AdminTournamentRegistrations() {
           >
             AI Import
           </Button>
+          {!isSingles && (
+            <Button
+              variant="outlined"
+              startIcon={<CasinoIcon />}
+              onClick={() => setAbOpen(true)}
+            >
+              Bốc thăm A–B
+            </Button>
+          )}
         </Stack>
         {tournament ? (
           <Typography variant="caption" color="text.secondary" fontSize={16}>
@@ -1081,6 +1093,13 @@ export default function AdminTournamentRegistrations() {
         onClose={() => setImportOpen(false)}
         tournamentId={id}
         eventType={eventType}
+      />
+
+      <ABPairDrawDialog
+        open={abOpen}
+        onClose={() => setAbOpen(false)}
+        tournamentId={id}
+        onDone={() => refetch()}
       />
     </DashboardLayout>
   );
