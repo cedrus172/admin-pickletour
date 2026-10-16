@@ -2,7 +2,7 @@
 // Bốc thăm ghép cặp theo trình A–B: nhập 2 danh sách (trình A, trình B), xáo &
 // ghép A↔B thành các cặp (10A+10B -> 10 cặp). Lệch số -> cặp dư để chờ. Tạo cặp
 // tái dùng endpoint roster-import (tạo VĐV khách + dedup tài khoản theo SĐT).
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -22,9 +22,69 @@ import {
   TableHead,
   TableRow,
   Chip,
+  Autocomplete,
 } from "@mui/material";
 import CasinoIcon from "@mui/icons-material/Casino";
 import { useImportRosterMutation } from "slices/tournamentsApiSlice";
+import { useLazySearchUsersQuery } from "slices/adminUsersApiSlice";
+
+const lineFrom = (p) =>
+  [p?.name, p?.phone, p?.score].filter((x) => String(x || "").trim()).join(", ");
+
+function AccountSearchAdd({ label, onAdd }) {
+  const [input, setInput] = useState("");
+  const [options, setOptions] = useState([]);
+  const [trigger, { isFetching }] = useLazySearchUsersQuery();
+  const timer = useRef(null);
+  const onType = (v) => {
+    setInput(v);
+    clearTimeout(timer.current);
+    if (!v || !v.trim()) {
+      setOptions([]);
+      return;
+    }
+    timer.current = setTimeout(async () => {
+      try {
+        const r = await trigger({ q: v.trim(), limit: 10 }).unwrap();
+        setOptions(Array.isArray(r) ? r : r?.items || []);
+      } catch {
+        setOptions([]);
+      }
+    }, 300);
+  };
+  return (
+    <Autocomplete
+      size="small"
+      options={options}
+      loading={isFetching}
+      inputValue={input}
+      onInputChange={(e, v, reason) => {
+        if (reason !== "reset") onType(v);
+      }}
+      getOptionLabel={(o) =>
+        o?.nickName || o?.nickname || o?.name
+          ? `${o.nickName || o.nickname || o.name}${o.phone ? " · " + o.phone : ""}`
+          : ""
+      }
+      filterOptions={(x) => x}
+      isOptionEqualToValue={(o, v) => o?._id === v?._id}
+      onChange={(e, val) => {
+        if (!val) return;
+        onAdd({
+          name: val.nickName || val.nickname || val.name || "",
+          phone: val.phone || "",
+          score: val.double ?? val.single ?? "",
+        });
+        setInput("");
+        setOptions([]);
+      }}
+      renderInput={(params) => (
+        <TextField {...params} label={label} placeholder="Tìm tên / SĐT…" />
+      )}
+      sx={{ mb: 1 }}
+    />
+  );
+}
 
 // 1 VĐV / dòng: "Tên, SĐT, Điểm" (phân tách bởi dấu phẩy hoặc tab). Chỉ Tên là bắt buộc.
 function parseList(text) {
@@ -114,24 +174,36 @@ export default function ABPairDrawDialog({ open, onClose, tournamentId, onDone }
           1 VĐV trình B thành 1 cặp.
         </Typography>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-          <TextField
-            label={`Trình A (${aList.length})`}
-            value={aText}
-            onChange={(e) => setAText(e.target.value)}
-            multiline
-            minRows={8}
-            fullWidth
-            placeholder={"Nguyễn Văn A, 0901234567, 3.5\nTrần B\n..."}
-          />
-          <TextField
-            label={`Trình B (${bList.length})`}
-            value={bText}
-            onChange={(e) => setBText(e.target.value)}
-            multiline
-            minRows={8}
-            fullWidth
-            placeholder={"Lê Văn C\nPhạm D, 0987654321\n..."}
-          />
+          <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+            <AccountSearchAdd
+              label="＋ Thêm tài khoản vào trình A"
+              onAdd={(p) => setAText((t) => (t ? t.replace(/\s*$/, "") + "\n" : "") + lineFrom(p))}
+            />
+            <TextField
+              label={`Trình A (${aList.length})`}
+              value={aText}
+              onChange={(e) => setAText(e.target.value)}
+              multiline
+              minRows={8}
+              fullWidth
+              placeholder={"Nguyễn Văn A, 0901234567, 3.5\nTrần B\n..."}
+            />
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+            <AccountSearchAdd
+              label="＋ Thêm tài khoản vào trình B"
+              onAdd={(p) => setBText((t) => (t ? t.replace(/\s*$/, "") + "\n" : "") + lineFrom(p))}
+            />
+            <TextField
+              label={`Trình B (${bList.length})`}
+              value={bText}
+              onChange={(e) => setBText(e.target.value)}
+              multiline
+              minRows={8}
+              fullWidth
+              placeholder={"Lê Văn C\nPhạm D, 0987654321\n..."}
+            />
+          </Box>
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 1.5 }}>
