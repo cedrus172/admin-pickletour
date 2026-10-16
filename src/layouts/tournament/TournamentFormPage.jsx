@@ -495,6 +495,7 @@ export default function TournamentFormPage() {
     sportType: 1,
     groupId: 0,
     eventType: "double",
+    abPairDraw: false,
     tournamentMode: "standard",
     teamFactions: normalizeTeamFactionsForForm(),
     nameDisplayMode: "nickname",
@@ -740,6 +741,7 @@ export default function TournamentFormPage() {
       sportType: 1,
       groupId: Number(tour.groupId ?? 0),
       eventType: tour.eventType || "double",
+      abPairDraw: !!tour.abPairDraw,
       tournamentMode: (() => {
         const m = String(tour.tournamentMode || "").toLowerCase();
         if (m === "team") return "team";
@@ -880,6 +882,7 @@ export default function TournamentFormPage() {
       sportType: 1,
       groupId: Number(form.groupId) || 0,
       eventType: form.eventType,
+      abPairDraw: form.eventType === "double" ? !!form.abPairDraw : false,
       tournamentMode: ["team", "mlp"].includes(form.tournamentMode)
         ? form.tournamentMode
         : "standard",
@@ -1305,6 +1308,20 @@ export default function TournamentFormPage() {
                     <MenuItem value="single">Đơn</MenuItem>
                     <MenuItem value="double">Đôi</MenuItem>
                   </TextField>
+                  {form.eventType === "double" && (
+                    <FormControlLabel
+                      sx={{ mt: 0.5 }}
+                      control={
+                        <Switch
+                          checked={!!form.abPairDraw}
+                          onChange={(e) =>
+                            setForm((prev) => ({ ...prev, abPairDraw: e.target.checked }))
+                          }
+                        />
+                      }
+                      label="Ghép trình A–B (bốc thăm) — nhập 2 DS A/B rồi bốc thăm ghép cặp"
+                    />
+                  )}
                   <TextField
                     name="tournamentMode"
                     label="Kiểu giải"
