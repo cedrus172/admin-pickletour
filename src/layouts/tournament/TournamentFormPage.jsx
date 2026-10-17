@@ -496,6 +496,7 @@ export default function TournamentFormPage() {
     groupId: 0,
     eventType: "double",
     abPairDraw: false,
+    tiebreakByDraw: false,
     tournamentMode: "standard",
     teamFactions: normalizeTeamFactionsForForm(),
     nameDisplayMode: "nickname",
@@ -742,6 +743,7 @@ export default function TournamentFormPage() {
       groupId: Number(tour.groupId ?? 0),
       eventType: tour.eventType || "double",
       abPairDraw: !!tour.abPairDraw,
+      tiebreakByDraw: !!tour.tiebreakByDraw,
       tournamentMode: (() => {
         const m = String(tour.tournamentMode || "").toLowerCase();
         if (m === "team") return "team";
@@ -883,6 +885,7 @@ export default function TournamentFormPage() {
       groupId: Number(form.groupId) || 0,
       eventType: form.eventType,
       abPairDraw: form.eventType === "double" ? !!form.abPairDraw : false,
+      tiebreakByDraw: !!form.tiebreakByDraw,
       tournamentMode: ["team", "mlp"].includes(form.tournamentMode)
         ? form.tournamentMode
         : "standard",
@@ -1322,6 +1325,21 @@ export default function TournamentFormPage() {
                       label="Ghép trình A–B (bốc thăm) — nhập 2 DS A/B rồi bốc thăm ghép cặp"
                     />
                   )}
+                  <FormControlLabel
+                    sx={{ mt: 0.5 }}
+                    control={
+                      <Switch
+                        checked={!!form.tiebreakByDraw}
+                        onChange={(e) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            tiebreakByDraw: e.target.checked,
+                          }))
+                        }
+                      />
+                    }
+                    label="Vòng bảng: bằng điểm thì BỐC THĂM phân hạng (thay vì xét hệ số)"
+                  />
                   <TextField
                     name="tournamentMode"
                     label="Kiểu giải"
