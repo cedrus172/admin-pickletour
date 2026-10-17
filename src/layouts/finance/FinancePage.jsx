@@ -88,6 +88,7 @@ export default function FinancePage() {
     amount: "",
     category: "",
     tournamentName: "",
+    person: "",
     occurredAt: todayStr(),
     note: "",
   });
@@ -105,11 +106,12 @@ export default function FinancePage() {
         amount: amt,
         category: form.category.trim(),
         tournamentName: form.tournamentName.trim(),
+        person: form.person.trim(),
         occurredAt: form.occurredAt,
         note: form.note.trim(),
       }).unwrap();
       toast.success("Đã thêm bút toán");
-      setForm((s) => ({ ...s, amount: "", note: "" }));
+      setForm((s) => ({ ...s, amount: "", note: "", person: "" }));
     } catch (err) {
       toast.error(err?.data?.message || "Thêm thất bại");
     }
@@ -286,6 +288,16 @@ export default function FinancePage() {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <TextField
+                    label={form.type === "revenue" ? "Người thu" : "Người chi"}
+                    size="small"
+                    fullWidth
+                    placeholder="Tên người thu/chi"
+                    value={form.person}
+                    onChange={setF("person")}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
                     label="Ngày"
                     type="date"
                     size="small"
@@ -337,6 +349,7 @@ export default function FinancePage() {
                       <TableCell>Loại</TableCell>
                       <TableCell align="right">Số tiền</TableCell>
                       <TableCell>Hạng mục</TableCell>
+                      <TableCell>Người thu/chi</TableCell>
                       <TableCell>Giải / Ghi chú</TableCell>
                       <TableCell />
                     </TableRow>
@@ -371,6 +384,7 @@ export default function FinancePage() {
                           {fmtVND(it.amount)}
                         </TableCell>
                         <TableCell>{it.category || "—"}</TableCell>
+                        <TableCell>{it.person || "—"}</TableCell>
                         <TableCell>
                           <Typography variant="body2" fontWeight={600} noWrap>
                             {it.tournamentName || "(Chung)"}
@@ -390,7 +404,7 @@ export default function FinancePage() {
                     ))}
                     {(!list?.items || list.items.length === 0) && (
                       <TableRow>
-                        <TableCell colSpan={6} align="center" sx={{ py: 3, color: "text.secondary" }}>
+                        <TableCell colSpan={7} align="center" sx={{ py: 3, color: "text.secondary" }}>
                           Chưa có bút toán nào.
                         </TableCell>
                       </TableRow>
