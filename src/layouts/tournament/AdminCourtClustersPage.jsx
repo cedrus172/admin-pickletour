@@ -12,6 +12,7 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  IconButton,
   MenuItem,
   Paper,
   Stack,
@@ -24,6 +25,9 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import DragIndicatorRoundedIcon from "@mui/icons-material/DragIndicatorRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import SaveRoundedIcon from "@mui/icons-material/SaveRounded";
+import QrCode2RoundedIcon from "@mui/icons-material/QrCode2Rounded";
+import QrSvg from "components/QrSvg";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -48,6 +52,10 @@ import {
   useListCourtClustersQuery,
   useUpdateCourtClusterMutation,
   useUpdateCourtStationMutation,
+  useListClusterRefereesQuery,
+  useAddClusterRefereeMutation,
+  useRemoveClusterRefereeMutation,
+  useLazyGetClusterRefereeQrQuery,
 } from "slices/courtClustersApiSlice";
 
 const EMPTY_CLUSTER = {
@@ -193,6 +201,17 @@ function AdminCourtClustersPage() {
   const [assignMatchToCourtStation, { isLoading: isAssigningStation }] =
     useAssignMatchToCourtStationMutation();
   const [freeCourtStation, { isLoading: isFreeingStation }] = useFreeCourtStationMutation();
+
+  const [refereePhone, setRefereePhone] = useState("");
+  const [refereeQrDialog, setRefereeQrDialog] = useState({ open: false, data: null });
+  const { data: clusterReferees = [], isFetching: isRefereesFetching } = useListClusterRefereesQuery(
+    selectedClusterId,
+    { skip: !selectedClusterId }
+  );
+  const [addClusterReferee, { isLoading: isAddingReferee }] = useAddClusterRefereeMutation();
+  const [removeClusterReferee, { isLoading: isRemovingReferee }] =
+    useRemoveClusterRefereeMutation();
+  const [fetchClusterRefereeQr, { isFetching: isQrFetching }] = useLazyGetClusterRefereeQrQuery();
 
   const selectedCluster = useMemo(
     () =>
@@ -521,6 +540,53 @@ function AdminCourtClustersPage() {
     }
   };
 
+  const handleAddReferee = async () => {
+    if (!selectedClusterId) return;
+    const phone = refereePhone.trim();
+    if (!phone) {
+      toast.error("Hãy nhập số điện thoại trọng tài.");
+      return;
+    }
+    try {
+      await addClusterReferee({ clusterId: selectedClusterId, phone }).unwrap();
+      setRefereePhone("");
+      toast.success("Đã thêm trọng tài cụm sân.");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message || "Thêm trọng tài thất bại.");
+    }
+  };
+
+  const handleRemoveReferee = async (userId) => {
+    if (!selectedClusterId || !userId) return;
+    try {
+      await removeClusterReferee({ clusterId: selectedClusterId, userId }).unwrap();
+      toast.success("Đã xóa trọng tài khỏi cụm sân.");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message || "Xóa trọng tài thất bại.");
+    }
+  };
+
+  const openRefereeQr = async () => {
+    if (!selectedClusterId) return;
+    try {
+      const data = await fetchClusterRefereeQr(selectedClusterId).unwrap();
+      setRefereeQrDialog({ open: true, data });
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message || "Lấy mã QR trọng tài thất bại.");
+    }
+  };
+
+  const closeRefereeQr = () => setRefereeQrDialog({ open: false, data: null });
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text || "");
+      toast.success("Đã sao chép.");
+    } catch (error) {
+      toast.error("Không sao chép được.");
+    }
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -821,6 +887,111 @@ function AdminCourtClustersPage() {
                   </Stack>
                 ) : (
                   <Alert severity="info">Chưa có giải nào map vào cụm sân này.</Alert>
+                )}
+              </Card>
+
+              <Card sx={{ p: 3, borderRadius: 3 }}>
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  justifyContent="space-between"
+                  alignItems={{ xs: "flex-start", md: "center" }}
+                  spacing={2}
+                  mb={2}
+                >
+                  <Box>
+                    <Typography variant="h6" fontWeight={700}>
+                      Trọng tài cụm sân
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Trọng tài được thêm ở đây có thể chấm mọi sân trong cụm.
+                    </Typography>
+                  </Box>
+                  <Button
+                    variant="outlined"
+                    startIcon={<QrCode2RoundedIcon />}
+                    onClick={openRefereeQr}
+                    disabled={!selectedClusterId || isQrFetching}
+                  >
+                    Mã QR trọng tài cụm
+                  </Button>
+                </Stack>
+
+                {selectedCluster ? (
+                  <Stack spacing={2}>
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1.5}
+                      alignItems={{ xs: "stretch", sm: "flex-start" }}
+                    >
+                      <TextField
+                        label="Số điện thoại trọng tài"
+                        fullWidth
+                        value={refereePhone}
+                        onChange={(e) => setRefereePhone(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddReferee();
+                        }}
+                      />
+                      <Button
+                        variant="contained"
+                        startIcon={<AddRoundedIcon />}
+                        onClick={handleAddReferee}
+                        disabled={isAddingReferee}
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
+                        Thêm
+                      </Button>
+                    </Stack>
+
+                    {clusterReferees.length ? (
+                      <Stack spacing={1}>
+                        {clusterReferees.map((referee) => (
+                          <Paper
+                            key={sid(referee?._id)}
+                            variant="outlined"
+                            sx={{ p: 1.5, borderRadius: 2 }}
+                          >
+                            <Stack
+                              direction="row"
+                              justifyContent="space-between"
+                              alignItems="center"
+                              spacing={1.5}
+                            >
+                              <Box>
+                                <Typography variant="body2" fontWeight={700}>
+                                  {referee?.name ||
+                                    referee?.fullName ||
+                                    referee?.nickname ||
+                                    "Trọng tài"}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {[referee?.nickname, referee?.phone || referee?.email]
+                                    .filter(Boolean)
+                                    .join(" · ") || "Chưa có thông tin liên hệ"}
+                                </Typography>
+                              </Box>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => handleRemoveReferee(sid(referee?._id))}
+                                disabled={isRemovingReferee}
+                              >
+                                <CloseRoundedIcon fontSize="small" />
+                              </IconButton>
+                            </Stack>
+                          </Paper>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Alert severity="info">
+                        {isRefereesFetching
+                          ? "Đang tải danh sách trọng tài..."
+                          : "Cụm này chưa có trọng tài nào."}
+                      </Alert>
+                    )}
+                  </Stack>
+                ) : (
+                  <Alert severity="info">Hãy chọn một cụm sân ở cột bên trái.</Alert>
                 )}
               </Card>
 
@@ -1172,6 +1343,65 @@ function AdminCourtClustersPage() {
           </Grid>
         </Grid>
       </Box>
+
+      <Dialog open={refereeQrDialog.open} onClose={closeRefereeQr} maxWidth="sm" fullWidth>
+        <DialogTitle>Mã QR trọng tài cụm sân</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} mt={1}>
+            <Box>
+              <Typography variant="subtitle1" fontWeight={700}>
+                {refereeQrDialog.data?.clusterName || selectedCluster?.name || "Cụm sân"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {refereeQrDialog.data?.venueName || selectedCluster?.venueName || "Chưa có địa điểm"}
+              </Typography>
+            </Box>
+            {refereeQrDialog.data?.qrPayload ? (
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+                <Box sx={{ p: 1, bgcolor: "#fff", borderRadius: 2 }}>
+                  <QrSvg value={refereeQrDialog.data.qrPayload} size={200} />
+                </Box>
+                <Typography variant="caption" color="text.secondary" textAlign="center">
+                  Trọng tài mở app PickleTour → &quot;Quét QR trọng tài&quot; → quét mã này để
+                  được chấm mọi sân/trận trong cụm.
+                </Typography>
+              </Box>
+            ) : null}
+            <TextField
+              label="Liên kết tham gia (joinUrl)"
+              value={refereeQrDialog.data?.joinUrl || ""}
+              fullWidth
+              multiline
+              InputProps={{ readOnly: true }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => copyToClipboard(refereeQrDialog.data?.joinUrl)}
+              sx={{ alignSelf: "flex-start" }}
+            >
+              Sao chép liên kết
+            </Button>
+            <TextField
+              label="Chuỗi QR (qrPayload)"
+              value={refereeQrDialog.data?.qrPayload || ""}
+              fullWidth
+              InputProps={{ readOnly: true }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => copyToClipboard(refereeQrDialog.data?.qrPayload)}
+              sx={{ alignSelf: "flex-start" }}
+            >
+              Sao chép chuỗi QR
+            </Button>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={closeRefereeQr}>Đóng</Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={confirmDialog.open} onClose={closeConfirmDialog} maxWidth="sm" fullWidth>
         <DialogTitle>{confirmDialog.title}</DialogTitle>

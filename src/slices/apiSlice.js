@@ -99,6 +99,7 @@ export const apiSlice = createApi({
     "CourtCluster",
     "CourtStation",
     "CourtClusterRuntime",
+    "ClusterReferee",
     "CourtFreeManager",
     "SelfAssessment",
     "AssessmentHistory",

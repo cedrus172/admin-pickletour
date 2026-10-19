@@ -793,15 +793,9 @@ export default function TournamentFormPage() {
       ageMin: Number.isFinite(ageMin) ? ageMin : 0,
       ageMax: Number.isFinite(ageMax) ? ageMax : 100,
       allowedCourtClusterIds: Array.isArray(tour.allowedCourtClusters)
-        ? tour.allowedCourtClusters
-            .map((cluster) => toEntityId(cluster))
-            .filter(Boolean)
-            .slice(0, 1)
+        ? tour.allowedCourtClusters.map((cluster) => toEntityId(cluster)).filter(Boolean)
         : Array.isArray(tour.allowedCourtClusterIds)
-        ? tour.allowedCourtClusterIds
-            .map((cluster) => toEntityId(cluster))
-            .filter(Boolean)
-            .slice(0, 1)
+        ? tour.allowedCourtClusterIds.map((cluster) => toEntityId(cluster)).filter(Boolean)
         : [],
     };
     setForm(nextForm);
@@ -1462,16 +1456,19 @@ export default function TournamentFormPage() {
                     </Stack>
                   ) : null}
                   <Autocomplete
+                    multiple
                     options={courtClusters}
-                    value={
-                      courtClusters.find(
-                        (cluster) => toEntityId(cluster) === String(form.allowedCourtClusterIds?.[0] || "")
-                      ) || null
-                    }
+                    value={courtClusters.filter((cluster) =>
+                      (form.allowedCourtClusterIds || []).some(
+                        (id) => toEntityId(cluster) === String(id || "")
+                      )
+                    )}
                     onChange={(_, value) =>
                       setForm((prev) => ({
                         ...prev,
-                        allowedCourtClusterIds: value ? [toEntityId(value)].filter(Boolean) : [],
+                        allowedCourtClusterIds: (value || [])
+                          .map((cluster) => toEntityId(cluster))
+                          .filter(Boolean),
                       }))
                     }
                     getOptionLabel={(option) =>

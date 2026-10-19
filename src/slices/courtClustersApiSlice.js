@@ -127,6 +127,40 @@ export const courtClustersApiSlice = apiSlice.injectEndpoints({
       query: (stationId) => `/admin/court-stations/${stationId}/current-match`,
       providesTags: (result, error, stationId) => [{ type: "CourtStation", id: stationId }],
     }),
+
+    listClusterReferees: builder.query({
+      query: (clusterId) => `/admin/court-clusters/${clusterId}/referees`,
+      transformResponse: (res) => res?.items || [],
+      providesTags: (result = [], error, clusterId) => [
+        ...result.map((item) => ({ type: "ClusterReferee", id: item._id })),
+        { type: "ClusterReferee", id: `LIST:${clusterId}` },
+      ],
+    }),
+
+    addClusterReferee: builder.mutation({
+      query: ({ clusterId, userId, phone }) => ({
+        url: `/admin/court-clusters/${clusterId}/referees`,
+        method: "POST",
+        body: userId ? { userId } : { phone },
+      }),
+      invalidatesTags: (result, error, { clusterId }) => [
+        { type: "ClusterReferee", id: `LIST:${clusterId}` },
+      ],
+    }),
+
+    removeClusterReferee: builder.mutation({
+      query: ({ clusterId, userId }) => ({
+        url: `/admin/court-clusters/${clusterId}/referees/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { clusterId }) => [
+        { type: "ClusterReferee", id: `LIST:${clusterId}` },
+      ],
+    }),
+
+    getClusterRefereeQr: builder.query({
+      query: (clusterId) => `/admin/court-clusters/${clusterId}/referee-qr`,
+    }),
   }),
   overrideExisting: true,
 });
@@ -144,4 +178,8 @@ export const {
   useAssignMatchToCourtStationMutation,
   useFreeCourtStationMutation,
   useGetCourtStationCurrentMatchQuery,
+  useListClusterRefereesQuery,
+  useAddClusterRefereeMutation,
+  useRemoveClusterRefereeMutation,
+  useLazyGetClusterRefereeQrQuery,
 } = courtClustersApiSlice;
