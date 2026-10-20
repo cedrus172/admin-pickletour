@@ -917,7 +917,6 @@ export default function TournamentFormPage() {
         ? form.allowedCourtClusterIds
             .map((value) => toEntityId(value))
             .filter(Boolean)
-            .slice(0, 1)
         : [],
 
       requireKyc: !!form.requireKyc,
