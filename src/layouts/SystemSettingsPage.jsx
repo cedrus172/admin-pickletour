@@ -817,13 +817,14 @@ function EventLiveSection() {
         />
         <TextField
           label="Lọc tên sân ở tab Xem lại"
-          placeholder="VD: Riverside"
+          placeholder="VD: Riverside, Tân Dân Phú"
           fullWidth
           value={replayTitleFilter}
           onChange={(e) => setReplayTitleFilter(e.target.value)}
           helperText={
-            'Chỉ hiện video XEM LẠI có tiêu đề/tên sân chứa chuỗi này (không phân biệt ' +
-            'hoa thường). Rỗng = hiện tất cả. VD nhập "Riverside" → chỉ hiện các trận có "Riverside".'
+            'Chỉ hiện video XEM LẠI có tiêu đề/tên sân chứa từ khoá (không phân biệt hoa thường). ' +
+            'Nhập NHIỀU từ khoá ngăn bằng dấu phẩy — chứa bất kỳ từ nào là hiện. Rỗng = hiện tất cả. ' +
+            'VD "Riverside, Tân Dân Phú" → hiện các trận có "Riverside" hoặc "Tân Dân Phú".'
           }
         />
         <TextField
@@ -1002,8 +1003,8 @@ function EventLiveSection() {
               />
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
                 <TextField
-                  label="Lọc tên sân (Xem lại)"
-                  placeholder="VD: Riverside"
+                  label="Lọc tên sân (Xem lại) — nhiều từ, ngăn bằng dấu phẩy"
+                  placeholder="VD: Riverside, Tân Dân Phú"
                   size="small"
                   fullWidth
                   value={x.replayTitleFilter}
