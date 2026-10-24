@@ -86,6 +86,7 @@ import DriveVideoManagerPage from "layouts/DriveVideoManagerPage";
 import FbVodDriveMonitorPage from "layouts/FbVodDriveMonitorPage";
 import FbTokensPage from "layouts/FbTokensPage";
 import FbBootTokensPage from "layouts/FbBootTokensPage";
+import FbToYoutubePage from "layouts/FbToYoutubePage";
 import FbLiveTestPage from "layouts/FbLiveTestPage";
 import YtLiveTestPage from "layouts/YtLiveTestPage";
 import NewsAdminPage from "layouts/NewsAdminPage";
@@ -958,6 +959,18 @@ const routes = [
     icon: <Icon fontSize="small">key</Icon>,
     route: "/admin/fb-boot-tokens",
     component: <FbBootTokensPage />,
+    private: true,
+    roles: ["admin"],
+    requireAdminAndSuperAdmin: true,
+    show: true,
+  },
+  {
+    type: "collapse",
+    name: "FB VOD → YouTube",
+    key: "fb-to-youtube",
+    icon: <Icon fontSize="small">smart_display</Icon>,
+    route: "/admin/fb-to-youtube",
+    component: <FbToYoutubePage />,
     private: true,
     roles: ["admin"],
     requireAdminAndSuperAdmin: true,
