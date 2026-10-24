@@ -60,6 +60,11 @@ export const tournamentAutoLiveApiSlice = apiSlice.injectEndpoints({
     deleteRtspSource: builder.mutation({
       query: (id) => ({ url: `/tournament-auto-live/rtsp-sources/${id}`, method: "DELETE" }),
     }),
+    // Danh sách sân của giải KÈM tên cụm (clusterName) — để gán sân cho luồng live.
+    getTournamentCourtsForLive: builder.query({
+      query: (tid) => `/tournament-auto-live/tournaments/${tid}/courts`,
+      keepUnusedDataFor: 30,
+    }),
     // Clip từng trận (recording auto-live) — giám sát trạng thái + link Drive.
     listAutoLiveClips: builder.query({
       query: ({ tournamentId, sessionId, status } = {}) => {
@@ -80,6 +85,7 @@ export const {
   useStopAutoLiveMutation,
   useSetOverlayDelayMutation,
   useListTournamentCourtsForAutoLiveQuery,
+  useGetTournamentCourtsForLiveQuery,
   useListAdminFbPagesQuery,
   useListAvailableCamsQuery,
   useGetAutoLiveStatsQuery,

@@ -9,6 +9,7 @@ import {
   Divider,
   Fab,
   IconButton,
+  ListSubheader,
   MenuItem,
   Paper,
   Skeleton,
@@ -24,6 +25,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useGetLiveRecordingAiCommentaryMonitorQuery } from "slices/liveApiSlice";
 import { useGlobalBroadcastMutation } from "slices/adminNotifyApi";
+import { useGetTournamentCourtsForLiveQuery } from "slices/tournamentAutoLiveApiSlice";
 import {
   useDisconnectRecordingDriveMutation,
   useGetOverlayGeneratorKeyStatusQuery,
@@ -567,6 +569,27 @@ function EventLiveSection() {
   const [autoNotifyCooldownMinutes, setAutoNotifyCooldownMinutes] = useState(180);
   const [manualStreams, setManualStreams] = useState([]);
   const [replayTitleFilter, setReplayTitleFilter] = useState("");
+  // Sân của giải (để gán luồng thủ công theo sân → tự lấy tên trận + tỉ số).
+  const { data: courtsForLive } = useGetTournamentCourtsForLiveQuery(
+    (tournamentId || "").trim(),
+    { skip: !(tournamentId || "").trim() },
+  );
+  const courtGroups = React.useMemo(() => {
+    const list = Array.isArray(courtsForLive) ? courtsForLive : [];
+    const map = new Map();
+    for (const c of list) {
+      const cl = c.clusterName || "Khác";
+      if (!map.has(cl)) map.set(cl, []);
+      map.get(cl).push(c);
+    }
+    return [...map.entries()];
+  }, [courtsForLive]);
+  const courtLabelById = React.useMemo(() => {
+    const m = {};
+    for (const [cl, arr] of courtGroups)
+      for (const c of arr) m[String(c._id)] = `${cl} - Sân ${c.name}`;
+    return m;
+  }, [courtGroups]);
   const [slug, setSlug] = useState("");
   const [pinnedToHome, setPinnedToHome] = useState(true);
   // Nhiều giải song song (events[])
@@ -592,6 +615,7 @@ function EventLiveSection() {
             url: m.url || "",
             title: m.title || "",
             courtLabel: m.courtLabel || "",
+            courtStationId: m.courtStationId || "",
             angleLabel: m.angleLabel || "",
             kind: m.kind === "replay" ? "replay" : "live",
             thumbnail: m.thumbnail || "",
@@ -650,7 +674,7 @@ function EventLiveSection() {
   const addManualStream = () =>
     setManualStreams((prev) => [
       ...prev,
-      { url: "", title: "", courtLabel: "", angleLabel: "Toàn cảnh", kind: "live", thumbnail: "", enabled: true },
+      { url: "", title: "", courtLabel: "", courtStationId: "", angleLabel: "Toàn cảnh", kind: "live", thumbnail: "", enabled: true },
     ]);
   const updateManualStream = (idx, patch) =>
     setManualStreams((prev) => prev.map((m, i) => (i === idx ? { ...m, ...patch } : m)));
@@ -677,6 +701,7 @@ function EventLiveSection() {
             url: (m.url || "").trim(),
             title: (m.title || "").trim(),
             courtLabel: (m.courtLabel || "").trim(),
+            courtStationId: (m.courtStationId || "").trim(),
             angleLabel: (m.angleLabel || "").trim(),
             kind: m.kind === "replay" ? "replay" : "live",
             thumbnail: (m.thumbnail || "").trim(),
@@ -900,6 +925,34 @@ function EventLiveSection() {
                 value={m.url}
                 onChange={(e) => updateManualStream(idx, { url: e.target.value })}
               />
+              {courtGroups.length > 0 && (
+                <TextField
+                  select
+                  label="Gán sân theo giải (tự lấy tên trận + tỉ số)"
+                  size="small"
+                  fullWidth
+                  value={m.courtStationId || ""}
+                  onChange={(e) => {
+                    const cid = e.target.value;
+                    updateManualStream(idx, {
+                      courtStationId: cid,
+                      courtLabel: cid ? courtLabelById[cid] || m.courtLabel : m.courtLabel,
+                    });
+                  }}
+                  helperText="Chọn sân của giải để tự hiện tên trận + tỉ số đúng sân (hết đụng số sân giữa 2 cụm). Bỏ trống = nhập tên sân thủ công."
+                >
+                  <MenuItem value="">(Không gán — nhập tên sân thủ công)</MenuItem>
+                  {courtGroups.flatMap(([cl, arr]) => [
+                    <ListSubheader key={`h-${cl}`}>{cl}</ListSubheader>,
+                    ...arr.map((c) => (
+                      <MenuItem key={c._id} value={String(c._id)} sx={{ pl: 3 }}>
+                        {cl} · Sân {c.name}
+                        {c.hasMatch ? " · (đang có trận)" : ""}
+                      </MenuItem>
+                    )),
+                  ])}
+                </TextField>
+              )}
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
                 <TextField
                   label="Tên sân"
@@ -907,7 +960,13 @@ function EventLiveSection() {
                   size="small"
                   fullWidth
                   value={m.courtLabel}
-                  onChange={(e) => updateManualStream(idx, { courtLabel: e.target.value })}
+                  onChange={(e) =>
+                    updateManualStream(idx, {
+                      courtLabel: e.target.value,
+                      // Sửa tay tên sân → bỏ liên kết sân (tránh lệch).
+                      courtStationId: "",
+                    })
+                  }
                 />
                 <TextField
                   label="Góc camera / nhãn"
