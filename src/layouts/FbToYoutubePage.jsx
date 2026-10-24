@@ -54,6 +54,10 @@ export default function FbToYoutubePage() {
   const [pageId, setPageId] = useState("");
   const [privacy, setPrivacy] = useState("public");
   const [selected, setSelected] = useState({});
+  // Sửa tiêu đề/mô tả YouTube trước khi up: { [fbVideoId]: { title, description } }
+  const [edits, setEdits] = useState({});
+  const setEdit = (id, patch) =>
+    setEdits((e) => ({ ...e, [id]: { ...(e[id] || {}), ...patch } }));
 
   useEffect(() => {
     if (!pageId && pages.length) setPageId(pages[0].pageId);
@@ -101,15 +105,20 @@ export default function FbToYoutubePage() {
   const handleUpload = async () => {
     const videos = lives
       .filter((v) => selected[v.fbVideoId])
-      .map((v) => ({
-        fbVideoId: v.fbVideoId,
-        title: v.title,
-        description: v.description,
-        permalink: v.permalink,
-        createdTime: v.createdTime,
-        durationSec: v.durationSec,
-        thumbnail: v.thumbnail,
-      }));
+      .map((v) => {
+        const ed = edits[v.fbVideoId] || {};
+        const title = (ed.title ?? v.title ?? "").trim();
+        return {
+          fbVideoId: v.fbVideoId,
+          // Tiêu đề/mô tả đã sửa (nếu để trống title → fallback tên FB ở backend).
+          title: title || v.title || "",
+          description: ed.description ?? v.description ?? "",
+          permalink: v.permalink,
+          createdTime: v.createdTime,
+          durationSec: v.durationSec,
+          thumbnail: v.thumbnail,
+        };
+      });
     if (!videos.length) return toast.info("Chưa chọn video nào");
     try {
       const r = await doUpload({ pageId, videos, privacy }).unwrap();
@@ -213,13 +222,15 @@ export default function FbToYoutubePage() {
             {lives.map((v) => {
               const up = v.upload;
               const disabled = up && !["failed", "canceled"].includes(up.status);
+              const isSel = !!selected[v.fbVideoId];
+              const ed = edits[v.fbVideoId] || {};
               return (
+                <Box key={v.fbVideoId} sx={{ py: 0.5 }}>
                 <Stack
-                  key={v.fbVideoId}
                   direction="row"
                   spacing={1.5}
                   alignItems="center"
-                  sx={{ py: 1 }}
+                  sx={{ py: 0.5 }}
                 >
                   <Checkbox
                     size="small"
@@ -272,6 +283,31 @@ export default function FbToYoutubePage() {
                     <Chip size="small" variant="outlined" label="Chưa up" />
                   )}
                 </Stack>
+                {isSel && !disabled ? (
+                  <Stack spacing={1} sx={{ pl: 6, pr: 1, pb: 1.5 }}>
+                    <TextField
+                      label="Tiêu đề YouTube"
+                      size="small"
+                      fullWidth
+                      value={ed.title ?? v.title ?? ""}
+                      onChange={(e) => setEdit(v.fbVideoId, { title: e.target.value })}
+                      inputProps={{ maxLength: 100 }}
+                      helperText={`${(ed.title ?? v.title ?? "").length}/100 ký tự`}
+                    />
+                    <TextField
+                      label="Mô tả YouTube"
+                      size="small"
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      maxRows={6}
+                      value={ed.description ?? v.description ?? ""}
+                      onChange={(e) => setEdit(v.fbVideoId, { description: e.target.value })}
+                      placeholder="Để trống = tự ghi link nguồn Facebook"
+                    />
+                  </Stack>
+                ) : null}
+                </Box>
               );
             })}
           </Stack>
