@@ -20,6 +20,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ReplayIcon from "@mui/icons-material/Replay";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -29,6 +30,7 @@ import {
   useFbytJobsQuery,
   useFbytUploadMutation,
   useFbytRetryMutation,
+  useFbytUpdateMetaMutation,
 } from "slices/fbYoutubeApiSlice";
 
 const fmtDur = (s) => {
@@ -87,6 +89,20 @@ export default function FbToYoutubePage() {
 
   const [doUpload, { isLoading: uploading }] = useFbytUploadMutation();
   const [doRetry] = useFbytRetryMutation();
+  const [doUpdateMeta, { isLoading: savingMeta }] = useFbytUpdateMetaMutation();
+  // Sửa tiêu đề/mô tả clip ĐÃ up: id job đang sửa + giá trị.
+  const [editJob, setEditJob] = useState("");
+  const [editVals, setEditVals] = useState({ title: "", description: "" });
+  const saveMeta = async (id) => {
+    try {
+      await doUpdateMeta({ id, title: editVals.title, description: editVals.description }).unwrap();
+      toast.success("Đã cập nhật tiêu đề/mô tả trên YouTube");
+      setEditJob("");
+      refetchJobs();
+    } catch (e) {
+      toast.error(e?.data?.message || e?.error || "Cập nhật thất bại");
+    }
+  };
 
   const selectableLives = useMemo(
     () => lives.filter((v) => !v.upload || ["failed", "canceled"].includes(v.upload.status)),
@@ -322,10 +338,11 @@ export default function FbToYoutubePage() {
           ) : (
             <Stack divider={<Divider />}>
               {jobs.map((j) => (
-                <Stack key={j._id} direction="row" spacing={1.5} alignItems="center" sx={{ py: 1 }}>
+                <Box key={j._id} sx={{ py: 0.5 }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ py: 0.5 }}>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography sx={{ fontWeight: 700 }} noWrap>
-                      {j.fbTitle || j.fbVideoId}
+                      {j.ytTitle || j.fbTitle || j.fbVideoId}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {fmtDate(j.updatedAt)}
@@ -344,12 +361,66 @@ export default function FbToYoutubePage() {
                       YouTube ↗
                     </Link>
                   ) : null}
+                  {j.status === "done" && j.ytVideoId ? (
+                    <IconButton
+                      size="small"
+                      title="Sửa tiêu đề/mô tả"
+                      onClick={() => {
+                        setEditJob(editJob === j._id ? "" : j._id);
+                        setEditVals({
+                          title: j.ytTitle || j.fbTitle || "",
+                          description: j.fbDescription || "",
+                        });
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  ) : null}
                   {["failed", "canceled"].includes(j.status) ? (
                     <IconButton size="small" title="Chạy lại" onClick={() => doRetry(j._id)}>
                       <ReplayIcon fontSize="small" />
                     </IconButton>
                   ) : null}
                 </Stack>
+                {editJob === j._id ? (
+                  <Stack spacing={1} sx={{ pl: 1, pr: 1, pb: 1.5 }}>
+                    <TextField
+                      label="Tiêu đề YouTube"
+                      size="small"
+                      fullWidth
+                      value={editVals.title}
+                      onChange={(e) => setEditVals((s) => ({ ...s, title: e.target.value }))}
+                      inputProps={{ maxLength: 100 }}
+                      helperText={`${editVals.title.length}/100 ký tự`}
+                    />
+                    <TextField
+                      label="Mô tả YouTube"
+                      size="small"
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      maxRows={6}
+                      value={editVals.description}
+                      onChange={(e) =>
+                        setEditVals((s) => ({ ...s, description: e.target.value }))
+                      }
+                    />
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button size="small" onClick={() => setEditJob("")}>
+                        Huỷ
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        disabled={savingMeta || !editVals.title.trim()}
+                        onClick={() => saveMeta(j._id)}
+                      >
+                        {savingMeta ? "Đang lưu…" : "Lưu lên YouTube"}
+                      </Button>
+                    </Stack>
+                  </Stack>
+                ) : null}
+                </Box>
               ))}
             </Stack>
           )}
