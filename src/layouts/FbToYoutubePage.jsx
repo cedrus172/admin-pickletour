@@ -21,6 +21,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ReplayIcon from "@mui/icons-material/Replay";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { toast } from "react-toastify";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -31,6 +32,7 @@ import {
   useFbytUploadMutation,
   useFbytRetryMutation,
   useFbytUpdateMetaMutation,
+  useFbytDeleteMutation,
 } from "slices/fbYoutubeApiSlice";
 
 const fmtDur = (s) => {
@@ -90,6 +92,22 @@ export default function FbToYoutubePage() {
   const [doUpload, { isLoading: uploading }] = useFbytUploadMutation();
   const [doRetry] = useFbytRetryMutation();
   const [doUpdateMeta, { isLoading: savingMeta }] = useFbytUpdateMetaMutation();
+  const [doDelete] = useFbytDeleteMutation();
+  const handleDelete = async (j) => {
+    const msg =
+      j.status === "done" && j.ytVideoId
+        ? "Xoá clip này? Sẽ XOÁ video trên YouTube và bản ghi ở PickleTour (để tải lại được)."
+        : "Xoá bản ghi clip này ở PickleTour?";
+    if (!window.confirm(msg)) return;
+    try {
+      await doDelete(j._id).unwrap();
+      toast.success("Đã xoá clip (YouTube + PickleTour)");
+      refetchJobs();
+      refetchLives();
+    } catch (e) {
+      toast.error(e?.data?.message || "Xoá thất bại");
+    }
+  };
   // Sửa tiêu đề/mô tả clip ĐÃ up: id job đang sửa + giá trị.
   const [editJob, setEditJob] = useState("");
   const [editVals, setEditVals] = useState({ title: "", description: "" });
@@ -379,6 +397,16 @@ export default function FbToYoutubePage() {
                   {["failed", "canceled"].includes(j.status) ? (
                     <IconButton size="small" title="Chạy lại" onClick={() => doRetry(j._id)}>
                       <ReplayIcon fontSize="small" />
+                    </IconButton>
+                  ) : null}
+                  {!["pending", "downloading", "uploading"].includes(j.status) ? (
+                    <IconButton
+                      size="small"
+                      color="error"
+                      title="Xoá (YouTube + PickleTour)"
+                      onClick={() => handleDelete(j)}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
                     </IconButton>
                   ) : null}
                 </Stack>

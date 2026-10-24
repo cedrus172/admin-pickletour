@@ -35,6 +35,10 @@ export const fbYoutubeApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["FbYtJobs"],
     }),
+    fbytDelete: builder.mutation({
+      query: (id) => ({ url: `/admin/fb-youtube/jobs/${id}`, method: "DELETE" }),
+      invalidatesTags: ["FbYtJobs", "FbYtLives"],
+    }),
   }),
 });
 
@@ -45,4 +49,5 @@ export const {
   useFbytUploadMutation,
   useFbytRetryMutation,
   useFbytUpdateMetaMutation,
+  useFbytDeleteMutation,
 } = fbYoutubeApiSlice;
