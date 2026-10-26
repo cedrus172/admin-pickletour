@@ -70,6 +70,7 @@ import ReviewModerationPage from "layouts/reviews/ReviewModerationPage";
 import CourtOwnerRequestsPage from "layouts/court-owner/CourtOwnerRequestsPage";
 import ReconciliationPage from "layouts/reconciliation/ReconciliationPage";
 import NicknameRequestsPage from "layouts/NicknameRequestsPage";
+import CamClipGrantsPage from "layouts/CamClipGrantsPage";
 import AiGatewaySettingsPage from "layouts/AiGatewaySettingsPage";
 import FilesManager from "layouts/FilesManager";
 import AdminMonitorPage from "layouts/AdminMonitorPage";
@@ -337,6 +338,17 @@ const routes = [
     icon: <Icon fontSize="small">edit_note</Icon>,
     route: "/admin/nickname-requests",
     component: <NicknameRequestsPage />,
+    private: true,
+    roles: ["admin"],
+    show: true,
+  },
+  {
+    type: "collapse",
+    name: "Quyền Cắt Cam Sân",
+    key: "cam-clip-grants",
+    icon: <Icon fontSize="small">content_cut</Icon>,
+    route: "/admin/cam-clip",
+    component: <CamClipGrantsPage />,
     private: true,
     roles: ["admin"],
     show: true,
