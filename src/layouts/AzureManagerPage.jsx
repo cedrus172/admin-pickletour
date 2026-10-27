@@ -216,7 +216,7 @@ export default function AzureManagerPage() {
           </Box>
         </Box>
 
-        <Card sx={{ p: 2.5, mb: 3, background: "linear-gradient(135deg, #eef4ff 0%, #f9fbff 100%)" }}>
+        <Card sx={{ p: 2.5, mb: 3, background: "linear-gradient(135deg, rgba(32,200,255,0.1) 0%, rgba(11,37,65,0.5) 100%)" }}>
           <Typography variant="subtitle1" fontWeight="bold" color="info.main" mb={0.5}>
             Chi tiết chi phí Azure
           </Typography>

@@ -20,7 +20,7 @@ import typography from "assets/theme-dark/base/typography";
 // PickleTour React Helper Functions
 import pxToRem from "assets/theme-dark/functions/pxToRem";
 
-const { white, text, info, secondary } = colors;
+const { white, text, info, secondary, success, warning, error } = colors;
 const { size } = typography;
 
 const contained = {
@@ -85,6 +85,35 @@ const contained = {
     "&:focus:not(:hover)": {
       backgroundColor: secondary.focus,
     },
+  },
+
+  // Các màu MUI còn thiếu slot override -> tránh nút rơi về nền trắng.
+  info: {
+    backgroundColor: info.main,
+    color: white.main,
+    "&:hover": { backgroundColor: info.main },
+    "&:focus:not(:hover)": { backgroundColor: info.focus },
+  },
+
+  success: {
+    backgroundColor: success.main,
+    color: white.main,
+    "&:hover": { backgroundColor: success.main },
+    "&:focus:not(:hover)": { backgroundColor: success.focus },
+  },
+
+  warning: {
+    backgroundColor: warning.main,
+    color: white.main,
+    "&:hover": { backgroundColor: warning.main },
+    "&:focus:not(:hover)": { backgroundColor: warning.focus },
+  },
+
+  error: {
+    backgroundColor: error.main,
+    color: white.main,
+    "&:hover": { backgroundColor: error.main },
+    "&:focus:not(:hover)": { backgroundColor: error.focus },
   },
 };
 
