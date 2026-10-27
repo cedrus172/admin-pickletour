@@ -30,6 +30,7 @@ import AdminMatchesList from "layouts/match/AdminMatchesList";
 import Icon from "@mui/material/Icon";
 import AdminTournamentMatches from "layouts/tournament/AdminTournamentMatches";
 import AutoLivePage from "layouts/tournament/AutoLivePage";
+import RtspSourcesPage from "layouts/tournament/RtspSourcesPage";
 import TournamentBracketView from "layouts/tournament/TournamentBracketView";
 import AdminRefereeConsole from "layouts/tournament/referee/AdminRefereeConsole";
 import RefereeMatches from "layouts/tournament/referee/RefereeMatches";
@@ -566,6 +567,17 @@ const routes = [
     icon: <Icon fontSize="small">view_module</Icon>,
     route: "/admin/court-clusters",
     component: <AdminCourtClustersPage />,
+    private: true,
+    roles: ["admin"],
+    show: true,
+  },
+  {
+    type: "collapse",
+    name: "Nguồn video đã lưu",
+    key: "admin-rtsp-sources",
+    icon: <Icon fontSize="small">video_library</Icon>,
+    route: "/admin/rtsp-sources",
+    component: <RtspSourcesPage />,
     private: true,
     roles: ["admin"],
     show: true,
