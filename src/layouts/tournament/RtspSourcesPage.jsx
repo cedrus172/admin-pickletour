@@ -1,5 +1,5 @@
 // Nguồn video đã lưu (RTSP/HLS/RTMP) — quản trị thư viện nguồn dùng lại khi Auto-Live.
-// Dùng API /tournament-auto-live/rtsp-sources (list/create/update/delete).
+// Dùng API /tournament-auto-live/rtsp-sources (list/create/update/delete/test/bulk-credentials).
 import { useMemo, useState } from "react";
 import {
   Card,
@@ -21,6 +21,7 @@ import {
   DialogActions,
   Tooltip,
   Chip,
+  Checkbox,
   CircularProgress,
   Typography,
 } from "@mui/material";
@@ -29,6 +30,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import VideocamIcon from "@mui/icons-material/Videocam";
+import NetworkCheckIcon from "@mui/icons-material/NetworkCheck";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/ErrorOutline";
+import KeyIcon from "@mui/icons-material/VpnKey";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -40,6 +45,8 @@ import {
   useCreateRtspSourceMutation,
   useUpdateRtspSourceMutation,
   useDeleteRtspSourceMutation,
+  useTestRtspSourcesMutation,
+  useBulkUpdateRtspCredentialsMutation,
 } from "slices/tournamentAutoLiveApiSlice";
 
 const TRANSPORTS = [
@@ -73,20 +80,38 @@ export default function RtspSourcesPage() {
   const [createSource, { isLoading: creating }] = useCreateRtspSourceMutation();
   const [updateSource, { isLoading: updating }] = useUpdateRtspSourceMutation();
   const [deleteSource] = useDeleteRtspSourceMutation();
+  const [testSources, { isLoading: testing }] = useTestRtspSourcesMutation();
+  const [bulkCreds, { isLoading: bulkSaving }] = useBulkUpdateRtspCredentialsMutation();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [err, setErr] = useState("");
-  const [confirmDel, setConfirmDel] = useState(null); // source cần xoá
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const [selected, setSelected] = useState([]); // ids đã tick
+  const [results, setResults] = useState({}); // id -> { ok, info, error, ms }
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulk, setBulk] = useState({ user: "", pass: "", ip: "", port: "" });
+  const [bulkErr, setBulkErr] = useState("");
 
   const saving = creating || updating;
   const setField = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const setBulkField = (k) => (e) => setBulk((b) => ({ ...b, [k]: e.target.value }));
 
   const rows = useMemo(
     () => [...sources].sort((a, b) => (a.label || "").localeCompare(b.label || "")),
     [sources],
   );
+
+  const allIds = rows.map((r) => r._id);
+  const allChecked = allIds.length > 0 && selected.length === allIds.length;
+  const someChecked = selected.length > 0 && !allChecked;
+  const selectedSet = new Set(selected);
+
+  const toggleOne = (id) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const toggleAll = () => setSelected(allChecked ? [] : allIds);
 
   const openAdd = () => {
     setEditingId(null);
@@ -144,6 +169,81 @@ export default function RtspSourcesPage() {
     }
   };
 
+  const runTest = async (ids) => {
+    const list = ids && ids.length ? ids : selected;
+    if (!list.length) return;
+    // Xoá kết quả cũ của các id sắp test để hiện spinner.
+    setResults((r) => {
+      const next = { ...r };
+      list.forEach((id) => delete next[id]);
+      return next;
+    });
+    try {
+      const res = await testSources({ ids: list }).unwrap();
+      const map = {};
+      (res?.results || []).forEach((x) => {
+        map[x.id] = x;
+      });
+      setResults((r) => ({ ...r, ...map }));
+    } catch (e) {
+      setErr(e?.data?.message || "Test thất bại");
+    }
+  };
+
+  const applyBulk = async () => {
+    setBulkErr("");
+    if (!bulk.user.trim() && !bulk.pass && !bulk.ip.trim() && !bulk.port.trim()) {
+      return setBulkErr("Nhập ít nhất 1 trong: user / pass / ip / port");
+    }
+    try {
+      const res = await bulkCreds({
+        ids: selected,
+        user: bulk.user,
+        pass: bulk.pass,
+        ip: bulk.ip,
+        port: bulk.port,
+      }).unwrap();
+      setBulkOpen(false);
+      setBulk({ user: "", pass: "", ip: "", port: "" });
+      refetch();
+      // Test lại ngay các nguồn vừa đổi để xác nhận.
+      runTest(selected);
+      setErr(`Đã đổi thông tin ${res?.count ?? selected.length} nguồn.`);
+    } catch (e) {
+      setBulkErr(e?.data?.message || "Đổi thông tin thất bại");
+    }
+    return undefined;
+  };
+
+  const renderResult = (id) => {
+    if (testing && selectedSet.has(id) && !results[id]) {
+      return <CircularProgress size={16} color="info" />;
+    }
+    const r = results[id];
+    if (!r) return <Typography variant="caption" sx={{ opacity: 0.5 }}>—</Typography>;
+    if (r.ok) {
+      const info = r.info || {};
+      const dim = info.width && info.height ? `${info.width}×${info.height}` : "";
+      const label = [info.codec, dim, info.fps ? `${info.fps}fps` : ""].filter(Boolean).join(" · ") || "OK";
+      return (
+        <Tooltip title={`Kết nối OK · ${r.ms}ms`}>
+          <Chip
+            size="small"
+            color="success"
+            icon={<CheckCircleIcon />}
+            label={label}
+            sx={{ maxWidth: 220 }}
+          />
+        </Tooltip>
+      );
+    }
+    return (
+      <Tooltip title={r.error || "Lỗi"}>
+        <Chip size="small" color="error" icon={<ErrorIcon />} label="Không kết nối" />
+      </Tooltip>
+    );
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -164,7 +264,31 @@ export default function RtspSourcesPage() {
                 Thư viện link RTSP / HLS / RTMP có tên để chọn nhanh khi bắt đầu Auto-Live.
               </MDTypography>
             </Box>
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {selected.length > 0 && (
+                <>
+                  <Button
+                    variant="outlined"
+                    color="info"
+                    startIcon={testing ? <CircularProgress size={16} color="inherit" /> : <NetworkCheckIcon />}
+                    onClick={() => runTest(selected)}
+                    disabled={testing}
+                  >
+                    Test kết nối ({selected.length})
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    startIcon={<KeyIcon />}
+                    onClick={() => {
+                      setBulkErr("");
+                      setBulkOpen(true);
+                    }}
+                  >
+                    Đổi user/pass/ip/port ({selected.length})
+                  </Button>
+                </>
+              )}
               <Tooltip title="Tải lại">
                 <span>
                   <IconButton onClick={refetch} disabled={isFetching}>
@@ -183,11 +307,7 @@ export default function RtspSourcesPage() {
               <CircularProgress color="info" />
             </MDBox>
           ) : rows.length === 0 ? (
-            <MDBox
-              textAlign="center"
-              py={6}
-              sx={{ color: "rgba(255,255,255,0.7)" }}
-            >
+            <MDBox textAlign="center" py={6} sx={{ color: "rgba(255,255,255,0.7)" }}>
               <VideocamIcon sx={{ fontSize: 48, opacity: 0.5 }} />
               <MDTypography variant="body2" color="text" mt={1}>
                 Chưa có nguồn video nào. Bấm “Thêm nguồn” để lưu link dùng lại.
@@ -198,23 +318,39 @@ export default function RtspSourcesPage() {
               <Table>
                 <TableHead sx={{ display: "table-header-group" }}>
                   <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="info"
+                        checked={allChecked}
+                        indeterminate={someChecked}
+                        onChange={toggleAll}
+                      />
+                    </TableCell>
                     <TableCell>Tên gợi nhớ</TableCell>
                     <TableCell>Link nguồn</TableCell>
                     <TableCell>Transport</TableCell>
-                    <TableCell>Overlay (bảng điểm · logo · tài trợ)</TableCell>
+                    <TableCell>Kết nối</TableCell>
+                    <TableCell>Overlay</TableCell>
                     <TableCell>Ghi chú</TableCell>
                     <TableCell align="right">Thao tác</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {rows.map((s) => (
-                    <TableRow key={s._id} hover>
+                    <TableRow key={s._id} hover selected={selectedSet.has(s._id)}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="info"
+                          checked={selectedSet.has(s._id)}
+                          onChange={() => toggleOne(s._id)}
+                        />
+                      </TableCell>
                       <TableCell>
                         <MDTypography variant="button" fontWeight="medium">
                           {s.label}
                         </MDTypography>
                       </TableCell>
-                      <TableCell sx={{ maxWidth: 360 }}>
+                      <TableCell sx={{ maxWidth: 320 }}>
                         <Typography
                           variant="caption"
                           sx={{
@@ -229,18 +365,24 @@ export default function RtspSourcesPage() {
                       <TableCell>
                         <Chip size="small" label={s.transport} variant="outlined" color="info" />
                       </TableCell>
+                      <TableCell>{renderResult(s._id)}</TableCell>
                       <TableCell>
                         <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)" }}>
                           {cornerLabel(s.layout?.scoreboard)} · {cornerLabel(s.layout?.brand)} ·{" "}
                           {cornerLabel(s.layout?.sponsor)}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ maxWidth: 220 }}>
+                      <TableCell sx={{ maxWidth: 200 }}>
                         <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
                           {s.note || "—"}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
+                        <Tooltip title="Test kết nối">
+                          <IconButton size="small" color="info" onClick={() => runTest([s._id])}>
+                            <NetworkCheckIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title="Sửa">
                           <IconButton size="small" color="info" onClick={() => openEdit(s)}>
                             <EditIcon fontSize="small" />
@@ -258,6 +400,12 @@ export default function RtspSourcesPage() {
               </Table>
             </TableContainer>
           )}
+
+          {err ? (
+            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", mt: 1, display: "block" }}>
+              {err}
+            </Typography>
+          ) : null}
         </Card>
       </MDBox>
 
@@ -331,6 +479,47 @@ export default function RtspSourcesPage() {
           </Button>
           <Button onClick={onSave} variant="contained" color="info" disabled={saving}>
             {saving ? "Đang lưu…" : "Lưu"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Đổi user/pass/ip/port hàng loạt */}
+      <Dialog open={bulkOpen} onClose={() => setBulkOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Đổi user / pass / ip / port ({selected.length} nguồn)</DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body2" sx={{ mb: 2, color: "rgba(255,255,255,0.75)" }}>
+            Áp dụng cho {selected.length} nguồn đã chọn, chỉ đổi 4 thông tin dưới — giữ nguyên
+            channel / path. Field để trống = giữ giá trị cũ của từng nguồn. Mật khẩu có ký tự đặc
+            biệt (@, :, …) sẽ được tự mã hoá trong link RTSP.
+          </Typography>
+          <Stack spacing={2}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <TextField label="User" value={bulk.user} onChange={setBulkField("user")} fullWidth placeholder="admin" />
+              <TextField
+                label="Password"
+                value={bulk.pass}
+                onChange={setBulkField("pass")}
+                fullWidth
+                placeholder="có @ cũng được"
+              />
+            </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <TextField label="IP / Host" value={bulk.ip} onChange={setBulkField("ip")} fullWidth placeholder="192.168.1.10" />
+              <TextField label="Port" value={bulk.port} onChange={setBulkField("port")} fullWidth placeholder="554" />
+            </Stack>
+            {bulkErr ? (
+              <Typography variant="caption" color="error">
+                {bulkErr}
+              </Typography>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkOpen(false)} color="secondary">
+            Huỷ
+          </Button>
+          <Button onClick={applyBulk} variant="contained" color="warning" disabled={bulkSaving}>
+            {bulkSaving ? "Đang đổi…" : "Đổi & kiểm tra lại"}
           </Button>
         </DialogActions>
       </Dialog>

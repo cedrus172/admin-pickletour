@@ -60,6 +60,18 @@ export const tournamentAutoLiveApiSlice = apiSlice.injectEndpoints({
     deleteRtspSource: builder.mutation({
       query: (id) => ({ url: `/tournament-auto-live/rtsp-sources/${id}`, method: "DELETE" }),
     }),
+    // Test kết nối nhiều nguồn RTSP cùng lúc (ffprobe phía server).
+    testRtspSources: builder.mutation({
+      query: (body) => ({ url: `/tournament-auto-live/rtsp-sources/test`, method: "POST", body }),
+    }),
+    // Đổi hàng loạt user/pass/ip/port cho nhiều nguồn, giữ channel.
+    bulkUpdateRtspCredentials: builder.mutation({
+      query: (body) => ({
+        url: `/tournament-auto-live/rtsp-sources/bulk-credentials`,
+        method: "POST",
+        body,
+      }),
+    }),
     // Danh sách sân của giải KÈM tên cụm (clusterName) — để gán sân cho luồng live.
     getTournamentCourtsForLive: builder.query({
       query: (tid) => `/tournament-auto-live/tournaments/${tid}/courts`,
@@ -95,5 +107,7 @@ export const {
   useCreateRtspSourceMutation,
   useUpdateRtspSourceMutation,
   useDeleteRtspSourceMutation,
+  useTestRtspSourcesMutation,
+  useBulkUpdateRtspCredentialsMutation,
   useListAutoLiveClipsQuery,
 } = tournamentAutoLiveApiSlice;
