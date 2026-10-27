@@ -92,9 +92,11 @@ function UpcomingCard({ items = [], loading = false }) {
             Không có giải sắp tới
           </MDBox>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table
+            style={{ width: "100%", borderCollapse: "collapse", color: "rgba(255,255,255,0.88)" }}
+          >
             <thead>
-              <tr>
+              <tr style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>
                 <th align="left">Tên</th>
                 <th align="left">Ngày</th>
                 <th align="right">Đã ĐK / Tối đa</th>
@@ -158,12 +160,15 @@ function TodosCard({ todos, loading = false }) {
                 alignItems="center"
                 justifyContent="space-between"
                 py={1}
+                sx={{ color: "rgba(255,255,255,0.88)" }}
               >
                 <MDBox display="flex" alignItems="center" gap={1}>
                   <Icon fontSize="small">{r.icon}</Icon>
                   <span>{r.label}</span>
                 </MDBox>
-                <MDBox fontWeight="bold">{r.value}</MDBox>
+                <MDBox fontWeight="bold" sx={{ color: "#fff" }}>
+                  {r.value}
+                </MDBox>
               </MDBox>
             ))}
       </MDBox>
@@ -239,9 +244,9 @@ function FinanceOverviewCard({ summary, loading = false }) {
             <MDBox fontSize={13} fontWeight="bold" color="text" mb={1}>
               Lợi nhuận theo giải (Top 5)
             </MDBox>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", color: "rgba(255,255,255,0.9)" }}>
               <thead>
-                <tr style={{ fontSize: 12, color: "#7b809a" }}>
+                <tr style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
                   <th align="left" style={{ padding: "4px 0" }}>
                     Giải
                   </th>
@@ -258,7 +263,7 @@ function FinanceOverviewCard({ summary, loading = false }) {
               </thead>
               <tbody>
                 {tops.map((t) => (
-                  <tr key={t.name} style={{ fontSize: 13, borderTop: "1px solid #eee" }}>
+                  <tr key={t.name} style={{ fontSize: 13, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
                     <td style={{ padding: "6px 0" }}>{t.name}</td>
                     <td align="right" style={{ color: "#16a34a" }}>
                       {fmtVND(t.revenue)}
