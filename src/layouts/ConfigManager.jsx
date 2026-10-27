@@ -736,7 +736,8 @@ function ImportDialog({ open, onClose, fileName, items, progress, importing, don
                 overflow: "auto",
                 fontFamily: "monospace",
                 fontSize: 12,
-                background: "#fafafa",
+                background: "rgba(255,255,255,0.05)",
+                color: "text.primary",
               }}
             >
               {items.slice(0, 200).map((x, idx) => (

@@ -952,7 +952,7 @@ export default function AuditLogsPage() {
                 </Stack>
               </DialogTitle>
 
-              <DialogContent dividers sx={{ bgcolor: "grey.50", p: { xs: 2.5, md: 3 } }}>
+              <DialogContent dividers sx={{ bgcolor: "rgba(255,255,255,0.03)", p: { xs: 2.5, md: 3 } }}>
                 {/* ===== filters inside dialog ===== */}
                 <Paper
                   variant="outlined"

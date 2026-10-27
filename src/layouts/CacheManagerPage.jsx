@@ -475,7 +475,7 @@ export default function CacheManagerPage() {
                       sx={{
                         height: "100%",
                         borderRadius: 2,
-                        bgcolor: "grey.100",
+                        bgcolor: "rgba(255,255,255,0.05)",
                         px: 1.5,
                         justifyContent: "center",
                       }}

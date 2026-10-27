@@ -269,7 +269,7 @@ export default function AzureManagerPage() {
                     <strong>Trạng thái:</strong> <Chip size="small" label={currentPowerState} color={chipColor} />
                   </Typography>
                   
-                  <Box sx={{ backgroundColor: '#f5f5f5', p: 2, borderRadius: 2, mb: 2 }}>
+                  <Box sx={{ backgroundColor: 'rgba(255,255,255,0.05)', p: 2, borderRadius: 2, mb: 2 }}>
                     <Typography variant="subtitle2" color="textSecondary">Chi phí kỳ này (Cost API)</Typography>
                     <Typography variant="h4" color="error" fontWeight="bold">
                       {billInfo.totalCost ? formatCurrency(billInfo.totalCost, billInfo.currency || "USD") : (loadingBilling ? "Đang tính..." : "?")}

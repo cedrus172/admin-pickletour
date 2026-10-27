@@ -26,7 +26,8 @@ const select = {
     select: {
       display: "grid",
       alignItems: "center",
-      padding: `0 ${pxToRem(12)} !important`,
+      // Khớp chiều cao với OutlinedInput (padding 12px) để select không thấp hơn input.
+      padding: `${pxToRem(12)} ${pxToRem(12)} !important`,
 
       "& .Mui-selected": {
         backgroundColor: transparent.main,

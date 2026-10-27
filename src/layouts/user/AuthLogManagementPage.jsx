@@ -336,7 +336,7 @@ export default function AuthLogManagementPage() {
             sx={{
               m: 0,
               p: 2,
-              bgcolor: "grey.100",
+              bgcolor: "rgba(255,255,255,0.05)",
               borderRadius: 1,
               overflow: "auto",
               fontSize: 13,

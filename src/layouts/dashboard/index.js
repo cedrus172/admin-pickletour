@@ -179,7 +179,7 @@ function FinanceMiniStat({ label, value, color }) {
       minWidth={140}
       p={1.5}
       borderRadius="lg"
-      sx={{ border: "1px solid", borderColor: "grey.300", bgcolor: "grey.100" }}
+      sx={{ border: "1px solid", borderColor: "rgba(255,255,255,0.12)", bgcolor: "rgba(255,255,255,0.05)" }}
     >
       <MDBox fontSize={13} color="text" mb={0.5}>
         {label}

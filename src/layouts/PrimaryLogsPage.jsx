@@ -82,7 +82,7 @@ const TABLE_HEAD_SX = {
     display: "table-row",
   },
   "& .MuiTableCell-root": {
-    bgcolor: "grey.100",
+    bgcolor: "rgba(255,255,255,0.05)",
     fontWeight: 800,
     lineHeight: 1.35,
     whiteSpace: "nowrap",

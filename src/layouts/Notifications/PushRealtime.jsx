@@ -193,7 +193,7 @@ function JsonCard({ title, value }) {
               mb: 0,
               p: 1.5,
               borderRadius: 2,
-              bgcolor: "grey.100",
+              bgcolor: "rgba(255,255,255,0.05)",
               overflow: "auto",
               fontSize: 12,
               lineHeight: 1.5,

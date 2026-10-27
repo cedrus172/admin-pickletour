@@ -891,7 +891,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                             height: 24,
                             borderRadius: 1.5,
                             fontWeight: 700,
-                            bgcolor: "rgba(255,255,255,0.82)",
+                            bgcolor: "rgba(255,255,255,0.14)",
                           }}
                         />
                         <Chip
@@ -902,7 +902,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                             height: 24,
                             borderRadius: 1.5,
                             fontWeight: 700,
-                            bgcolor: "rgba(255,255,255,0.82)",
+                            bgcolor: "rgba(255,255,255,0.14)",
                           }}
                         />
                       </InputAdornment>
@@ -914,11 +914,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       cursor: "pointer",
                       borderRadius: 999,
                       background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(247,250,255,0.98) 100%)",
-                      boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+                        "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
+                      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
                       transition: "transform 0.18s ease, box-shadow 0.18s ease",
                       "& fieldset": {
-                        borderColor: "rgba(59, 130, 246, 0.18)",
+                        borderColor: "rgba(32, 200, 255, 0.28)",
                       },
                       "&:hover": {
                         transform: "translateY(-1px)",
@@ -999,10 +999,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
           sx: {
             borderRadius: 4,
             overflow: "hidden",
-            border: "1px solid rgba(148, 163, 184, 0.2)",
-            boxShadow: "0 30px 80px rgba(15, 23, 42, 0.28)",
+            border: "1px solid rgba(32, 200, 255, 0.18)",
+            boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)",
             background:
-              "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)",
+              "linear-gradient(180deg, #0b2541 0%, #071d38 100%)",
           },
         }}
       >
@@ -1013,7 +1013,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
             pb={2}
             sx={{
               background:
-                "linear-gradient(180deg, rgba(239,246,255,0.9) 0%, rgba(255,255,255,0.92) 100%)",
+                "linear-gradient(180deg, rgba(32,200,255,0.08) 0%, rgba(11,37,65,0) 100%)",
             }}
           >
             <Box
@@ -1049,7 +1049,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   size="small"
                   label="↑ ↓ Di chuyển"
                   sx={{
-                    bgcolor: "rgba(15, 23, 42, 0.06)",
+                    bgcolor: "rgba(255,255,255,0.08)",
                     fontWeight: 600,
                   }}
                 />
@@ -1057,7 +1057,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   size="small"
                   label="Enter Chạy"
                   sx={{
-                    bgcolor: "rgba(15, 23, 42, 0.06)",
+                    bgcolor: "rgba(255,255,255,0.08)",
                     fontWeight: 600,
                   }}
                 />
@@ -1124,7 +1124,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 3,
-                  bgcolor: "rgba(255,255,255,0.92)",
+                  bgcolor: "rgba(255,255,255,0.06)",
                   boxShadow: "0 12px 34px rgba(37, 99, 235, 0.08)",
                   "& fieldset": {
                     borderColor: "rgba(59, 130, 246, 0.18)",
@@ -1147,7 +1147,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               display: "flex",
               flexWrap: "wrap",
               gap: 1,
-              bgcolor: "rgba(248, 250, 252, 0.95)",
+              bgcolor: "rgba(255,255,255,0.03)",
             }}
           >
             <Chip size="small" variant="outlined" label="Trang" />
@@ -1167,7 +1167,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               px: 1,
               maxHeight: 460,
               overflowY: "auto",
-              bgcolor: "rgba(255,255,255,0.88)",
+              bgcolor: "transparent",
             }}
           >
             {commandResults.length === 0 ? (

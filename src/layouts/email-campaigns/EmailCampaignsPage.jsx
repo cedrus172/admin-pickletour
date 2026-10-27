@@ -446,7 +446,7 @@ export default function EmailCampaignsPage() {
                   const pct = total ? Math.min(100, Math.round((sent / total) * 100)) : 0;
                   const running = ["queued", "running"].includes(c.status);
                   return (
-                    <Box key={c._id} sx={{ border: "1px solid", borderColor: "grey.300", borderRadius: 2, p: 1.5 }}>
+                    <Box key={c._id} sx={{ border: "1px solid", borderColor: "rgba(255,255,255,0.12)", borderRadius: 2, p: 1.5 }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
                         <Box sx={{ minWidth: 0 }}>
                           <Typography variant="button" fontWeight="bold" sx={{ display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>

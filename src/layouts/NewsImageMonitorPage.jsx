@@ -197,7 +197,7 @@ function ImagePreviewDialog({ open, imageUrl, title, subtitle, onClose }) {
               maxHeight: "75vh",
               objectFit: "contain",
               borderRadius: 1,
-              bgcolor: "grey.100",
+              bgcolor: "rgba(255,255,255,0.05)",
             }}
           />
         ) : (
