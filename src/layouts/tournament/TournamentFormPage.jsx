@@ -402,7 +402,7 @@ function FormSkeleton() {
   Text.defaultProps = { w: 200, h: 36, sx: undefined };
 
   return (
-    <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 1 }}>
+    <Box p={3} sx={{ backgroundColor: "background.paper", borderRadius: 1 }}>
       <Text w={260} h={44} sx={{ mb: 2 }} />
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
@@ -1100,7 +1100,7 @@ export default function TournamentFormPage() {
       {loading ? (
         <FormSkeleton />
       ) : (
-        <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 1 }}>
+        <Box p={3} sx={{ backgroundColor: "background.paper", borderRadius: 1 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}

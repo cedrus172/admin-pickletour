@@ -86,7 +86,22 @@ import dialogActions from "assets/theme-dark/components/dialog/dialogActions";
 
 export default createTheme({
   breakpoints: { ...breakpoints },
-  palette: { ...colors },
+  palette: {
+    // Bật dark mode cho MUI để Paper/Card/Dialog/Table/TextField... thuần
+    // MUI không còn mặc định nền trắng chữ đen trên nền navy.
+    mode: "dark",
+    ...colors,
+    background: {
+      ...colors.background,
+      paper: colors.background.card,
+    },
+    text: {
+      ...colors.text,
+      primary: "#ffffffde",
+      secondary: "#ffffff99",
+      disabled: "#ffffff61",
+    },
+  },
   typography: { ...typography },
   boxShadows: { ...boxShadows },
   borders: { ...borders },

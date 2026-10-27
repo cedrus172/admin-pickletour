@@ -197,7 +197,7 @@ export default function CmsHeroEditor() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 1 }}>
+      <Box p={3} sx={{ backgroundColor: "background.paper", borderRadius: 1 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="h4">Chỉnh sửa Hero & Logo overlay</Typography>
         </Stack>

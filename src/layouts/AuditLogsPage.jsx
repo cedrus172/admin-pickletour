@@ -511,7 +511,7 @@ export default function AuditLogsPage() {
             mb: 4,
             border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
             borderRadius: 3,
-            bgcolor: "white",
+            bgcolor: "background.paper",
             boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.08)}`,
           }}
         >
@@ -959,7 +959,7 @@ export default function AuditLogsPage() {
                   sx={{
                     p: { xs: 2, md: 2.5 },
                     mb: 3.5,
-                    bgcolor: "white",
+                    bgcolor: "background.paper",
                     borderRadius: 2,
                     border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                   }}
