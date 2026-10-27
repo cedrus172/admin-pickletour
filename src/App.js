@@ -52,8 +52,8 @@ import { useVerifyQuery } from "slices/authApiSlice";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
 // Images
-import brandWhite from "assets/images/logo-ct.png";
-import brandDark from "assets/images/logo-ct-dark.png";
+import brandWhite from "assets/images/pickletour-logo.png";
+import brandDark from "assets/images/pickletour-logo.png";
 
 function AdminSessionSync() {
   const userInfo = useSelector((state) => state.auth?.userInfo || null);
