@@ -34,6 +34,8 @@ import NetworkCheckIcon from "@mui/icons-material/NetworkCheck";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/ErrorOutline";
 import KeyIcon from "@mui/icons-material/VpnKey";
+import ToggleOnIcon from "@mui/icons-material/ToggleOn";
+import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -41,12 +43,13 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
 import {
-  useListRtspSourcesQuery,
+  useListRtspSourcesAllQuery,
   useCreateRtspSourceMutation,
   useUpdateRtspSourceMutation,
   useDeleteRtspSourceMutation,
   useTestRtspSourcesMutation,
   useBulkUpdateRtspCredentialsMutation,
+  useBulkSetRtspDisabledMutation,
 } from "slices/tournamentAutoLiveApiSlice";
 
 const TRANSPORTS = [
@@ -76,7 +79,8 @@ const EMPTY_FORM = {
 };
 
 export default function RtspSourcesPage() {
-  const { data: sources = [], isLoading, isFetching, refetch } = useListRtspSourcesQuery();
+  const { data: sources = [], isLoading, isFetching, refetch } = useListRtspSourcesAllQuery();
+  const [bulkDisable, { isLoading: toggling }] = useBulkSetRtspDisabledMutation();
   const [createSource, { isLoading: creating }] = useCreateRtspSourceMutation();
   const [updateSource, { isLoading: updating }] = useUpdateRtspSourceMutation();
   const [deleteSource] = useDeleteRtspSourceMutation();
@@ -215,6 +219,18 @@ export default function RtspSourcesPage() {
     return undefined;
   };
 
+  // Bật/tắt hàng loạt nguồn đã tick (nguồn tắt bị ẩn khỏi danh sách chọn khi live).
+  const applyDisabled = async (disabled) => {
+    if (!selected.length) return;
+    try {
+      const res = await bulkDisable({ ids: selected, disabled }).unwrap();
+      refetch();
+      setErr(`Đã ${disabled ? "tắt" : "bật"} ${res?.count ?? selected.length} nguồn.`);
+    } catch (e) {
+      setErr(e?.data?.message || (disabled ? "Tắt nguồn thất bại" : "Bật nguồn thất bại"));
+    }
+  };
+
   const renderResult = (id) => {
     if (testing && selectedSet.has(id) && !results[id]) {
       return <CircularProgress size={16} color="info" />;
@@ -287,6 +303,24 @@ export default function RtspSourcesPage() {
                   >
                     Đổi user/pass/ip/port ({selected.length})
                   </Button>
+                  <Button
+                    variant="outlined"
+                    color="success"
+                    startIcon={<ToggleOnIcon />}
+                    onClick={() => applyDisabled(false)}
+                    disabled={toggling}
+                  >
+                    Bật ({selected.length})
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<ToggleOffIcon />}
+                    onClick={() => applyDisabled(true)}
+                    disabled={toggling}
+                  >
+                    Tắt ({selected.length})
+                  </Button>
                 </>
               )}
               <Tooltip title="Tải lại">
@@ -337,7 +371,12 @@ export default function RtspSourcesPage() {
                 </TableHead>
                 <TableBody>
                   {rows.map((s) => (
-                    <TableRow key={s._id} hover selected={selectedSet.has(s._id)}>
+                    <TableRow
+                      key={s._id}
+                      hover
+                      selected={selectedSet.has(s._id)}
+                      sx={s.disabled ? { opacity: 0.5 } : undefined}
+                    >
                       <TableCell padding="checkbox">
                         <Checkbox
                           color="info"
@@ -349,6 +388,9 @@ export default function RtspSourcesPage() {
                         <MDTypography variant="button" fontWeight="medium">
                           {s.label}
                         </MDTypography>
+                        {s.disabled ? (
+                          <Chip size="small" label="Đã tắt" color="error" variant="outlined" sx={{ ml: 1 }} />
+                        ) : null}
                       </TableCell>
                       <TableCell sx={{ maxWidth: 320 }}>
                         <Typography

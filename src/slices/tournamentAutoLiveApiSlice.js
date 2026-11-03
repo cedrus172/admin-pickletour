@@ -51,6 +51,18 @@ export const tournamentAutoLiveApiSlice = apiSlice.injectEndpoints({
     listRtspSources: builder.query({
       query: () => `/tournament-auto-live/rtsp-sources`,
     }),
+    // Trang quản lý: kèm cả nguồn đã tắt (disabled).
+    listRtspSourcesAll: builder.query({
+      query: () => `/tournament-auto-live/rtsp-sources?all=1`,
+    }),
+    // Bật/tắt hàng loạt nguồn theo ids.
+    bulkSetRtspDisabled: builder.mutation({
+      query: (body) => ({
+        url: `/tournament-auto-live/rtsp-sources/bulk-disabled`,
+        method: "POST",
+        body,
+      }),
+    }),
     createRtspSource: builder.mutation({
       query: (body) => ({ url: `/tournament-auto-live/rtsp-sources`, method: "POST", body }),
     }),
@@ -109,5 +121,7 @@ export const {
   useDeleteRtspSourceMutation,
   useTestRtspSourcesMutation,
   useBulkUpdateRtspCredentialsMutation,
+  useListRtspSourcesAllQuery,
+  useBulkSetRtspDisabledMutation,
   useListAutoLiveClipsQuery,
 } = tournamentAutoLiveApiSlice;
