@@ -420,12 +420,14 @@ function ManageDialog({ venue, onClose }) {
   const [note, setNote] = useState("");
   const [camMode, setCamMode] = useState("all"); // "all" = tất cả camera; "pick" = chọn từng camera
   const [picked, setPicked] = useState([]); // channel id đã chọn
+  const [replayOnly, setReplayOnly] = useState(false); // chỉ xem lại, không xem trực tiếp
+  const [replayDelay, setReplayDelay] = useState("60"); // phút
   const togglePick = (camId) =>
     setPicked((prev) => (prev.includes(camId) ? prev.filter((x) => x !== camId) : [...prev, camId]));
 
   const resetForm = () => {
     setEditingId(null); setEditingName(""); setPhone(""); setDays(30);
-    setNote(""); setCamMode("all"); setPicked([]);
+    setNote(""); setCamMode("all"); setPicked([]); setReplayOnly(false); setReplayDelay("60");
   };
   const startEdit = (g) => {
     setEditingId(g._id);
@@ -435,6 +437,8 @@ function ManageDialog({ venue, onClose }) {
     const cams = Array.isArray(g.cameras) ? g.cameras : [];
     setCamMode(cams.length ? "pick" : "all");
     setPicked(cams);
+    setReplayOnly(Boolean(g.replayOnly));
+    setReplayDelay(String(g.replayDelayMin || 60));
     setDays(-1); // mặc định giữ nguyên hạn khi sửa
   };
 
@@ -453,12 +457,16 @@ function ManageDialog({ venue, onClose }) {
   const onSubmit = async () => {
     if (camMode === "pick" && picked.length === 0) return toast.warn("Chọn ít nhất một camera");
     const cameras = camMode === "pick" ? picked : [];
+    const delay = Math.round(Number(replayDelay));
+    if (replayOnly && !(delay >= 1 && delay <= 10080)) return toast.warn("Số phút xem lại phải từ 1 đến 10080 (7 ngày)");
+    const replay = { replayOnly, replayDelayMin: replayOnly ? delay : 60 };
     try {
       if (editingId) {
         await updateGrant({
           id: editingId,
           venueId,
           cameras,
+          ...replay,
           note: note.trim(),
           ...(days >= 0 ? { durationDays: days } : {}), // -1 = giữ nguyên hạn
         }).unwrap();
@@ -466,7 +474,7 @@ function ManageDialog({ venue, onClose }) {
         toast.success("Đã lưu thay đổi");
       } else {
         if (!phone.trim()) return toast.warn("Nhập số điện thoại");
-        await addGrant({ venueId, phone: phone.trim(), durationDays: days, note: note.trim(), cameras }).unwrap();
+        await addGrant({ venueId, phone: phone.trim(), durationDays: days, note: note.trim(), cameras, ...replay }).unwrap();
         resetForm();
         toast.success("Đã cấp quyền");
       }
@@ -581,6 +589,36 @@ function ManageDialog({ venue, onClose }) {
                 )}
               </Box>
 
+              {/* Quyền xem: đầy đủ / chỉ xem lại */}
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="caption" color="text.secondary">Quyền xem</Typography>
+                <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+                  <Chip
+                    label="Đầy đủ (xem trực tiếp + xem lại)"
+                    color={!replayOnly ? "info" : "default"}
+                    variant={!replayOnly ? "filled" : "outlined"}
+                    onClick={() => setReplayOnly(false)}
+                  />
+                  <Chip
+                    label="Chỉ xem lại"
+                    color={replayOnly ? "warning" : "default"}
+                    variant={replayOnly ? "filled" : "outlined"}
+                    onClick={() => setReplayOnly(true)}
+                  />
+                </Stack>
+                {replayOnly && (
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }} sx={{ mt: 1.5 }}>
+                    <TextField
+                      size="small" type="number" label="Chỉ xem video cũ hơn (phút)" value={replayDelay}
+                      onChange={(e) => setReplayDelay(e.target.value)} sx={{ width: 220 }} inputProps={{ min: 1, max: 10080 }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Không xem / ghi hình trực tiếp; chỉ xem và cắt video từ {Number(replayDelay) >= 1 ? replayDelay : 60} phút trước trở về trước.
+                    </Typography>
+                  </Stack>
+                )}
+              </Box>
+
               <Alert severity="info" sx={{ mt: 2 }}>
                 Khách đặt sân qua app tự được quyền cắt cam 48 giờ kể từ lúc nhận sân — không cần cấp thủ công.
               </Alert>
@@ -598,6 +636,7 @@ function ManageDialog({ venue, onClose }) {
                       <TableCell>Người dùng</TableCell>
                       <TableCell>SĐT</TableCell>
                       <TableCell>Camera</TableCell>
+                      <TableCell>Quyền xem</TableCell>
                       <TableCell>Ghi chú</TableCell>
                       <TableCell>Hạn</TableCell>
                       <TableCell align="right" />
@@ -613,6 +652,13 @@ function ManageDialog({ venue, onClose }) {
                             <Chip size="small" variant="outlined" label={g.cameras.map(camName).join(", ")} />
                           ) : (
                             <Chip size="small" color="info" variant="outlined" label="Tất cả" />
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {g.replayOnly ? (
+                            <Chip size="small" color="warning" variant="outlined" label={`Chỉ xem lại · trễ ${g.replayDelayMin || 60} phút`} />
+                          ) : (
+                            <Chip size="small" variant="outlined" label="Đầy đủ" />
                           )}
                         </TableCell>
                         <TableCell>{g.note || ""}</TableCell>
