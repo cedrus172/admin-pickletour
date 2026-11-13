@@ -101,6 +101,34 @@ VendorSelect.propTypes = {
   sx: PropTypes.object,
 };
 
+const ADMIN_URL_LABEL = "Địa chỉ quản trị camera — để thêm/sửa camera";
+const ADMIN_URL_HELP = "Pi qua Tailscale (http://100.x.x.x:9997) hoặc trang quản trị https://….pickletour.vn (sân dùng DDNS, cần đăng nhập). Thêm ?nvr=<số> để chỉ quản lý một đầu ghi.";
+
+// Trang quản trị dạng https cần tài khoản/mật khẩu (đăng nhập của trang, không phải của đầu ghi).
+function AdminLoginFields({ url, user, onUser, pass, onPass, hasPass }) {
+  if (!/^https:\/\//i.test(String(url || "").trim())) return null;
+  return (
+    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1.5 }}>
+      <TextField size="small" fullWidth label="Tài khoản trang quản trị" autoComplete="off" value={user} onChange={(e) => onUser(e.target.value)} />
+      <TextField
+        size="small" fullWidth type="password" autoComplete="new-password" label="Mật khẩu trang quản trị" value={pass}
+        onChange={(e) => onPass(e.target.value)}
+        placeholder={hasPass ? "Đã lưu — để trống nếu không đổi" : ""}
+        InputLabelProps={hasPass ? { shrink: true } : undefined}
+      />
+    </Stack>
+  );
+}
+
+AdminLoginFields.propTypes = {
+  url: PropTypes.string,
+  user: PropTypes.string,
+  onUser: PropTypes.func.isRequired,
+  pass: PropTypes.string,
+  onPass: PropTypes.func.isRequired,
+  hasPass: PropTypes.bool,
+};
+
 const EMPTY_NVR = { name: "", host: "", user: "admin", password: "", vendor: "dahua", channels: 16, rtspPort: 554, webPort: 80 };
 
 // Camera của sân: danh sách camera đang cho cắt clip (lưu trên Pi của sân) + thêm / sửa / xoá, thêm đầu ghi.
@@ -115,6 +143,7 @@ function CameraSection({ venueId, piAdminUrl, nvrVendor }) {
 
   const cameras = data?.cameras || [];
   const nvrs = data?.nvrs || [];
+  const nvrScoped = Boolean(data?.nvrScoped);
 
   const [editingId, setEditingId] = useState(null);
   const [nvrId, setNvrId] = useState("");
@@ -212,7 +241,7 @@ function CameraSection({ venueId, piAdminUrl, nvrVendor }) {
 
       {!piAdminUrl ? (
         <Typography variant="body2" color="text.secondary">
-          Nhập “Địa chỉ quản trị Pi (Tailscale)” ở mục Cấu hình rồi bấm Lưu cấu hình để thêm, sửa, xoá camera ngay tại đây.
+          Nhập “Địa chỉ quản trị camera” ở mục Cấu hình rồi bấm Lưu cấu hình để thêm, sửa, xoá camera ngay tại đây.
         </Typography>
       ) : isFetching && !data ? (
         <Box sx={{ textAlign: "center", py: 2 }}><CircularProgress size={22} /></Box>
@@ -265,7 +294,7 @@ function CameraSection({ venueId, piAdminUrl, nvrVendor }) {
           </Stack>
           {nvrs.length === 0 ? (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Pi của sân chưa có đầu ghi nào. Thêm đầu ghi bên dưới trước.
+              {nvrScoped ? "Không tìm thấy đầu ghi theo số ?nvr= trong địa chỉ quản trị." : "Pi của sân chưa có đầu ghi nào. Thêm đầu ghi bên dưới trước."}
             </Typography>
           ) : (
             <>
@@ -311,7 +340,7 @@ function CameraSection({ venueId, piAdminUrl, nvrVendor }) {
           )}
 
           {/* Thêm đầu ghi */}
-          <Box sx={{ mt: 2 }}>
+          {!nvrScoped && <Box sx={{ mt: 2 }}>
             <Button size="small" onClick={() => setShowNvrForm((v) => !v)}>
               {showNvrForm ? "Ẩn phần thêm đầu ghi" : "Thêm đầu ghi (NVR) mới"}
             </Button>
@@ -342,7 +371,7 @@ function CameraSection({ venueId, piAdminUrl, nvrVendor }) {
                 </Stack>
               </>
             )}
-          </Box>
+          </Box>}
         </>
       )}
     </Paper>
@@ -370,9 +399,13 @@ function ManageDialog({ venue, onClose }) {
   const [enabled, setEnabled] = useState(false);
   const [piBaseUrl, setPiBaseUrl] = useState("");
   const [piAdminUrl, setPiAdminUrl] = useState("");
+  const [piAdminUser, setPiAdminUser] = useState("");
+  const [piAdminPass, setPiAdminPass] = useState("");
   const [nvrVendor, setNvrVendor] = useState("dahua");
   useEffect(() => {
     if (data?.config) {
+      setPiAdminUser(data.config.piAdminUser || "");
+      setPiAdminPass("");
       setNvrVendor(data.config.nvrVendor || "dahua");
       setEnabled(!!data.config.enabled);
       setPiBaseUrl(data.config.piBaseUrl || "");
@@ -407,7 +440,11 @@ function ManageDialog({ venue, onClose }) {
 
   const onSaveConfig = async () => {
     try {
-      await setConfig({ venueId, enabled, piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor }).unwrap();
+      await setConfig({
+        venueId, enabled, piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor,
+        piAdminUser: piAdminUser.trim(), ...(piAdminPass ? { piAdminPass } : {}),
+      }).unwrap();
+      setPiAdminPass("");
       toast.success("Đã lưu cấu hình");
     } catch (e) {
       toast.error(e?.data?.message || "Không lưu được");
@@ -469,11 +506,15 @@ function ManageDialog({ venue, onClose }) {
               />
               <TextField
                 fullWidth size="small" sx={{ mt: 1.5 }}
-                label="Địa chỉ quản trị Pi (Tailscale) — để thêm/sửa camera"
-                placeholder="http://100.126.99.23:9997"
-                helperText="Địa chỉ Tailscale của Pi tại sân, cổng 9997. Chỉ dùng nội bộ để quản lý camera bên dưới."
+                label={ADMIN_URL_LABEL}
+                placeholder="http://100.126.99.23:9997 hoặc https://nvr.pickletour.vn/?nvr=1"
+                helperText={ADMIN_URL_HELP}
                 value={piAdminUrl}
                 onChange={(e) => setPiAdminUrl(e.target.value)}
+              />
+              <AdminLoginFields
+                url={piAdminUrl} user={piAdminUser} onUser={setPiAdminUser}
+                pass={piAdminPass} onPass={setPiAdminPass} hasPass={Boolean(data?.config?.piAdminHasPass)}
               />
               <VendorSelect value={nvrVendor} onChange={setNvrVendor} sx={{ mt: 1.5 }} />
               <Button variant="contained" sx={{ mt: 2, color: "#fff" }} onClick={onSaveConfig} disabled={savingCfg}>
@@ -620,6 +661,8 @@ function AddVenueDialog({ onClose, onDone }) {
   const [piBaseUrl, setPiBaseUrl] = useState("");
   const [piAdminUrl, setPiAdminUrl] = useState("");
   const [nvrVendor, setNvrVendor] = useState("dahua");
+  const [piAdminUser, setPiAdminUser] = useState("");
+  const [piAdminPass, setPiAdminPass] = useState("");
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(q.trim()), 400);
@@ -636,6 +679,8 @@ function AddVenueDialog({ onClose, onDone }) {
     setPiBaseUrl(v.piBaseUrl || "");
     setPiAdminUrl(v.piAdminUrl || "");
     setNvrVendor(v.nvrVendor || "dahua");
+    setPiAdminUser(v.piAdminUser || "");
+    setPiAdminPass("");
   };
 
   const onSubmit = async () => {
@@ -644,6 +689,7 @@ function AddVenueDialog({ onClose, onDone }) {
         if (!picked) return toast.warn("Tìm và chọn một sân");
         const r = await setConfig({
           venueId: picked.venueId, enabled: true, piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor,
+          piAdminUser: piAdminUser.trim(), ...(piAdminPass ? { piAdminPass } : {}),
         }).unwrap();
         toast.success(`Đã bật Cắt Cam Sân cho ${picked.venueName}`);
         onDone({ ...picked, enabled: true, nvrVendor, piBaseUrl: r?.piBaseUrl ?? piBaseUrl.trim(), piAdminUrl: r?.piAdminUrl ?? piAdminUrl.trim() });
@@ -652,6 +698,7 @@ function AddVenueDialog({ onClose, onDone }) {
         const v = await createVenue({
           name: name.trim(), address: address.trim(), province: province.trim(), ownerPhone: ownerPhone.trim(),
           piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor,
+          piAdminUser: piAdminUser.trim(), ...(piAdminPass ? { piAdminPass } : {}),
         }).unwrap();
         toast.success(`Đã thêm sân ${v.venueName}`);
         onDone(v);
@@ -732,8 +779,12 @@ function AddVenueDialog({ onClose, onDone }) {
                 helperText="Địa chỉ công khai của Pi tại sân. App chỉ hiện sân khi đã có địa chỉ này."
               />
               <TextField
-                size="small" fullWidth label="Địa chỉ quản trị Pi (Tailscale) — để thêm/sửa camera" placeholder="http://100.x.x.x:9997"
-                value={piAdminUrl} onChange={(e) => setPiAdminUrl(e.target.value)}
+                size="small" fullWidth label={ADMIN_URL_LABEL} placeholder="http://100.x.x.x:9997 hoặc https://nvr.pickletour.vn/?nvr=1"
+                value={piAdminUrl} onChange={(e) => setPiAdminUrl(e.target.value)} helperText={ADMIN_URL_HELP}
+              />
+              <AdminLoginFields
+                url={piAdminUrl} user={piAdminUser} onUser={setPiAdminUser}
+                pass={piAdminPass} onPass={setPiAdminPass} hasPass={Boolean(picked?.piAdminHasPass)}
               />
               <VendorSelect value={nvrVendor} onChange={setNvrVendor} />
             </>
