@@ -9,6 +9,11 @@ export const camClipApiSlice = apiSlice.injectEndpoints({
       query: (q) => ({ url: "/cam-clip/admin/venues", params: q ? { q } : {} }),
       providesTags: [{ type: "CamClip", id: "LIST" }],
     }),
+    // ADMIN: tạo sân mới đã bật Cắt Cam Sân.
+    createCamClipVenue: builder.mutation({
+      query: (body) => ({ url: "/cam-clip/admin/venues", method: "POST", body }),
+      invalidatesTags: [{ type: "CamClip", id: "LIST" }],
+    }),
     // Cấu hình + danh sách grant của 1 venue.
     camClipGrants: builder.query({
       query: (venueId) => `/cam-clip/venues/${venueId}/grants`,
@@ -104,6 +109,7 @@ export const camClipApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useAdminCamClipVenuesQuery,
+  useCreateCamClipVenueMutation,
   useCamClipGrantsQuery,
   useCamClipCamerasQuery,
   useCamClipPiQuery,

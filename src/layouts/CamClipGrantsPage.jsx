@@ -24,9 +24,12 @@ import {
   TableHead,
   TableRow,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -38,6 +41,7 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import {
   useAdminCamClipVenuesQuery,
+  useCreateCamClipVenueMutation,
   useCamClipGrantsQuery,
   useCamClipCamerasQuery,
   useCamClipPiQuery,
@@ -74,10 +78,33 @@ const STREAMS = [
   { label: "Luồng chính (nét)", value: 0 },
   { label: "Luồng phụ (nhẹ)", value: 1 },
 ];
+const NVR_VENDORS = [
+  { value: "dahua", label: "NVR Dahua — đủ tính năng (cắt theo phút, tua lại, ghi trực tiếp)" },
+  { value: "hikvision", label: "NVR Hikvision — chỉ ghi hình trực tiếp theo thời gian" },
+];
+
+function VendorSelect({ value, onChange, sx }) {
+  return (
+    <TextField
+      select fullWidth size="small" label="Loại đầu thu" value={value || "dahua"}
+      onChange={(e) => onChange(e.target.value)} sx={sx}
+      helperText="Quyết định chức năng trên app: Dahua cắt clip theo phút, Hikvision chỉ ghi hình trực tiếp."
+    >
+      {NVR_VENDORS.map((o) => (<MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>))}
+    </TextField>
+  );
+}
+
+VendorSelect.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  sx: PropTypes.object,
+};
+
 const EMPTY_NVR = { name: "", host: "", user: "admin", password: "", vendor: "dahua", channels: 16, rtspPort: 554, webPort: 80 };
 
 // Camera của sân: danh sách camera đang cho cắt clip (lưu trên Pi của sân) + thêm / sửa / xoá, thêm đầu ghi.
-function CameraSection({ venueId, piAdminUrl }) {
+function CameraSection({ venueId, piAdminUrl, nvrVendor }) {
   const { data, isFetching, error, refetch } = useCamClipPiQuery(venueId, { skip: !piAdminUrl });
   const [addCamera, { isLoading: adding }] = useAddCamClipPiCameraMutation();
   const [updateCamera, { isLoading: updating }] = useUpdateCamClipPiCameraMutation();
@@ -97,7 +124,8 @@ function CameraSection({ venueId, piAdminUrl }) {
   const [description, setDescription] = useState("");
   const [scanned, setScanned] = useState(null); // kênh quét được trên đầu ghi
   const [showNvrForm, setShowNvrForm] = useState(false);
-  const [nvr, setNvr] = useState(EMPTY_NVR);
+  const freshNvr = () => ({ ...EMPTY_NVR, vendor: nvrVendor === "hikvision" ? "hikvision" : "dahua" });
+  const [nvr, setNvr] = useState(freshNvr);
 
   // Chỉ có một đầu ghi thì chọn sẵn.
   useEffect(() => {
@@ -167,7 +195,7 @@ function CameraSection({ venueId, piAdminUrl }) {
     }
     try {
       const r = await addNvr({ venueId, ...nvr, name: nvr.name.trim(), host: nvr.host.trim(), user: nvr.user.trim() }).unwrap();
-      setNvr(EMPTY_NVR); setShowNvrForm(false);
+      setNvr(freshNvr()); setShowNvrForm(false);
       if (r?.id) setNvrId(r.id);
       toast.success("Đã thêm đầu ghi");
     } catch (e) {
@@ -324,6 +352,7 @@ function CameraSection({ venueId, piAdminUrl }) {
 CameraSection.propTypes = {
   venueId: PropTypes.string.isRequired,
   piAdminUrl: PropTypes.string,
+  nvrVendor: PropTypes.string,
 };
 
 function ManageDialog({ venue, onClose }) {
@@ -341,8 +370,10 @@ function ManageDialog({ venue, onClose }) {
   const [enabled, setEnabled] = useState(false);
   const [piBaseUrl, setPiBaseUrl] = useState("");
   const [piAdminUrl, setPiAdminUrl] = useState("");
+  const [nvrVendor, setNvrVendor] = useState("dahua");
   useEffect(() => {
     if (data?.config) {
+      setNvrVendor(data.config.nvrVendor || "dahua");
       setEnabled(!!data.config.enabled);
       setPiBaseUrl(data.config.piBaseUrl || "");
       setPiAdminUrl(data.config.piAdminUrl || "");
@@ -376,7 +407,7 @@ function ManageDialog({ venue, onClose }) {
 
   const onSaveConfig = async () => {
     try {
-      await setConfig({ venueId, enabled, piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim() }).unwrap();
+      await setConfig({ venueId, enabled, piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor }).unwrap();
       toast.success("Đã lưu cấu hình");
     } catch (e) {
       toast.error(e?.data?.message || "Không lưu được");
@@ -444,13 +475,14 @@ function ManageDialog({ venue, onClose }) {
                 value={piAdminUrl}
                 onChange={(e) => setPiAdminUrl(e.target.value)}
               />
+              <VendorSelect value={nvrVendor} onChange={setNvrVendor} sx={{ mt: 1.5 }} />
               <Button variant="contained" sx={{ mt: 2, color: "#fff" }} onClick={onSaveConfig} disabled={savingCfg}>
                 {savingCfg ? "Đang lưu…" : "Lưu cấu hình"}
               </Button>
             </Paper>
 
             {/* Camera của sân (thêm / sửa / xoá camera muốn cắt clip) */}
-            <CameraSection venueId={venueId} piAdminUrl={data?.config?.piAdminUrl || ""} />
+            <CameraSection venueId={venueId} piAdminUrl={data?.config?.piAdminUrl || ""} nvrVendor={data?.config?.nvrVendor || "dahua"} />
 
             {/* Cấp quyền / Sửa quyền */}
             <Paper variant="outlined" sx={{ p: 2, ...(editingId ? { borderColor: "info.main" } : {}) }}>
@@ -575,10 +607,162 @@ ManageDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
+// Thêm sân vào Cắt Cam Sân: chọn sân có sẵn (bật + nhập địa chỉ Pi) hoặc tạo sân mới.
+function AddVenueDialog({ onClose, onDone }) {
+  const [mode, setMode] = useState("existing");
+  const [q, setQ] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [picked, setPicked] = useState(null);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [province, setProvince] = useState("");
+  const [ownerPhone, setOwnerPhone] = useState("");
+  const [piBaseUrl, setPiBaseUrl] = useState("");
+  const [piAdminUrl, setPiAdminUrl] = useState("");
+  const [nvrVendor, setNvrVendor] = useState("dahua");
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(q.trim()), 400);
+    return () => clearTimeout(t);
+  }, [q]);
+  const { data, isFetching } = useAdminCamClipVenuesQuery(debounced, { skip: mode !== "existing" || !debounced });
+  const results = debounced && Array.isArray(data) ? data : [];
+
+  const [setConfig, { isLoading: saving }] = useSetCamClipConfigMutation();
+  const [createVenue, { isLoading: creating }] = useCreateCamClipVenueMutation();
+
+  const pick = (v) => {
+    setPicked(v);
+    setPiBaseUrl(v.piBaseUrl || "");
+    setPiAdminUrl(v.piAdminUrl || "");
+    setNvrVendor(v.nvrVendor || "dahua");
+  };
+
+  const onSubmit = async () => {
+    try {
+      if (mode === "existing") {
+        if (!picked) return toast.warn("Tìm và chọn một sân");
+        const r = await setConfig({
+          venueId: picked.venueId, enabled: true, piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor,
+        }).unwrap();
+        toast.success(`Đã bật Cắt Cam Sân cho ${picked.venueName}`);
+        onDone({ ...picked, enabled: true, nvrVendor, piBaseUrl: r?.piBaseUrl ?? piBaseUrl.trim(), piAdminUrl: r?.piAdminUrl ?? piAdminUrl.trim() });
+      } else {
+        if (!name.trim()) return toast.warn("Nhập tên sân");
+        const v = await createVenue({
+          name: name.trim(), address: address.trim(), province: province.trim(), ownerPhone: ownerPhone.trim(),
+          piBaseUrl: piBaseUrl.trim(), piAdminUrl: piAdminUrl.trim(), nvrVendor,
+        }).unwrap();
+        toast.success(`Đã thêm sân ${v.venueName}`);
+        onDone(v);
+      }
+    } catch (e) {
+      toast.error(e?.data?.message || "Không thêm được sân");
+    }
+  };
+
+  return (
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Thêm sân Cắt Cam Sân</DialogTitle>
+      <DialogContent dividers>
+        <Stack spacing={2}>
+          <ToggleButtonGroup
+            exclusive size="small" color="primary" value={mode}
+            onChange={(e, v) => { if (v) { setMode(v); setPicked(null); } }}
+          >
+            <ToggleButton value="existing">Sân có sẵn</ToggleButton>
+            <ToggleButton value="new">Tạo sân mới</ToggleButton>
+          </ToggleButtonGroup>
+
+          {mode === "existing" ? (
+            <>
+              <TextField
+                size="small" fullWidth autoFocus label="Tìm sân theo tên" value={q}
+                onChange={(e) => { setQ(e.target.value); setPicked(null); }}
+                InputProps={{ endAdornment: isFetching ? <CircularProgress size={16} /> : null }}
+              />
+              {debounced && !isFetching && results.length === 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  Không thấy sân này. Chuyển sang “Tạo sân mới”.
+                </Typography>
+              )}
+              {results.length > 0 && (
+                <Paper variant="outlined" sx={{ maxHeight: 220, overflowY: "auto" }}>
+                  <Table size="small">
+                    <TableBody>
+                      {results.map((v) => (
+                        <TableRow
+                          key={v.venueId} hover selected={picked?.venueId === v.venueId}
+                          onClick={() => pick(v)} sx={{ cursor: "pointer" }}
+                        >
+                          <TableCell>{v.venueName}</TableCell>
+                          <TableCell align="right">
+                            <Chip size="small" color={v.enabled ? "success" : "default"} label={v.enabled ? "Đã bật" : "Chưa bật"} />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Paper>
+              )}
+            </>
+          ) : (
+            <>
+              <TextField size="small" fullWidth autoFocus label="Tên sân" value={name} onChange={(e) => setName(e.target.value)} />
+              <TextField size="small" fullWidth label="Địa chỉ (tuỳ chọn)" value={address} onChange={(e) => setAddress(e.target.value)} />
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+                <TextField size="small" label="Tỉnh/thành (tuỳ chọn)" value={province} onChange={(e) => setProvince(e.target.value)} sx={{ flex: 1 }} />
+                <TextField
+                  size="small" label="SĐT chủ sân (tuỳ chọn)" value={ownerPhone}
+                  onChange={(e) => setOwnerPhone(e.target.value)} sx={{ flex: 1 }}
+                  helperText="Để trống: tài khoản của bạn làm chủ sân"
+                />
+              </Stack>
+              <Typography variant="caption" color="text.secondary">
+                Sân mới chỉ dùng cho Cắt Cam Sân, chưa hiện trong danh sách đặt sân (có thể bật ở Quản lý sân).
+              </Typography>
+            </>
+          )}
+
+          {(mode === "new" || picked) && (
+            <>
+              <TextField
+                size="small" fullWidth label="Pi base URL (camera venue)" placeholder="https://tensan.pickletour.vn"
+                value={piBaseUrl} onChange={(e) => setPiBaseUrl(e.target.value)}
+                helperText="Địa chỉ công khai của Pi tại sân. App chỉ hiện sân khi đã có địa chỉ này."
+              />
+              <TextField
+                size="small" fullWidth label="Địa chỉ quản trị Pi (Tailscale) — để thêm/sửa camera" placeholder="http://100.x.x.x:9997"
+                value={piAdminUrl} onChange={(e) => setPiAdminUrl(e.target.value)}
+              />
+              <VendorSelect value={nvrVendor} onChange={setNvrVendor} />
+            </>
+          )}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Huỷ</Button>
+        <Button
+          variant="contained" sx={{ color: "#fff" }} onClick={onSubmit}
+          disabled={saving || creating || (mode === "existing" && !picked)}
+        >
+          {mode === "existing" ? "Bật và quản lý camera" : "Thêm sân"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+AddVenueDialog.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onDone: PropTypes.func.isRequired,
+};
+
 export default function CamClipGrantsPage() {
   const [q, setQ] = useState("");
   const [debounced, setDebounced] = useState("");
   const [selected, setSelected] = useState(null);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(q.trim()), 400);
@@ -592,7 +776,12 @@ export default function CamClipGrantsPage() {
     <DashboardLayout>
       <DashboardNavbar />
       <Box sx={{ py: 3, px: { xs: 1, md: 2 } }}>
-        <Typography variant="h5" gutterBottom>Quyền Cắt Cam Sân (PickClip)</Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ gap: 1 }}>
+          <Typography variant="h5" gutterBottom>Quyền Cắt Cam Sân (PickClip)</Typography>
+          <Button variant="contained" sx={{ color: "#fff" }} startIcon={<AddIcon />} onClick={() => setAdding(true)}>
+            Thêm sân
+          </Button>
+        </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Bật tính năng cho từng sân (nhập Pi base URL), thêm camera muốn cắt và cấp quyền cắt cam cho người dùng — bấm Quản lý ở từng sân. Khách đặt sân tự có 48 giờ.
         </Typography>
@@ -615,6 +804,7 @@ export default function CamClipGrantsPage() {
               <TableRow>
                 <TableCell>Sân</TableCell>
                 <TableCell>Trạng thái</TableCell>
+                <TableCell>Đầu thu</TableCell>
                 <TableCell>Pi base URL</TableCell>
                 <TableCell>Đã cấp</TableCell>
                 <TableCell align="right" />
@@ -622,8 +812,8 @@ export default function CamClipGrantsPage() {
             </TableHead>
             <TableBody>
               {venues.length === 0 ? (
-                <TableRow><TableCell colSpan={5} align="center" sx={{ py: 4, color: "text.secondary" }}>
-                  {debounced ? "Không tìm thấy sân." : "Chưa có sân nào bật. Gõ tên sân để tìm và bật."}
+                <TableRow><TableCell colSpan={6} align="center" sx={{ py: 4, color: "text.secondary" }}>
+                  {debounced ? "Không tìm thấy sân." : "Chưa có sân nào bật. Bấm “Thêm sân” để thêm."}
                 </TableCell></TableRow>
               ) : (
                 venues.map((v) => (
@@ -632,6 +822,7 @@ export default function CamClipGrantsPage() {
                     <TableCell>
                       <Chip size="small" color={v.enabled ? "success" : "default"} label={v.enabled ? "Đã bật" : "Chưa bật"} />
                     </TableCell>
+                    <TableCell>{v.nvrVendor === "hikvision" ? "Hikvision" : "Dahua"}</TableCell>
                     <TableCell sx={{ maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.piBaseUrl || "—"}</TableCell>
                     <TableCell>{v.grantCount || 0}</TableCell>
                     <TableCell align="right">
@@ -646,6 +837,12 @@ export default function CamClipGrantsPage() {
       </Box>
 
       {selected && <ManageDialog venue={selected} onClose={() => setSelected(null)} />}
+      {adding && (
+        <AddVenueDialog
+          onClose={() => setAdding(false)}
+          onDone={(v) => { setAdding(false); setSelected(v); }}
+        />
+      )}
     </DashboardLayout>
   );
 }
