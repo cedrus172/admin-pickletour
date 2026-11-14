@@ -50,6 +50,12 @@ const SCOPE_META = [
     desc: "Gen ảnh bìa tin tức (/images/generations). Chỉ dùng endpoint được chọn; để trống = dùng SEO_NEWS_IMAGE_GENERATION_URL trong ENV.",
     explicit: true,
   },
+  {
+    key: "gemini",
+    label: "Thay Gemini (tin tức)",
+    desc: "Tìm tin SEO, tìm bài V2 (cần endpoint hỗ trợ Responses API + web_search, vd api.openai.com) và chuẩn hoá bài V2. Để trống = dùng Google Gemini như cũ; bật fallback thì endpoint lỗi sẽ quay về Gemini.",
+    explicit: true,
+  },
 ];
 
 const emptyScope = {
@@ -75,6 +81,7 @@ const normalizeConfig = (config = {}) => ({
     default: { ...emptyScope, ...(config.scopes?.default || {}) },
     pikora: { ...emptyScope, ...(config.scopes?.pikora || {}) },
     seoImage: { ...emptyScope, ...(config.scopes?.seoImage || {}) },
+    gemini: { ...emptyScope, ...(config.scopes?.gemini || {}) },
   },
 });
 
