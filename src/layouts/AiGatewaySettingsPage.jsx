@@ -38,6 +38,18 @@ const SCOPE_META = [
   { key: "cccd", label: "CCCD / KYC", desc: "Đọc ảnh CCCD và auto review KYC." },
   { key: "poster", label: "Poster / ảnh đăng ký", desc: "AI đọc poster và ảnh liên quan đăng ký." },
   { key: "default", label: "AI mặc định", desc: "Các luồng AI dùng client OpenAI chung." },
+  {
+    key: "pikora",
+    label: "Pikora (chatbot)",
+    desc: "Trợ lý Pikora trên web/app. Chỉ dùng endpoint được chọn; để trống = dùng PIKORA_BASE_URL trong ENV.",
+    explicit: true,
+  },
+  {
+    key: "seoImage",
+    label: "Ảnh tin tức SEO",
+    desc: "Gen ảnh bìa tin tức (/images/generations). Chỉ dùng endpoint được chọn; để trống = dùng SEO_NEWS_IMAGE_GENERATION_URL trong ENV.",
+    explicit: true,
+  },
 ];
 
 const emptyScope = {
@@ -61,6 +73,8 @@ const normalizeConfig = (config = {}) => ({
     cccd: { ...emptyScope, ...(config.scopes?.cccd || {}) },
     poster: { ...emptyScope, ...(config.scopes?.poster || {}) },
     default: { ...emptyScope, ...(config.scopes?.default || {}) },
+    pikora: { ...emptyScope, ...(config.scopes?.pikora || {}) },
+    seoImage: { ...emptyScope, ...(config.scopes?.seoImage || {}) },
   },
 });
 
@@ -633,7 +647,9 @@ export default function AiGatewaySettingsPage() {
                             renderValue: (selected) =>
                               selected.length
                                 ? selected.map((id) => endpointLabelById.get(id) || id).join(", ")
-                                : "Tất cả endpoint đang bật",
+                                : scopeMeta.explicit
+                                  ? "Chưa chọn — dùng ENV"
+                                  : "Tất cả endpoint đang bật",
                           }}
                           fullWidth
                         >
@@ -685,11 +701,11 @@ export default function AiGatewaySettingsPage() {
                 Fallback và trạng thái
               </Typography>
               <Divider />
-              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2} useFlexGap flexWrap="wrap">
                 {SCOPE_META.map((scopeMeta) => {
                   const fallback = data?.envFallbacks?.[scopeMeta.key] || {};
                   return (
-                    <Alert key={scopeMeta.key} severity={fallback.apiKeySet ? "info" : "warning"} sx={{ flex: 1 }}>
+                    <Alert key={scopeMeta.key} severity={fallback.apiKeySet ? "info" : "warning"} sx={{ flex: 1, minWidth: 240 }}>
                       <Typography fontWeight={700}>{scopeMeta.label}</Typography>
                       <Typography variant="body2">Model ENV: {fallback.model || "-"}</Typography>
                       <Typography variant="body2">Base URL ENV: {fallback.baseUrl || "-"}</Typography>
