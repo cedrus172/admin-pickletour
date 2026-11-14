@@ -312,6 +312,19 @@ const DEFAULT_PO_RULES = {
   cap: { mode: "none", points: null },
 };
 
+// Số timeout mỗi đội/game + nghỉ y tế toàn trận. Trống = mặc định của trận (2 / 1).
+const TIMEOUT_RULE_KEYS = ["timeoutPerGame", "medicalTimeouts"];
+const pickTimeoutRules = (r) => {
+  const out = {};
+  TIMEOUT_RULE_KEYS.forEach((key) => {
+    const raw = r?.[key];
+    if (raw === null || raw === undefined || raw === "") return;
+    const n = Number(raw);
+    if (Number.isFinite(n) && n >= 0 && n <= 20) out[key] = Math.trunc(n);
+  });
+  return out;
+};
+
 const normalizeRulesForState = (r = {}, fallback = DEFAULT_RULES) => ({
   bestOf: Number(r.bestOf ?? fallback.bestOf),
   pointsToWin: Number(r.pointsToWin ?? fallback.pointsToWin),
@@ -320,6 +333,7 @@ const normalizeRulesForState = (r = {}, fallback = DEFAULT_RULES) => ({
     mode: String(r?.cap?.mode ?? fallback.cap.mode),
     points: r?.cap?.points === null || r?.cap?.points === undefined ? null : Number(r.cap.points),
   },
+  ...pickTimeoutRules(r),
 });
 const ruleSummary = (r) => {
   const base = `BO${r.bestOf} • ${r.pointsToWin} điểm • ${r.winByTwo ? "Win by 2" : "No win-by-2"}`;
@@ -327,7 +341,15 @@ const ruleSummary = (r) => {
     r?.cap?.mode && r.cap.mode !== "none"
       ? ` • Cap: ${r.cap.mode}${Number.isFinite(Number(r.cap.points)) ? ` @${r.cap.points}` : ""}`
       : "";
-  return base + cap;
+  const timeouts = [
+    Number.isFinite(Number(r?.timeoutPerGame)) && r?.timeoutPerGame !== null && r?.timeoutPerGame !== undefined
+      ? ` • Timeout: ${r.timeoutPerGame}/đội/game`
+      : "",
+    Number.isFinite(Number(r?.medicalTimeouts)) && r?.medicalTimeouts !== null && r?.medicalTimeouts !== undefined
+      ? ` • Y tế: ${r.medicalTimeouts}/trận`
+      : "",
+  ].join("");
+  return base + cap + timeouts;
 };
 
 function RulesEditor({ label = "Luật trận", value, onChange, disabled = false }) {
@@ -335,6 +357,13 @@ function RulesEditor({ label = "Luật trận", value, onChange, disabled = fals
   const set = (patch) => {
     if (disabled) return;
     onChange({ ...v, ...patch });
+  };
+  const setCount = (key, raw) => {
+    if (disabled) return;
+    const next = { ...v };
+    if (raw === "" || raw === null || raw === undefined) delete next[key];
+    else next[key] = Math.max(0, Math.min(20, parseInt(raw, 10) || 0));
+    onChange(next);
   };
 
   return (
@@ -421,6 +450,32 @@ function RulesEditor({ label = "Luật trận", value, onChange, disabled = fals
         disabled={disabled || v.cap.mode === "none"}
         placeholder={v.cap.mode === "none" ? "—" : "e.g. 15"}
       />
+
+      <TextField
+        size="small"
+        type="number"
+        label="Timeout / đội / game"
+        value={v.timeoutPerGame ?? ""}
+        onChange={(e) => setCount("timeoutPerGame", e.target.value)}
+        sx={{ width: 170 }}
+        disabled={disabled}
+        placeholder="Mặc định 2"
+        InputLabelProps={{ shrink: true }}
+        inputProps={{ min: 0, max: 20, step: 1 }}
+      />
+
+      <TextField
+        size="small"
+        type="number"
+        label="Nghỉ y tế / trận"
+        value={v.medicalTimeouts ?? ""}
+        onChange={(e) => setCount("medicalTimeouts", e.target.value)}
+        sx={{ width: 150 }}
+        disabled={disabled}
+        placeholder="Mặc định 1"
+        InputLabelProps={{ shrink: true }}
+        inputProps={{ min: 0, max: 20, step: 1 }}
+      />
     </Stack>
   );
 }
@@ -434,6 +489,8 @@ RulesEditor.propTypes = {
       mode: PropTypes.string,
       points: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([null])]),
     }),
+    timeoutPerGame: PropTypes.number,
+    medicalTimeouts: PropTypes.number,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
