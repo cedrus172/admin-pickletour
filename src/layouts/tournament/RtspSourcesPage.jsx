@@ -78,6 +78,38 @@ const EMPTY_FORM = {
   sponsor: "bottom-right",
 };
 
+// Chia nguồn theo venue, suy từ tên gợi nhớ: "Lã Vọng - Sân 1" hoặc "Sân 1 - Thành Nam Ninh Bình".
+// Tên không có " - " (vd "S25 Ultra") vào nhóm "Khác".
+const OTHER_VENUE = "Khác";
+const isCourtPart = (p) => /^sân(\s|\d|$)/i.test(p);
+function splitRtspLabel(label) {
+  const clean = String(label || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const parts = clean.split(/\s+-\s+/).filter(Boolean);
+  if (parts.length < 2) return { venue: "", court: clean };
+  if (isCourtPart(parts[0]) && !isCourtPart(parts[parts.length - 1])) {
+    return { venue: parts.slice(1).join(" - "), court: parts[0] };
+  }
+  return { venue: parts[0], court: parts.slice(1).join(" - ") };
+}
+const viCompare = (a, b) => a.localeCompare(b, "vi", { numeric: true, sensitivity: "base" });
+function groupRtspByVenue(list) {
+  const map = new Map();
+  list.forEach((source) => {
+    const { venue, court } = splitRtspLabel(source?.label);
+    const name = venue || OTHER_VENUE;
+    const key = name.toLowerCase();
+    if (!map.has(key)) map.set(key, { venue: name, items: [] });
+    map.get(key).items.push({ source, court });
+  });
+  return [...map.values()]
+    .sort(
+      (a, b) => (a.venue === OTHER_VENUE) - (b.venue === OTHER_VENUE) || viCompare(a.venue, b.venue)
+    )
+    .map((g) => ({ ...g, items: g.items.sort((x, y) => viCompare(x.court, y.court)) }));
+}
+
 export default function RtspSourcesPage() {
   const { data: sources = [], isLoading, isFetching, refetch } = useListRtspSourcesAllQuery();
   const [bulkDisable, { isLoading: toggling }] = useBulkSetRtspDisabledMutation();
@@ -107,6 +139,7 @@ export default function RtspSourcesPage() {
     () => [...sources].sort((a, b) => (a.label || "").localeCompare(b.label || "")),
     [sources],
   );
+  const groups = useMemo(() => groupRtspByVenue(rows), [rows]);
 
   const allIds = rows.map((r) => r._id);
   const allChecked = allIds.length > 0 && selected.length === allIds.length;
@@ -116,6 +149,12 @@ export default function RtspSourcesPage() {
   const toggleOne = (id) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   const toggleAll = () => setSelected(allChecked ? [] : allIds);
+  const toggleGroup = (ids) =>
+    setSelected((s) =>
+      ids.every((id) => s.includes(id))
+        ? s.filter((x) => !ids.includes(x))
+        : [...s, ...ids.filter((id) => !s.includes(id))]
+    );
 
   const openAdd = () => {
     setEditingId(null);
@@ -370,74 +409,103 @@ export default function RtspSourcesPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((s) => (
-                    <TableRow
-                      key={s._id}
-                      hover
-                      selected={selectedSet.has(s._id)}
-                      sx={s.disabled ? { opacity: 0.5 } : undefined}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="info"
-                          checked={selectedSet.has(s._id)}
-                          onChange={() => toggleOne(s._id)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <MDTypography variant="button" fontWeight="medium">
-                          {s.label}
-                        </MDTypography>
-                        {s.disabled ? (
-                          <Chip size="small" label="Đã tắt" color="error" variant="outlined" sx={{ ml: 1 }} />
-                        ) : null}
-                      </TableCell>
-                      <TableCell sx={{ maxWidth: 320 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            fontFamily: "monospace",
-                            wordBreak: "break-all",
-                            color: "rgba(255,255,255,0.75)",
-                          }}
+                  {groups.map((g) => {
+                    const groupIds = g.items.map((it) => it.source._id);
+                    const groupChecked = groupIds.every((id) => selectedSet.has(id));
+                    const groupSome = !groupChecked && groupIds.some((id) => selectedSet.has(id));
+                    return [
+                      <TableRow key={`venue-${g.venue}`}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="info"
+                            checked={groupChecked}
+                            indeterminate={groupSome}
+                            onChange={() => toggleGroup(groupIds)}
+                          />
+                        </TableCell>
+                        <TableCell colSpan={7}>
+                          <MDTypography variant="button" fontWeight="bold">
+                            {g.venue}
+                          </MDTypography>
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{ ml: 1, color: "rgba(255,255,255,0.6)" }}
+                          >
+                            {g.items.length} nguồn
+                          </Typography>
+                        </TableCell>
+                      </TableRow>,
+                      ...g.items.map(({ source: s }) => (
+                        <TableRow
+                          key={s._id}
+                          hover
+                          selected={selectedSet.has(s._id)}
+                          sx={s.disabled ? { opacity: 0.5 } : undefined}
                         >
-                          {s.url}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip size="small" label={s.transport} variant="outlined" color="info" />
-                      </TableCell>
-                      <TableCell>{renderResult(s._id)}</TableCell>
-                      <TableCell>
-                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)" }}>
-                          {cornerLabel(s.layout?.scoreboard)} · {cornerLabel(s.layout?.brand)} ·{" "}
-                          {cornerLabel(s.layout?.sponsor)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ maxWidth: 200 }}>
-                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
-                          {s.note || "—"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title="Test kết nối">
-                          <IconButton size="small" color="info" onClick={() => runTest([s._id])}>
-                            <NetworkCheckIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Sửa">
-                          <IconButton size="small" color="info" onClick={() => openEdit(s)}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Xoá">
-                          <IconButton size="small" color="error" onClick={() => setConfirmDel(s)}>
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              color="info"
+                              checked={selectedSet.has(s._id)}
+                              onChange={() => toggleOne(s._id)}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <MDTypography variant="button" fontWeight="medium">
+                              {s.label}
+                            </MDTypography>
+                            {s.disabled ? (
+                              <Chip size="small" label="Đã tắt" color="error" variant="outlined" sx={{ ml: 1 }} />
+                            ) : null}
+                          </TableCell>
+                          <TableCell sx={{ maxWidth: 320 }}>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontFamily: "monospace",
+                                wordBreak: "break-all",
+                                color: "rgba(255,255,255,0.75)",
+                              }}
+                            >
+                              {s.url}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip size="small" label={s.transport} variant="outlined" color="info" />
+                          </TableCell>
+                          <TableCell>{renderResult(s._id)}</TableCell>
+                          <TableCell>
+                            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)" }}>
+                              {cornerLabel(s.layout?.scoreboard)} · {cornerLabel(s.layout?.brand)} ·{" "}
+                              {cornerLabel(s.layout?.sponsor)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ maxWidth: 200 }}>
+                            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+                              {s.note || "—"}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
+                            <Tooltip title="Test kết nối">
+                              <IconButton size="small" color="info" onClick={() => runTest([s._id])}>
+                                <NetworkCheckIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Sửa">
+                              <IconButton size="small" color="info" onClick={() => openEdit(s)}>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Xoá">
+                              <IconButton size="small" color="error" onClick={() => setConfirmDel(s)}>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      )),
+                    ];
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
