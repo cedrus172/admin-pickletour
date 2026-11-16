@@ -152,6 +152,7 @@ const hydrateFormState = (source) => ({
   },
   referee: {
     matchControlLockEnabled: source?.referee?.matchControlLockEnabled ?? true,
+    optimisticScoringEnabled: source?.referee?.optimisticScoringEnabled ?? true,
   },
   privacy: {
     hideUserRatings: source?.privacy?.hideUserRatings ?? false,
@@ -1781,6 +1782,7 @@ export default function SystemSettingsPage() {
     },
     referee: {
       matchControlLockEnabled: source.referee?.matchControlLockEnabled ?? true,
+      optimisticScoringEnabled: source.referee?.optimisticScoringEnabled ?? true,
     },
     privacy: {
       hideUserRatings: !!source.privacy?.hideUserRatings,
@@ -1918,6 +1920,11 @@ export default function SystemSettingsPage() {
         successOff: "Đã tắt khóa trọng tài bắt trận",
         error: "Không thể cập nhật khóa trọng tài bắt trận",
       },
+      "referee.optimisticScoringEnabled": {
+        successOn: "Đã bật chấm điểm trên máy trước",
+        successOff: "Đã tắt, app trọng tài quay về chờ server",
+        error: "Không thể cập nhật chế độ chấm điểm",
+      },
     };
 
     if (instantToggleMeta[path]) {
@@ -1928,15 +1935,14 @@ export default function SystemSettingsPage() {
 
       persistSettings(nextForm, { showSuccessToast: false })
         .then(() => {
-          toast.success(checked ? "Đã bật chế độ bảo trì" : "Đã tắt chế độ bảo trì");
+          const meta = instantToggleMeta[path];
+          toast.success(checked ? meta.successOn : meta.successOff);
         })
         .catch((error) => {
           setForm(previousForm);
           console.error(error);
           toast.error(
-            error?.data?.message ||
-              error?.message ||
-              "Không thể cập nhật trạng thái bảo trì"
+            error?.data?.message || error?.message || instantToggleMeta[path].error
           );
         });
       return;
@@ -3022,6 +3028,26 @@ export default function SystemSettingsPage() {
               <Switch
                 checked={!!form.referee?.matchControlLockEnabled}
                 onChange={handleRefereeMatchControlLockToggle}
+              />
+            </Stack>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              spacing={2}
+              sx={{ mt: 2 }}
+            >
+              <Box sx={{ pr: 2 }}>
+                <Typography fontWeight={700}>Chấm điểm trên máy trước (không chờ mạng)</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Khi bật, app trọng tài cộng điểm / đổi giao ngay trên máy rồi đồng bộ server ở nền —
+                  bấm không còn chậm khi wifi yếu. Tắt đi thì app quay về bản cũ (chờ server trả kết
+                  quả mới đổi điểm). Có hiệu lực ngay, không cần cập nhật app.
+                </Typography>
+              </Box>
+              <Switch
+                checked={form.referee?.optimisticScoringEnabled !== false}
+                onChange={onToggle("referee.optimisticScoringEnabled")}
               />
             </Stack>
           </Section>
