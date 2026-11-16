@@ -121,7 +121,7 @@ const hydrateFormState = (source) => ({
     webViewUrl: source?.appShell?.webViewUrl ?? "",
   },
   frontendUi: {
-    version: ["v1", "v2", "v3"].includes(source?.frontendUi?.version)
+    version: ["v1", "v2", "v3", "v4"].includes(source?.frontendUi?.version)
       ? source.frontendUi.version
       : "v1",
   },
@@ -257,6 +257,11 @@ const FRONTEND_UI_OPTIONS = [
     value: "v3",
     label: "V3",
     description: "Modern Sports UI theo nhận diện navy–cyan của ứng dụng PickleTour mobile.",
+  },
+  {
+    value: "v4",
+    label: "V4",
+    description: "Giao diện sáng mới (xanh dương + xanh chanh) theo app mobile V3. Xem thử trước: pickletour.vn/?ui=v4",
   },
 ];
 
@@ -1763,7 +1768,7 @@ export default function SystemSettingsPage() {
       webViewUrl: source.appShell?.webViewUrl ?? "",
     },
     frontendUi: {
-      version: ["v1", "v2", "v3"].includes(source.frontendUi?.version)
+      version: ["v1", "v2", "v3", "v4"].includes(source.frontendUi?.version)
         ? source.frontendUi.version
         : "v1",
     },
@@ -2260,7 +2265,9 @@ export default function SystemSettingsPage() {
             </Stack>
 
             <Alert severity="info">
-              {form.frontendUi?.version === "v3"
+              {form.frontendUi?.version === "v4"
+                ? "V4 là giao diện sáng mới; V1, V2, V3 vẫn được giữ nguyên để có thể chuyển về bất kỳ lúc nào."
+                : form.frontendUi?.version === "v3"
                 ? "V3 sử dụng giao diện Modern Sports riêng; V1 và V2 vẫn được giữ nguyên để có thể chuyển đổi bất kỳ lúc nào."
                 : "Thay đổi này áp dụng cho frontend public và vẫn giữ nguyên toàn bộ giao diện cũ ở V1."}
             </Alert>
