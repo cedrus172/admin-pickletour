@@ -1316,7 +1316,8 @@ export default function AdminBracketsPage() {
         type: newBracketType,
         stage: newBracketStage,
         order: Number(newBracketOrder),
-        noRankDelta: !!tournament?.noRankDelta, // ⭐ NEW
+        // Minigame: bracket mới mặc định không tính điểm trình
+        noRankDelta: !!tournament?.noRankDelta || tournament?.kind === "minigame", // ⭐ NEW
       };
 
       // Knockout: có thể gửi drawRounds + meta khi bật custom scale

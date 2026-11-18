@@ -19,6 +19,9 @@ import {
   InputAdornment,
   Slider,
   Switch,
+  Tabs,
+  Tab,
+  Alert,
 } from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -515,6 +518,7 @@ export default function TournamentFormPage() {
     noRankDelta: false,
     allowExceedMaxRating: false,
     isTest: false,
+    kind: "tournament", // "tournament" | "minigame"
 
     // phạm vi chấm
     scoringScopeType: "national",
@@ -769,6 +773,7 @@ export default function TournamentFormPage() {
       noRankDelta: !!tour.noRankDelta,
       allowExceedMaxRating: !!tour.allowExceedMaxRating,
       isTest: !!tour.isTest,
+      kind: tour.kind === "minigame" ? "minigame" : "tournament",
 
       scoringScopeType: scopeType,
       scoringProvinces: scopeProvinces,
@@ -901,6 +906,7 @@ export default function TournamentFormPage() {
       noRankDelta: !!form.noRankDelta,
       allowExceedMaxRating: !!form.allowExceedMaxRating,
       isTest: !!form.isTest,
+      kind: form.kind === "minigame" ? "minigame" : "tournament",
 
       scoringScope: {
         type: scoringScopeType,
@@ -1108,7 +1114,9 @@ export default function TournamentFormPage() {
             justifyContent="space-between"
             mb={3}
           >
-            <Typography variant="h4">{isEdit ? "Sửa Giải đấu" : "Tạo Giải đấu"}</Typography>
+            <Typography variant="h4">
+              {isEdit ? "Sửa" : "Tạo"} {form.kind === "minigame" ? "Minigame" : "Giải đấu"}
+            </Typography>
             {isEdit ? (
               <Button
                 variant="outlined"
@@ -1121,6 +1129,24 @@ export default function TournamentFormPage() {
               </Button>
             ) : null}
           </Stack>
+
+          {/* Loại: Giải đấu thường hay Minigame (giải nhỏ, không tính điểm trình) */}
+          <Tabs
+            value={form.kind === "minigame" ? "minigame" : "tournament"}
+            onChange={(_, v) => setForm((p) => ({ ...p, kind: v }))}
+            sx={{ mb: 2, maxWidth: 420 }}
+          >
+            <Tab value="tournament" label="Giải đấu" />
+            <Tab value="minigame" label="Minigame" />
+          </Tabs>
+          {form.kind === "minigame" ? (
+            <Alert severity="info" sx={{ mb: 3 }}>
+              Minigame là giải nhỏ: nằm riêng ở mục Minigame trong tab Giải đấu của app, ở
+              &quot;Giải nổi bật&quot; luôn xếp sau các giải đấu và có nhãn Minigame. Các bracket
+              tạo sau sẽ{" "}
+              <b>mặc định không tính điểm trình</b> (vẫn bật lại được ở từng bracket).
+            </Alert>
+          ) : null}
 
           <Box
             component="form"
