@@ -1,5 +1,5 @@
 // layouts/pcoin/PcoinPage.jsx
-// Quản lý PCoin: tổng quan, số dư từng tài khoản, nạp / trừ, lịch sử giao dịch, giá tính năng.
+// Tab PCoin trong Quản lý người dùng: tổng quan, số dư từng tài khoản, nạp / trừ, lịch sử giao dịch, giá tính năng.
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
@@ -38,10 +38,6 @@ import HistoryIcon from "@mui/icons-material/History";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
-import { useSearchParams } from "react-router-dom";
-
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 import {
   useAdjustPcoinMutation,
@@ -413,19 +409,15 @@ function TransactionsTab({ user, onClearUser }) {
 }
 TransactionsTab.propTypes = { user: PropTypes.object, onClearUser: PropTypes.func.isRequired };
 
-export default function PcoinPage() {
-  const [params] = useSearchParams();
-  const [tab, setTab] = useState(params.get("tab") === "tx" ? 1 : 0);
+/** Nội dung quản lý PCoin — nhúng làm tab "PCoin" trong Quản lý người dùng. */
+export function PcoinPanel() {
+  const [tab, setTab] = useState(0);
   const [adjust, setAdjust] = useState(null); // { user, mode }
   const [historyUser, setHistoryUser] = useState(null);
   const { data: summary } = useGetPcoinSummaryQuery();
   return (
-    <DashboardLayout>
-      <DashboardNavbar />
+    <>
       <Box sx={{ p: { xs: 1, md: 3 } }}>
-        <Typography variant="h4" sx={{ mb: 0.5 }}>
-          PCoin
-        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Đồng xu trong app PickleTour. Dùng để tạo video Highlight & VAR. Admin nạp hoặc trừ cho từng tài khoản; mọi thay đổi đều ghi lịch sử.
         </Typography>
@@ -453,6 +445,6 @@ export default function PcoinPage() {
         )}
       </Box>
       {adjust ? <PcoinAdjustDialog user={adjust.user} initialMode={adjust.mode} onClose={() => setAdjust(null)} /> : null}
-    </DashboardLayout>
+    </>
   );
 }

@@ -10,7 +10,6 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import UserManagement from "layouts/user/UserListPage";
-import PcoinPage from "layouts/pcoin/PcoinPage";
 import CoachApprovalsPage from "layouts/coaches/CoachApprovalsPage";
 import SelfAssessmentManagementPage from "layouts/user/SelfAssessmentManagementPage";
 import AssessmentHistoryPage from "layouts/user/AssessmentHistoryPage";
@@ -330,16 +329,6 @@ const routes = [
     icon: <Icon fontSize="small">people</Icon>,
     route: "/users",
     component: <UserManagement />,
-    private: true,
-    roles: ["admin"],
-  },
-  {
-    type: "collapse",
-    name: "PCoin",
-    key: "pcoin",
-    icon: <Icon fontSize="small">toll</Icon>,
-    route: "/admin/pcoin",
-    component: <PcoinPage />,
     private: true,
     roles: ["admin"],
   },

@@ -74,7 +74,9 @@ import {
   useDeleteUserMutation,
   useRestoreUserMutation,
 } from "slices/adminApiSlice";
-import { PcoinAdjustDialog } from "layouts/pcoin/PcoinPage";
+import { PcoinAdjustDialog, PcoinPanel } from "layouts/pcoin/PcoinPage";
+import { Tab as MuiTab, Tabs as MuiTabs } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
 import { useResetNicknameCooldownMutation } from "slices/nicknameRequestsApiSlice";
 
 import { setPage, setKeyword, setRole } from "slices/adminUiSlice";
@@ -277,6 +279,15 @@ export default function UserManagement() {
   // dialogs
   const [edit, setEdit] = useState(null);
   const [pcoinUser, setPcoinUser] = useState(null);
+  // Tab chính: Tài khoản | PCoin (giữ trên URL ?tab=pcoin để mở thẳng)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const mainTab = searchParams.get("tab") === "pcoin" ? "pcoin" : "accounts";
+  const setMainTab = (v) => {
+    const next = new URLSearchParams(searchParams);
+    if (v === "pcoin") next.set("tab", "pcoin");
+    else next.delete("tab");
+    setSearchParams(next, { replace: true });
+  };
   const [kyc, setKyc] = useState(null);
   const [zoom, setZoom] = useState(null);
   // ==== OCR CCCD (Cedrus) — đọc trực tiếp trong dialog KYC ====
@@ -693,6 +704,19 @@ export default function UserManagement() {
     <DashboardLayout>
       <DashboardNavbar />
 
+      <MDBox px={3} pt={2}>
+        <MuiTabs value={mainTab} onChange={(_, v) => setMainTab(v)} sx={{ maxWidth: 420 }}>
+          <MuiTab value="accounts" label="Tài khoản" />
+          <MuiTab value="pcoin" label="Số dư PCoin" />
+        </MuiTabs>
+      </MDBox>
+
+      {mainTab === "pcoin" ? (
+        <MDBox px={{ xs: 0, md: 0 }}>
+          <PcoinPanel />
+        </MDBox>
+      ) : (
+      <>
       {/* Toolbar */}
       <MDBox px={3} pt={4}>
         <Stack
@@ -807,6 +831,8 @@ export default function UserManagement() {
 
       {/* Backfill CCCD bằng AI - component riêng */}
       <CccdAiBackfillCard showSnack={showSnack} onRefetch={refetch} />
+      </>
+      )}
 
       <Footer />
 
