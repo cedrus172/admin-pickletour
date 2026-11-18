@@ -74,6 +74,7 @@ import {
   useDeleteUserMutation,
   useRestoreUserMutation,
 } from "slices/adminApiSlice";
+import { PcoinAdjustDialog } from "layouts/pcoin/PcoinPage";
 import { useResetNicknameCooldownMutation } from "slices/nicknameRequestsApiSlice";
 
 import { setPage, setKeyword, setRole } from "slices/adminUiSlice";
@@ -275,6 +276,7 @@ export default function UserManagement() {
 
   // dialogs
   const [edit, setEdit] = useState(null);
+  const [pcoinUser, setPcoinUser] = useState(null);
   const [kyc, setKyc] = useState(null);
   const [zoom, setZoom] = useState(null);
   // ==== OCR CCCD (Cedrus) — đọc trực tiếp trong dialog KYC ====
@@ -424,6 +426,7 @@ export default function UserManagement() {
     { Header: "Phone", accessor: "phone", align: "center" },
     { Header: "Điểm đơn", accessor: "single", align: "center" },
     { Header: "Điểm đôi", accessor: "double", align: "center" },
+    { Header: "PCoin", accessor: "pcoin", align: "center" },
     { Header: "Role", accessor: "role", align: "center" },
     { Header: "CCCD", accessor: "cccd", align: "center" },
     { Header: "Thao tác", accessor: "act", align: "center", width: "17%" },
@@ -467,6 +470,17 @@ export default function UserManagement() {
         ),
         single: <MDTypography variant="button">{u.single}</MDTypography>,
         double: <MDTypography variant="button">{u.double}</MDTypography>,
+        pcoin: (
+          <Tooltip title="Nạp / trừ PCoin">
+            <Chip
+              size="small"
+              clickable
+              onClick={() => setPcoinUser(u)}
+              label={Number(u.pcoin || 0).toLocaleString("vi-VN")}
+              sx={{ fontWeight: 700, color: u.pcoin > 0 ? "#b45309" : "text.secondary", bgcolor: u.pcoin > 0 ? "rgba(245,158,11,.15)" : undefined }}
+            />
+          </Tooltip>
+        ),
         role: (
           <Stack
             direction="row"
@@ -1564,6 +1578,7 @@ export default function UserManagement() {
           </>
         )}
       </Dialog>
+      {pcoinUser ? <PcoinAdjustDialog user={pcoinUser} onClose={() => setPcoinUser(null)} /> : null}
     </DashboardLayout>
   );
 }
