@@ -25,6 +25,8 @@ import {
 } from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 
 // === MUI X Date Pickers v5 ===
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -514,6 +516,7 @@ export default function TournamentFormPage() {
     contactHtml: "",
     contentHtml: "",
     zaloGroupUrl: "",
+    photoAlbums: [], // [{ title, url }] — thư mục Google Drive công khai
     maxPairs: 0,
     noRankDelta: false,
     allowExceedMaxRating: false,
@@ -770,6 +773,9 @@ export default function TournamentFormPage() {
       contactHtml: tour.contactHtml || "",
       contentHtml: tour.contentHtml || "",
       zaloGroupUrl: tour.zaloGroupUrl || "",
+      photoAlbums: Array.isArray(tour.photoAlbums)
+        ? tour.photoAlbums.map((a) => ({ title: a?.title || "", url: a?.url || "" }))
+        : [],
       noRankDelta: !!tour.noRankDelta,
       allowExceedMaxRating: !!tour.allowExceedMaxRating,
       isTest: !!tour.isTest,
@@ -902,6 +908,9 @@ export default function TournamentFormPage() {
       contactHtml: form.contactHtml,
       contentHtml: form.contentHtml,
       zaloGroupUrl: form.zaloGroupUrl,
+      photoAlbums: (form.photoAlbums || [])
+        .map((a) => ({ title: String(a?.title || "").trim(), url: String(a?.url || "").trim() }))
+        .filter((a) => a.url),
       maxPairs: Number(form.maxPairs) || 0,
       noRankDelta: !!form.noRankDelta,
       allowExceedMaxRating: !!form.allowExceedMaxRating,
@@ -1866,6 +1875,71 @@ export default function TournamentFormPage() {
                     }
                     helperText="Người dùng bấm nút này ở trang giải để tham gia nhóm Zalo."
                   />
+                </Grid>
+
+                {/* Album ảnh (Google Drive) */}
+                <Grid item xs={12}>
+                  <Card variant="outlined" sx={{ p: 2 }}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                      <PhotoLibraryIcon fontSize="small" />
+                      <Typography variant="h6">Album ảnh</Typography>
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+                      Dán link thư mục Google Drive (chia sẻ &quot;Bất kỳ ai có đường liên kết&quot;). VĐV xem và
+                      tải ảnh ngay trong app/web; thư mục con (vd. 4.4, 4.8) tự thành từng mục.
+                    </Typography>
+                    <Stack spacing={1.5}>
+                      {(form.photoAlbums || []).map((album, idx) => (
+                        <Stack key={idx} direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ sm: "center" }}>
+                          <TextField
+                            label="Tên album"
+                            placeholder="Ảnh VĐV ngày 1"
+                            value={album.title}
+                            onChange={(e) =>
+                              setForm((p) => ({
+                                ...p,
+                                photoAlbums: p.photoAlbums.map((a, i) => (i === idx ? { ...a, title: e.target.value } : a)),
+                              }))
+                            }
+                            sx={{ minWidth: 220 }}
+                          />
+                          <TextField
+                            fullWidth
+                            label="Link thư mục Google Drive"
+                            placeholder="https://drive.google.com/drive/folders/..."
+                            value={album.url}
+                            onChange={(e) =>
+                              setForm((p) => ({
+                                ...p,
+                                photoAlbums: p.photoAlbums.map((a, i) => (i === idx ? { ...a, url: e.target.value } : a)),
+                              }))
+                            }
+                            error={!!album.url && !/drive\.google\.com\/(drive\/)?(u\/\d+\/)?folders\/|[?&]id=/.test(album.url)}
+                          />
+                          <Tooltip title="Xoá album">
+                            <Button
+                              color="error"
+                              onClick={() =>
+                                setForm((p) => ({ ...p, photoAlbums: p.photoAlbums.filter((_, i) => i !== idx) }))
+                              }
+                            >
+                              <DeleteOutlineIcon />
+                            </Button>
+                          </Tooltip>
+                        </Stack>
+                      ))}
+                      <Box>
+                        <Button
+                          variant="outlined"
+                          onClick={() =>
+                            setForm((p) => ({ ...p, photoAlbums: [...(p.photoAlbums || []), { title: "", url: "" }] }))
+                          }
+                        >
+                          + Thêm album
+                        </Button>
+                      </Box>
+                    </Stack>
+                  </Card>
                 </Grid>
 
                 {/* Editors */}
