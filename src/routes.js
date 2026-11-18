@@ -10,6 +10,7 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import UserManagement from "layouts/user/UserListPage";
+import FaceDataPage from "layouts/faceData/FaceDataPage";
 import CoachApprovalsPage from "layouts/coaches/CoachApprovalsPage";
 import SelfAssessmentManagementPage from "layouts/user/SelfAssessmentManagementPage";
 import AssessmentHistoryPage from "layouts/user/AssessmentHistoryPage";
@@ -329,6 +330,16 @@ const routes = [
     icon: <Icon fontSize="small">people</Icon>,
     route: "/users",
     component: <UserManagement />,
+    private: true,
+    roles: ["admin"],
+  },
+  {
+    type: "collapse",
+    name: "Dữ liệu tra cứu ảnh VĐV",
+    key: "face-data",
+    icon: <Icon fontSize="small">face_retouching_natural</Icon>,
+    route: "/admin/face-data",
+    component: <FaceDataPage />,
     private: true,
     roles: ["admin"],
   },
