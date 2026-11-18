@@ -150,6 +150,16 @@ const hydrateFormState = (source) => ({
   liveCourtMonitor: {
     enabled: source?.liveCourtMonitor?.enabled ?? true,
   },
+  features: {
+    highlightVar: source?.features?.highlightVar ?? true,
+    photoAlbum: source?.features?.photoAlbum ?? true,
+    albumFaceSearch: source?.features?.albumFaceSearch ?? true,
+    albumIdentify: source?.features?.albumIdentify ?? true,
+    minigame: source?.features?.minigame ?? true,
+    heroBanner: source?.features?.heroBanner ?? true,
+    guestRegistration: source?.features?.guestRegistration ?? true,
+    spcFaceLookup: source?.features?.spcFaceLookup ?? true,
+  },
   referee: {
     matchControlLockEnabled: source?.referee?.matchControlLockEnabled ?? true,
     optimisticScoringEnabled: source?.referee?.optimisticScoringEnabled ?? true,
@@ -1694,6 +1704,16 @@ export default function SystemSettingsPage() {
     liveCourtMonitor: {
       enabled: source?.liveCourtMonitor?.enabled !== false,
     },
+    features: {
+      highlightVar: source?.features?.highlightVar !== false,
+      photoAlbum: source?.features?.photoAlbum !== false,
+      albumFaceSearch: source?.features?.albumFaceSearch !== false,
+      albumIdentify: source?.features?.albumIdentify !== false,
+      minigame: source?.features?.minigame !== false,
+      heroBanner: source?.features?.heroBanner !== false,
+      guestRegistration: source?.features?.guestRegistration !== false,
+      spcFaceLookup: source?.features?.spcFaceLookup !== false,
+    },
     kyc: {
       enabled: !!source.kyc?.enabled,
       autoApprove: !!source.kyc?.autoApprove,
@@ -1931,6 +1951,15 @@ export default function SystemSettingsPage() {
         error: "Không thể cập nhật chế độ chấm điểm",
       },
     };
+
+    // Công tắc tính năng (features.*) cũng lưu ngay.
+    if (!instantToggleMeta[path] && path.startsWith("features.")) {
+      instantToggleMeta[path] = {
+        successOn: "Đã bật tính năng",
+        successOff: "Đã tắt tính năng",
+        error: "Không thể cập nhật tính năng",
+      };
+    }
 
     if (instantToggleMeta[path]) {
       const previousForm = structuredClone(form || {});
@@ -3001,6 +3030,32 @@ export default function SystemSettingsPage() {
                 ? "Checkpoint đang tắt ở mức hệ thống. User sẽ không bị ép vào luồng checkpoint cho đến khi bật lại."
                 : "Checkpoint đang bật ở mức hệ thống. Policy checkpoint hiện tại vẫn quyết định khi nào cần xác minh."}
             </Alert>
+          </Section>
+
+          <Section
+            title="Tính năng (web + app)"
+            desc="Bật/tắt hiển thị từng tính năng trên web và app PickleTour. Tắt = ẩn khỏi giao diện, API của tính năng trả 403 (admin vẫn dùng thử được). Lưu ngay khi bấm."
+          >
+            {[
+              { key: "highlightVar", title: "Highlight & VAR", desc: "Phân tích video trận bằng AI: highlight tự dựng + soi VAR (app: Khác → Highlight & VAR, nút ở Cắt Cam Sân)." },
+              { key: "photoAlbum", title: "Album ảnh giải", desc: "Nút Album ảnh ở trang giải, danh sách giải và trang đăng ký (web + app)." },
+              { key: "albumFaceSearch", title: "Tìm ảnh theo khuôn mặt", desc: "“Tìm ảnh của tôi” và “Tìm ảnh người này” trong album." },
+              { key: "albumIdentify", title: "Đây là ai? (nhận diện VĐV)", desc: "Nút nhận diện tài khoản VĐV từ khuôn mặt trong ảnh album." },
+              { key: "minigame", title: "Minigame", desc: "Công tắc Giải đấu | Minigame, ô Minigame ở trang chủ và minigame trong Giải nổi bật." },
+              { key: "heroBanner", title: "Banner AI đầu trang giải", desc: "Nền banner tạo từ poster bằng AI ở trang tổng quan / đăng ký (tắt = dùng giao diện cũ)." },
+              { key: "guestRegistration", title: "Đăng ký VĐV ngoài hệ thống", desc: "Chế độ admin đăng ký VĐV chưa có tài khoản (tài khoản khách theo SĐT)." },
+              { key: "spcFaceLookup", title: "Tra cứu ảnh VĐV (admin)", desc: "Tìm tên, SĐT VĐV trong dữ liệu SPC từ khuôn mặt." },
+            ].map((f) => (
+              <Stack key={f.key} direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ py: 0.75 }}>
+                <Box sx={{ pr: 2 }}>
+                  <Typography fontWeight={700}>{f.title}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {f.desc}
+                  </Typography>
+                </Box>
+                <Switch checked={form.features?.[f.key] !== false} onChange={onToggle(`features.${f.key}`)} />
+              </Stack>
+            ))}
           </Section>
 
           <Section
