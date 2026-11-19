@@ -31,7 +31,7 @@ import { useCreateFaceWorkerKeyMutation, useGetFaceSourcesQuery, useRunFaceSourc
 
 const fmt = (n) => Number(n || 0).toLocaleString("vi-VN");
 const fmtDate = (d) => (d ? new Date(d).toLocaleString("vi-VN") : "—");
-const COLOR = { spc: "#2563eb", pbvn: "#16a34a" };
+const COLOR = { spc: "#2563eb", pbvn: "#16a34a", pt: "#0891b2" };
 const STATUS = {
   idle: { label: "Chưa chạy", color: "default" },
   pulling: { label: "Đang kéo dữ liệu", color: "info" },
@@ -82,7 +82,7 @@ function SourceCard({ s, onRun, running }) {
       </Stack>
 
       <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
-        <Stat label="VĐV trong dữ liệu" value={fmt(s.rows)} sub={`${fmt(s.withAvatar)} có ảnh đại diện`} />
+        <Stat label="VĐV trong dữ liệu" value={fmt(s.rows)} sub={s.source === "pt" ? `${fmt(s.withAvatar)} ảnh (đại diện + CCCD)` : `${fmt(s.withAvatar)} có ảnh đại diện`} />
         <Stat label="Đã có mã khuôn mặt" value={fmt(s.faces)} sub="dùng để tra cứu" />
         <Stat
           label="Lần kéo dữ liệu gần nhất"
@@ -193,7 +193,7 @@ export default function FaceDataPage() {
           <Typography variant="h4">Dữ liệu tra cứu ảnh VĐV</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Nguồn dữ liệu cho tính năng &quot;Tra cứu ảnh VĐV&quot; (web + app). Kết quả tra cứu ghi rõ VĐV thuộc SportConnect hay PickleballVN.
+          Nguồn dữ liệu cho tính năng &quot;Tra cứu ảnh VĐV&quot; (web + app). Kết quả tra cứu ghi rõ VĐV thuộc SportConnect, PickleballVN hay tài khoản PickleTour (PickleTour quét cả ảnh đại diện lẫn ảnh CCCD).
         </Typography>
         {isLoading ? (
           <Box sx={{ py: 6, textAlign: "center" }}>
