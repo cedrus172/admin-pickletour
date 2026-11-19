@@ -2,6 +2,7 @@
 // bật/tắt (tất cả / chỉ admin + người quản lý / tắt), cấp quyền quản lý gian hàng trong app cho tài khoản GOATWIN,
 // thông tin gian hàng + tài khoản nhận chuyển khoản (QR VietQR). Sản phẩm & đơn hàng quản lý ngay trong app PickleTour.
 import React from "react";
+import PropTypes from "prop-types";
 import {
   Alert,
   Autocomplete,
@@ -38,6 +39,7 @@ const VIS = [
 function Field({ label, value, onChange, ...rest }) {
   return <TextField fullWidth size="small" label={label} value={value || ""} onChange={(e) => onChange(e.target.value)} {...rest} />;
 }
+Field.propTypes = { label: PropTypes.string, value: PropTypes.string, onChange: PropTypes.func.isRequired };
 
 export default function ShopSettingsPage() {
   const { data, isLoading, error, refetch } = useGetShopConfigQuery();
