@@ -11,7 +11,11 @@ export const faceDataApiSlice = apiSlice.injectEndpoints({
       query: ({ source, mode }) => ({ url: `/admin/spc-face/sources/${source}/run`, method: "POST", body: { mode } }),
       invalidatesTags: ["FaceSources"],
     }),
+    createFaceWorkerKey: builder.mutation({
+      query: () => ({ url: "/admin/spc-face/worker-key", method: "POST" }),
+      invalidatesTags: ["FaceSources"],
+    }),
   }),
 });
 
-export const { useGetFaceSourcesQuery, useRunFaceSourceMutation } = faceDataApiSlice;
+export const { useGetFaceSourcesQuery, useRunFaceSourceMutation, useCreateFaceWorkerKeyMutation } = faceDataApiSlice;

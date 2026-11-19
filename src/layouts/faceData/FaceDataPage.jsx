@@ -21,11 +21,13 @@ import {
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ReplayIcon from "@mui/icons-material/Replay";
 import FaceRetouchingNaturalIcon from "@mui/icons-material/FaceRetouchingNatural";
+import StopIcon from "@mui/icons-material/Stop";
+import KeyIcon from "@mui/icons-material/Key";
 import { toast } from "react-toastify";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import { useGetFaceSourcesQuery, useRunFaceSourceMutation } from "slices/faceDataApiSlice";
+import { useCreateFaceWorkerKeyMutation, useGetFaceSourcesQuery, useRunFaceSourceMutation } from "slices/faceDataApiSlice";
 
 const fmt = (n) => Number(n || 0).toLocaleString("vi-VN");
 const fmtDate = (d) => (d ? new Date(d).toLocaleString("vi-VN") : "—");
@@ -36,6 +38,7 @@ const STATUS = {
   indexing: { label: "Đang quét ảnh", color: "warning" },
   done: { label: "Đã xong", color: "success" },
   failed: { label: "Lỗi", color: "error" },
+  stopped: { label: "Đã dừng", color: "default" },
 };
 
 function Stat({ label, value, sub }) {
@@ -66,7 +69,12 @@ function SourceCard({ s, onRun, running }) {
       <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ sm: "center" }} justifyContent="space-between">
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Chip label={s.label} sx={{ bgcolor: COLOR[s.source], color: "#fff !important", fontWeight: 800 }} />
-          <Chip size="small" color={st.color} label={st.label + (busy && s.mode === "reindex" ? " (reindex toàn bộ)" : "")} variant={busy ? "filled" : "outlined"} />
+          <Chip
+            size="small"
+            color={st.color}
+            label={st.label + (busy && s.mode === "reindex" ? " (reindex toàn bộ)" : "") + (busy && s.runner === "windows" ? " · máy Windows" : "")}
+            variant={busy ? "filled" : "outlined"}
+          />
         </Stack>
         <Typography variant="caption" color="text.secondary" sx={{ wordBreak: "break-all" }}>
           {s.url}
@@ -128,6 +136,17 @@ function SourceCard({ s, onRun, running }) {
         >
           Reindex toàn bộ avatar
         </Button>
+        {busy ? (
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={running === `${s.source}:stop` ? <CircularProgress size={16} /> : <StopIcon />}
+            disabled={!!running}
+            onClick={() => onRun(s, "stop")}
+          >
+            Dừng
+          </Button>
+        ) : null}
       </Stack>
       <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 1 }}>
         &quot;Kéo & cập nhật&quot; tải lại file nguồn, thêm/sửa/xoá VĐV rồi chỉ quét ảnh VĐV mới hoặc đổi ảnh. &quot;Reindex&quot; kéo dữ liệu rồi quét lại
@@ -149,11 +168,13 @@ export default function FaceDataPage() {
 
   React.useEffect(() => setPoll(anyBusy ? 4000 : 0), [anyBusy]);
 
+  const [createKey, { isLoading: creatingKey }] = useCreateFaceWorkerKeyMutation();
+  const [newKey, setNewKey] = React.useState("");
   const doRun = async (s, mode) => {
     setRunning(`${s.source}:${mode}`);
     try {
       await run({ source: s.source, mode }).unwrap();
-      toast.success(mode === "reindex" ? `Đã bắt đầu reindex ${s.label}` : `Đang kéo dữ liệu ${s.label}`);
+      toast.success(mode === "stop" ? `Đã dừng ${s.label}` : mode === "reindex" ? `Đã bắt đầu reindex ${s.label}` : `Đang kéo dữ liệu ${s.label}`);
       setPoll(4000);
     } catch (e) {
       toast.error(e?.data?.message || "Không chạy được");
@@ -187,9 +208,60 @@ export default function FaceDataPage() {
             {sources.map((s) => (
               <SourceCard key={s.source} s={s} onRun={onRun} running={running} />
             ))}
+            <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3 }}>
+              <Typography variant="h6" fontWeight={800}>
+                Quét bằng máy Windows
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Bộ quét (thư mục face-service/windows-worker) chạy trên máy ngoài: tự tải ảnh, tính mã khuôn mặt rồi gửi về — máy chủ
+                không tốn CPU. Chạy &quot;quet-anh-moi.bat&quot; (ảnh mới/đổi) hoặc &quot;reindex-toan-bo.bat&quot;; chạy lại thì làm tiếp chỗ dừng.
+              </Typography>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }} sx={{ mt: 1.5 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={creatingKey ? <CircularProgress size={16} /> : <KeyIcon />}
+                  disabled={creatingKey}
+                  onClick={async () => {
+                    try {
+                      const r = await createKey().unwrap();
+                      setNewKey(r.key);
+                    } catch (e) {
+                      toast.error(e?.data?.message || "Không tạo được mã");
+                    }
+                  }}
+                >
+                  {data?.workerKey ? "Tạo mã kết nối mới" : "Tạo mã kết nối"}
+                </Button>
+                <Typography variant="caption" color="text.secondary">
+                  {data?.workerKey
+                    ? `Mã hiện tại tạo lúc ${fmtDate(data.workerKey.createdAt)} — tạo mã mới thì mã cũ hết hiệu lực`
+                    : "Chưa có mã kết nối"}
+                </Typography>
+              </Stack>
+            </Paper>
           </Stack>
         )}
       </Box>
+      <Dialog open={!!newKey} onClose={() => setNewKey("")} maxWidth="sm" fullWidth>
+        <DialogTitle>Mã kết nối bộ quét</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            Mã chỉ hiện một lần. Dán vào bộ quét khi được hỏi (hoặc sửa &quot;key&quot; trong config.json).
+          </Typography>
+          <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "action.hover", fontFamily: "monospace", wordBreak: "break-all" }}>{newKey}</Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              navigator.clipboard?.writeText(newKey);
+              toast.success("Đã chép mã");
+            }}
+          >
+            Chép mã
+          </Button>
+          <Button onClick={() => setNewKey("")}>Đóng</Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={!!confirm} onClose={() => setConfirm(null)} maxWidth="xs" fullWidth>
         <DialogTitle>Reindex toàn bộ avatar {confirm?.label}?</DialogTitle>
         <DialogContent>
