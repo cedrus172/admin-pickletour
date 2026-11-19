@@ -11,6 +11,7 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import UserManagement from "layouts/user/UserListPage";
 import FaceDataPage from "layouts/faceData/FaceDataPage";
+import ShopSettingsPage from "layouts/shop/ShopSettingsPage";
 import CoachApprovalsPage from "layouts/coaches/CoachApprovalsPage";
 import SelfAssessmentManagementPage from "layouts/user/SelfAssessmentManagementPage";
 import AssessmentHistoryPage from "layouts/user/AssessmentHistoryPage";
@@ -340,6 +341,16 @@ const routes = [
     icon: <Icon fontSize="small">face_retouching_natural</Icon>,
     route: "/admin/face-data",
     component: <FaceDataPage />,
+    private: true,
+    roles: ["admin"],
+  },
+  {
+    type: "collapse",
+    name: "Gian hàng GOATWIN",
+    key: "shop-goatwin",
+    icon: <Icon fontSize="small">storefront</Icon>,
+    route: "/admin/shop",
+    component: <ShopSettingsPage />,
     private: true,
     roles: ["admin"],
   },

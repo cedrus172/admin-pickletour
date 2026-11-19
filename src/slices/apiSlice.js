@@ -61,6 +61,7 @@ export const apiSlice = createApi({
   baseQuery,
   tagTypes: [
     "FaceSources",
+    "ShopConfig",
     "Pcoin",
     "CamClip",
     "CourtOwnerRequests",
