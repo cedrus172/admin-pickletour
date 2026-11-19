@@ -62,6 +62,7 @@ export const apiSlice = createApi({
   tagTypes: [
     "FaceSources",
     "ShopConfig",
+    "OrganizeRequests",
     "Pcoin",
     "CamClip",
     "CourtOwnerRequests",
