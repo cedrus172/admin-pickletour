@@ -13,6 +13,7 @@ import UserManagement from "layouts/user/UserListPage";
 import FaceDataPage from "layouts/faceData/FaceDataPage";
 import ShopSettingsPage from "layouts/shop/ShopSettingsPage";
 import OrganizeRequestsPage from "layouts/organize/OrganizeRequestsPage";
+import VarCourtsPage from "layouts/var/VarCourtsPage";
 import CoachApprovalsPage from "layouts/coaches/CoachApprovalsPage";
 import SelfAssessmentManagementPage from "layouts/user/SelfAssessmentManagementPage";
 import AssessmentHistoryPage from "layouts/user/AssessmentHistoryPage";
@@ -362,6 +363,16 @@ const routes = [
     icon: <Icon fontSize="small">emoji_events</Icon>,
     route: "/admin/organize-requests",
     component: <OrganizeRequestsPage />,
+    private: true,
+    roles: ["admin"],
+  },
+  {
+    type: "collapse",
+    name: "Sân VAR",
+    key: "var-courts",
+    icon: <Icon fontSize="small">sports_tennis</Icon>,
+    route: "/admin/var-courts",
+    component: <VarCourtsPage />,
     private: true,
     roles: ["admin"],
   },

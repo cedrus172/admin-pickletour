@@ -63,6 +63,7 @@ export const apiSlice = createApi({
     "FaceSources",
     "ShopConfig",
     "OrganizeRequests",
+    "VarCourts",
     "Pcoin",
     "CamClip",
     "CourtOwnerRequests",
