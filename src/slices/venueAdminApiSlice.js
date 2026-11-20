@@ -30,6 +30,17 @@ export const venueAdminApiSlice = apiSlice.injectEndpoints({
         { type: "VenueAdmin", id: "LIST" },
       ],
     }),
+    updateVenueAdmin: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/venues/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (res, err, { id }) => [
+        { type: "VenueAdmin", id },
+        { type: "VenueAdmin", id: "LIST" },
+      ],
+    }),
     listBookingsAdmin: builder.query({
       query: ({ page = 1, limit = 20, status = "", payment = "", venueId = "", from = "", to = "" } = {}) => {
         const p = new URLSearchParams();
@@ -53,5 +64,6 @@ export const {
   useListVenuesAdminQuery,
   useGetVenueAdminQuery,
   useSetVenueStatusMutation,
+  useUpdateVenueAdminMutation,
   useListBookingsAdminQuery,
 } = venueAdminApiSlice;

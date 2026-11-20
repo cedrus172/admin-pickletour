@@ -20,6 +20,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import EditIcon from "@mui/icons-material/Edit";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -33,6 +34,7 @@ import {
   useListVenuesAdminQuery,
   useSetVenueStatusMutation,
 } from "slices/venueAdminApiSlice";
+import VenueEditDialog from "./VenueEditDialog";
 
 const fmtVND = (n) => `${(Number(n) || 0).toLocaleString("vi-VN")}đ`;
 const STATUS = {
@@ -47,6 +49,7 @@ export default function VenueListPage() {
   const [keyword, setKeyword] = useState("");
   const [applied, setApplied] = useState("");
   const [status, setStatus] = useState("");
+  const [editing, setEditing] = useState(null);
   const limit = 20;
 
   const { data, isFetching } = useListVenuesAdminQuery(
@@ -84,7 +87,7 @@ export default function VenueListPage() {
     { Header: "Tỉnh/TP", accessor: "province", align: "left" },
     { Header: "Số sân", accessor: "courts", align: "center" },
     { Header: "Trạng thái", accessor: "status", align: "center" },
-    { Header: "Thao tác", accessor: "act", align: "center", width: "16%" },
+    { Header: "Thao tác", accessor: "act", align: "center", width: "20%" },
   ];
 
   const rows = items.map((v) => {
@@ -124,6 +127,16 @@ export default function VenueListPage() {
             onClick={() => navigate(`/admin/venues/${v._id}`)}
           >
             <VisibilityIcon />
+          </MDButton>
+          <MDButton
+            size="small"
+            variant="outlined"
+            color="warning"
+            iconOnly
+            title="Sửa cụm sân"
+            onClick={() => setEditing(v)}
+          >
+            <EditIcon />
           </MDButton>
           <MDButton
             size="small"
@@ -218,6 +231,7 @@ export default function VenueListPage() {
           </Grid>
         </Grid>
       </MDBox>
+      <VenueEditDialog venue={editing} onClose={() => setEditing(null)} />
       <Footer />
     </DashboardLayout>
   );

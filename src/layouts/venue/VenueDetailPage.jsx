@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -14,6 +15,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import EditIcon from "@mui/icons-material/Edit";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -27,6 +29,7 @@ import {
   useGetVenueAdminQuery,
   useSetVenueStatusMutation,
 } from "slices/venueAdminApiSlice";
+import VenueEditDialog from "./VenueEditDialog";
 
 const fmtVND = (n) => `${(Number(n) || 0).toLocaleString("vi-VN")}đ`;
 const tz = { timeZone: "Asia/Bangkok" };
@@ -61,6 +64,7 @@ export default function VenueDetailPage() {
   const [setVenueStatus, { isLoading: saving }] = useSetVenueStatusMutation();
 
   const venue = data?.venue;
+  const [editing, setEditing] = useState(null);
 
   const changeStatus = async (status) => {
     try {
@@ -159,6 +163,9 @@ export default function VenueDetailPage() {
               </MDTypography>
             </MDBox>
             <Stack spacing={1} alignItems={{ md: "flex-end" }}>
+              <MDButton variant="outlined" color="info" size="small" onClick={() => setEditing(venue)} disabled={!venue}>
+                <EditIcon />&nbsp;Sửa thông tin
+              </MDButton>
               <FormControl size="small" sx={{ minWidth: 180 }}>
                 <InputLabel>Trạng thái</InputLabel>
                 <Select
@@ -214,6 +221,7 @@ export default function VenueDetailPage() {
           </Grid>
         </Grid>
       </MDBox>
+      <VenueEditDialog venue={editing} onClose={() => setEditing(null)} />
       <Footer />
     </DashboardLayout>
   );
