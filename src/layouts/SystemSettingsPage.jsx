@@ -159,6 +159,7 @@ const hydrateFormState = (source) => ({
     heroBanner: source?.features?.heroBanner ?? true,
     guestRegistration: source?.features?.guestRegistration ?? true,
     spcFaceLookup: source?.features?.spcFaceLookup ?? true,
+    facebookLogin: source?.features?.facebookLogin ?? true,
   },
   referee: {
     matchControlLockEnabled: source?.referee?.matchControlLockEnabled ?? true,
@@ -1713,6 +1714,7 @@ export default function SystemSettingsPage() {
       heroBanner: source?.features?.heroBanner !== false,
       guestRegistration: source?.features?.guestRegistration !== false,
       spcFaceLookup: source?.features?.spcFaceLookup !== false,
+      facebookLogin: source?.features?.facebookLogin !== false,
     },
     kyc: {
       enabled: !!source.kyc?.enabled,
@@ -3045,6 +3047,7 @@ export default function SystemSettingsPage() {
               { key: "heroBanner", title: "Banner AI đầu trang giải", desc: "Nền banner tạo từ poster bằng AI ở trang tổng quan / đăng ký (tắt = dùng giao diện cũ)." },
               { key: "guestRegistration", title: "Đăng ký VĐV ngoài hệ thống", desc: "Chế độ admin đăng ký VĐV chưa có tài khoản (tài khoản khách theo SĐT)." },
               { key: "spcFaceLookup", title: "Tra cứu ảnh VĐV (admin)", desc: "Tìm tên, SĐT VĐV trong dữ liệu SPC từ khuôn mặt." },
+              { key: "facebookLogin", title: "Đăng nhập bằng Facebook", desc: "Nút “Đăng nhập bằng Facebook” ở trang đăng nhập web + app và mục Liên kết Facebook trong hồ sơ (app Facebook Pickletour Live)." },
             ].map((f) => (
               <Stack key={f.key} direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ py: 0.75 }}>
                 <Box sx={{ pr: 2 }}>
