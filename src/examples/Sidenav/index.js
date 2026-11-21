@@ -191,7 +191,8 @@ function Sidenav({ routes }) {
 
   // Chỉ bung tạm khi thanh bên đang thu gọn — ở trạng thái mở sẵn thì không cần lớp expand-menu
   const expandMenuOpen = () => {
-    if (document.body.classList.contains("mini-sidebar")) document.body.classList.add("expand-menu");
+    if (document.body.classList.contains("mini-sidebar"))
+      document.body.classList.add("expand-menu");
   };
   const expandMenu = () => document.body.classList.remove("expand-menu");
 
