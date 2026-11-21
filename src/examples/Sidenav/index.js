@@ -189,7 +189,10 @@ function Sidenav({ routes }) {
     document.documentElement.classList.remove("menu-opened");
   }, [location.pathname]);
 
-  const expandMenuOpen = () => document.body.classList.add("expand-menu");
+  // Chỉ bung tạm khi thanh bên đang thu gọn — ở trạng thái mở sẵn thì không cần lớp expand-menu
+  const expandMenuOpen = () => {
+    if (document.body.classList.contains("mini-sidebar")) document.body.classList.add("expand-menu");
+  };
   const expandMenu = () => document.body.classList.remove("expand-menu");
 
   const handleLogout = async () => {

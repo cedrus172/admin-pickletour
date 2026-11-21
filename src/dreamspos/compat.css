@@ -63,6 +63,9 @@ body[data-theme="dark"] .sidebar .sidebar-inner { background: #141432; }
 .sidebar .sidebar-menu > ul > li.submenu-open ul li.active > a span,
 .sidebar .sidebar-menu > ul > li.submenu-open ul li > a.active span { color: #fe9f43; }
 .sidebar .sidebar-menu > ul > li.submenu-open .submenu-hdr { text-transform: none; }
+/* Mẫu gốc đặt line-height: 0 cho chữ khi rê chuột (expand-menu); nhãn của ta có overflow: hidden
+   nên bị cắt mất chữ → trả lại chiều cao dòng bình thường cho nhãn (không đụng biểu tượng). */
+.expand-menu .sidebar .sidebar-menu > ul > li.submenu-open ul li a span:not(.MuiIcon-root) { line-height: 1.5; }
 /* thu gọn: ẩn chữ, chỉ còn biểu tượng (mở lại khi rê chuột — lớp expand-menu) */
 @media (min-width: 992px) {
   .mini-sidebar:not(.expand-menu) .sidebar .sidebar-menu > ul > li.submenu-open ul li a span:not(.MuiIcon-root),
