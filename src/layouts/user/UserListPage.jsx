@@ -62,6 +62,7 @@ import {
   useUpdateUserSuperAdminMutation,
   useUpdateUserCoachMutation,
   useUpdateUserCommentatorMutation,
+  useUpdateUserStoryPermanentMutation,
   useUpdateUserInfoMutation,
   useVerifyUserPhoneMutation,
   useSetUserPhoneRequiredMutation,
@@ -230,6 +231,7 @@ export default function UserManagement() {
   const [updateSuperAdminMut] = useUpdateUserSuperAdminMutation();
   const [updateCoachMut] = useUpdateUserCoachMutation();
   const [updateCommentatorMut] = useUpdateUserCommentatorMutation();
+  const [updateStoryPermanentMut] = useUpdateUserStoryPermanentMutation();
   const [updateInfoMut] = useUpdateUserInfoMutation();
   const [verifyPhoneMut, { isLoading: verifyingPhone }] =
     useVerifyUserPhoneMutation();
@@ -579,6 +581,29 @@ export default function UserManagement() {
                 />
               }
               label="Bình luận viên"
+            />
+
+            {/* Checkbox: Story vĩnh viễn (nhãn hàng/đối tác) — người dùng thường story chỉ hiện 24 giờ */}
+            <FormControlLabel
+              sx={{ m: 0 }}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={Boolean(u.storyPermanent)}
+                  onChange={(e) =>
+                    handle(
+                      updateStoryPermanentMut({
+                        id: u._id,
+                        storyPermanent: e.target.checked,
+                      }).unwrap(),
+                      e.target.checked
+                        ? "Đã cấp quyền đăng story vĩnh viễn"
+                        : "Đã thu quyền story vĩnh viễn (story mới chỉ hiện 24 giờ)"
+                    )
+                  }
+                />
+              }
+              label="Story vĩnh viễn"
             />
 
             {canManageSuperAdmin && (

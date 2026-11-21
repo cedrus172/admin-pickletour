@@ -50,6 +50,16 @@ export const adminApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["User"],
     }),
 
+    // Cấp/thu quyền đăng story VĨNH VIỄN (nhãn hàng, đối tác). Người dùng thường: story 24 giờ.
+    updateUserStoryPermanent: builder.mutation({
+      query: ({ id, storyPermanent }) => ({
+        url: `/admin/users/${id}/story-permanent`,
+        method: "PATCH",
+        body: { storyPermanent },
+      }),
+      invalidatesTags: ["User"],
+    }),
+
     /* ===== Coach applications ===== */
     listCoachApplications: builder.query({
       query: ({ status = "pending", cursor, limit = 20 } = {}) => {
@@ -406,6 +416,7 @@ export const {
   useUpdateUserSuperAdminMutation,
   useUpdateUserCoachMutation,
   useUpdateUserCommentatorMutation,
+  useUpdateUserStoryPermanentMutation,
   useListCoachApplicationsQuery,
   useApproveCoachApplicationMutation,
   useRejectCoachApplicationMutation,
