@@ -291,7 +291,7 @@ function JobCard({ job }) {
           sx={{
             maxHeight: 240,
             overflow: "auto",
-            bgcolor: "rgba(255,255,255,0.05)",
+            bgcolor: "var(--dp-soft)",
             borderRadius: 1,
             p: 1,
             fontFamily: "monospace",

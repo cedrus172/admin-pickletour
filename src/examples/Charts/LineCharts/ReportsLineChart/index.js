@@ -33,16 +33,13 @@ import {
 } from "chart.js";
 
 // @mui material components
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
 import Icon from "@mui/material/Icon";
 
 // PickleTour React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
 
 // ReportsLineChart configurations
 import configs from "examples/Charts/LineCharts/ReportsLineChart/configs";
+import { DP_TONES } from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 
 ChartJS.register(
   CategoryScale,
@@ -56,51 +53,33 @@ ChartJS.register(
 );
 
 function ReportsLineChart({ color, title, description, date, chart }) {
-  const { data, options } = configs(chart.labels || [], chart.datasets || {});
+  const tone = DP_TONES[color] || DP_TONES.primary;
+  const { data, options } = configs(chart.labels || [], chart.datasets || {}, tone);
 
   return (
-    <Card sx={{ height: "100%" }}>
-      <MDBox padding="1rem">
+    <div className="card h-100 mb-0 dp-chart-card">
+      <div className="card-header">
+        <h5 className="card-title">{title}</h5>
+        {description ? <div className="dp-chart-desc">{description}</div> : null}
+      </div>
+      <div className="card-body">
         {useMemo(
           () => (
-            <MDBox
-              variant="gradient"
-              bgColor={color}
-              borderRadius="lg"
-              coloredShadow={color}
-              py={2}
-              pr={0.5}
-              mt={-5}
-              height="12.5rem"
-            >
+            <div style={{ height: "12.5rem" }}>
               <Line data={data} options={options} redraw />
-            </MDBox>
+            </div>
           ),
-          [chart, color]
+          [color, chart]
         )}
-        <MDBox pt={3} pb={1} px={1}>
-          <MDTypography variant="h6" textTransform="capitalize">
-            {title}
-          </MDTypography>
-          <MDTypography component="div" variant="button" color="text" fontWeight="light">
-            {description}
-          </MDTypography>
-          <Divider />
-          <MDBox display="flex" alignItems="center">
-            <MDTypography variant="button" color="text" lineHeight={1} sx={{ mt: 0.15, mr: 0.5 }}>
-              <Icon>schedule</Icon>
-            </MDTypography>
-            <MDTypography variant="button" color="text" fontWeight="light">
-              {date}
-            </MDTypography>
-          </MDBox>
-        </MDBox>
-      </MDBox>
-    </Card>
+        <div className="dp-chart-date">
+          <Icon fontSize="small">schedule</Icon>
+          <span>{date}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
-// Setting default values for the props of ReportsLineChart
 ReportsLineChart.defaultProps = {
   color: "info",
   description: "",

@@ -21,12 +21,17 @@ Coded by www.creative-tim.com
 
 const colors = {
   background: {
-    default: "#f0f2f5",
+    default: "#FAFBFE",
   },
 
   text: {
-    main: "#7b809a",
-    focus: "#7b809a",
+    main: "#637381",
+    focus: "#637381",
+  },
+
+  primary: {
+    main: "#FF9F43",
+    focus: "#FE820E",
   },
 
   transparent: {
@@ -50,38 +55,38 @@ const colors = {
   // },
 
   secondary: {
-    main: "#7b809a",
-    focus: "#8f93a9",
+    main: "#637381",
+    focus: "#4F5B66",
   },
 
   info: {
-    main: "#1aa0e6",
-    focus: "#0f86c9",
+    main: "#FF9F43",
+    focus: "#FE820E",
   },
 
   success: {
-    main: "#4CAF50",
-    focus: "#67bb6a",
+    main: "#28C76F",
+    focus: "#1FAE5F",
   },
 
   warning: {
-    main: "#fb8c00",
-    focus: "#fc9d26",
+    main: "#FFB400",
+    focus: "#E0A000",
   },
 
   error: {
-    main: "#F44335",
-    focus: "#f65f53",
+    main: "#EA5455",
+    focus: "#D83F40",
   },
 
   light: {
-    main: "#f0f2f5",
-    focus: "#f0f2f5",
+    main: "#F8F8F8",
+    focus: "#F8F8F8",
   },
 
   dark: {
-    main: "#344767",
-    focus: "#2c3c58",
+    main: "#212B36",
+    focus: "#1B2850",
   },
 
   grey: {
@@ -98,43 +103,43 @@ const colors = {
 
   gradients: {
     primary: {
-      main: "#1aa0e6",
-      state: "#0f86c9",
+      main: "#FF9F43",
+      state: "#FE820E",
     },
 
     secondary: {
-      main: "#747b8a",
-      state: "#495361",
+      main: "#637381",
+      state: "#4F5B66",
     },
 
     info: {
-      main: "#20c8ff",
-      state: "#008fc9",
+      main: "#FF9F43",
+      state: "#FE820E",
     },
 
     success: {
-      main: "#66BB6A",
-      state: "#43A047",
+      main: "#28C76F",
+      state: "#1FAE5F",
     },
 
     warning: {
-      main: "#FFA726",
-      state: "#FB8C00",
+      main: "#FFB400",
+      state: "#E0A000",
     },
 
     error: {
-      main: "#EF5350",
-      state: "#E53935",
+      main: "#EA5455",
+      state: "#D83F40",
     },
 
     light: {
-      main: "#EBEFF4",
-      state: "#CED4DA",
+      main: "#F8F8F8",
+      state: "#E9ECEF",
     },
 
     dark: {
-      main: "#42424a",
-      state: "#191919",
+      main: "#1B2850",
+      state: "#141E3C",
     },
   },
 

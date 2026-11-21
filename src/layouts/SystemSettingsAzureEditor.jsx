@@ -109,7 +109,7 @@ export default function SystemSettingsAzureEditor({ form, setForm }) {
         {form.azure?.enabled && (
           <>
             {accounts.map((acc, index) => (
-              <Paper key={acc.id} variant="outlined" sx={{ p: 2, bgcolor: "rgba(255,255,255,0.05)" }}>
+              <Paper key={acc.id} variant="outlined" sx={{ p: 2, bgcolor: "var(--dp-soft)" }}>
                 <Stack direction="row" justifyContent="space-between" mb={2}>
                   <Typography fontWeight="bold">Account #{index + 1}: {acc.label}</Typography>
                   <IconButton color="error" onClick={() => handleRemoveAccount(acc.id)}>

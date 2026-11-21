@@ -15,6 +15,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import { createTheme } from "@mui/material/styles";
+import { dreamsposComponents, dreamsposPalette, DP_FONT } from "dreamspos/muiOverrides";
 // import Fade from "@mui/material/Fade";
 
 // PickleTour React base styles
@@ -84,7 +85,7 @@ import dialogContent from "assets/theme-dark/components/dialog/dialogContent";
 import dialogContentText from "assets/theme-dark/components/dialog/dialogContentText";
 import dialogActions from "assets/theme-dark/components/dialog/dialogActions";
 
-export default createTheme({
+const baseTheme = createTheme({
   breakpoints: { ...breakpoints },
   palette: {
     // Bật dark mode cho MUI để Paper/Card/Dialog/Table/TextField... thuần
@@ -170,4 +171,11 @@ export default createTheme({
     MuiDialogContentText: { ...dialogContentText },
     MuiDialogActions: { ...dialogActions },
   },
+});
+
+// Lớp phủ DreamsPOS: gộp sau cùng để thắng các override gốc của Material Dashboard.
+export default createTheme(baseTheme, {
+  palette: dreamsposPalette("dark"),
+  typography: { fontFamily: DP_FONT },
+  components: dreamsposComponents("dark"),
 });

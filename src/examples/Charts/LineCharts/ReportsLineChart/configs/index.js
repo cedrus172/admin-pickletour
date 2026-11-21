@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-function configs(labels, datasets) {
+function configs(labels, datasets, tone = "#FF9F43") {
   return {
     data: {
       labels,
@@ -23,8 +23,8 @@ function configs(labels, datasets) {
           tension: 0,
           pointRadius: 5,
           pointBorderColor: "transparent",
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          borderColor: "rgba(255, 255, 255, .8)",
+          pointBackgroundColor: tone,
+          borderColor: tone,
           borderWidth: 4,
           backgroundColor: "transparent",
           fill: true,
@@ -53,11 +53,11 @@ function configs(labels, datasets) {
             drawOnChartArea: true,
             drawTicks: false,
             borderDash: [5, 5],
-            color: "rgba(255, 255, 255, .2)",
+            color: "rgba(99, 115, 129, 0.16)",
           },
           ticks: {
             display: true,
-            color: "#f8f9fa",
+            color: "#637381",
             padding: 10,
             font: {
               size: 14,
@@ -78,7 +78,7 @@ function configs(labels, datasets) {
           },
           ticks: {
             display: true,
-            color: "#f8f9fa",
+            color: "#637381",
             padding: 10,
             font: {
               size: 14,

@@ -1,17 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Alert from "@mui/material/Alert";
-import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
-
-import MDBox from "components/MDBox";
-import MDButton from "components/MDButton";
-import MDInput from "components/MDInput";
-import MDTypography from "components/MDTypography";
-
-import BasicLayout from "../components/BasicLayout";
-import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-
+import brandLogo from "assets/images/pickletour-logo.png";
+import mailIcon from "assets/dreamspos/img/icons/mail.svg";
+import loginImage from "assets/dreamspos/img/login-court.jpg";
+import { useMaterialUIController, setLayout } from "context";
 import { useDispatch } from "react-redux";
 import { authApiSlice, useLoginMutation } from "slices/authApiSlice";
 import { setCredentials } from "slices/authSlice";
@@ -21,6 +13,14 @@ export default function SignIn() {
   const [remember, setRemember] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  // Trang đăng nhập theo mẫu DreamsPOS: không có thanh bên/đầu trang, nền trắng toàn màn hình
+  const [, dispatchCtrl] = useMaterialUIController();
+  useEffect(() => {
+    setLayout(dispatchCtrl, "page");
+    document.body.classList.add("account-page");
+    return () => document.body.classList.remove("account-page");
+  }, [dispatchCtrl]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,79 +63,84 @@ export default function SignIn() {
   };
 
   return (
-    <BasicLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
-        >
-          <MDTypography variant="h4" color="white">
-            Admin Sign In
-          </MDTypography>
-        </MDBox>
-
-        <MDBox pt={4} pb={3} px={3}>
-          {error ? (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          ) : null}
-
-          <MDBox component="form" onSubmit={submit}>
-            <MDBox mb={2}>
-              <MDInput
-                type="email"
-                label="Email"
-                fullWidth
-                value={form.email}
-                onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                required
-              />
-            </MDBox>
-
-            <MDBox mb={2}>
-              <MDInput
-                type="password"
-                label="Password"
-                fullWidth
-                value={form.password}
-                onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
-                required
-              />
-            </MDBox>
-
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={remember} onChange={() => setRemember((prev) => !prev)} />
-              <MDTypography
-                variant="button"
-                color="text"
-                onClick={() => setRemember((prev) => !prev)}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
-            </MDBox>
-
-            <MDBox mt={4} mb={1}>
-              <MDButton
-                variant="gradient"
-                color="info"
-                fullWidth
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing in..." : "Sign In"}
-              </MDButton>
-            </MDBox>
-          </MDBox>
-        </MDBox>
-      </Card>
-    </BasicLayout>
+    <div className="account-content">
+      <div className="login-wrapper">
+        <div className="login-content">
+          <div className="login-userset">
+            <form onSubmit={submit}>
+              <div className="login-logo dp-login-logo">
+                <img src={brandLogo} alt="PickleTour" />
+                <span>PickleTour</span>
+              </div>
+              <div className="login-userheading">
+                <h3>Đăng nhập quản trị</h3>
+                <h4>Vui lòng đăng nhập bằng tài khoản quản trị của bạn</h4>
+              </div>
+              {error ? (
+                <div className="alert alert-danger py-2" role="alert">
+                  {error}
+                </div>
+              ) : null}
+              <div className="form-login">
+                <label htmlFor="dp-login-email">Email</label>
+                <div className="form-addons">
+                  <input
+                    id="dp-login-email"
+                    type="email"
+                    placeholder="Nhập email"
+                    autoComplete="username"
+                    value={form.email}
+                    onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                    required
+                  />
+                  <img src={mailIcon} alt="" />
+                </div>
+              </div>
+              <div className="form-login">
+                <label htmlFor="dp-login-password">Mật khẩu</label>
+                <div className="pass-group">
+                  <input
+                    id="dp-login-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Nhập mật khẩu"
+                    autoComplete="current-password"
+                    value={form.password}
+                    onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="dp-toggle-password"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showPassword ? "Ẩn" : "Hiện"}
+                  </button>
+                </div>
+              </div>
+              <div className="form-login">
+                <label className="dp-remember" htmlFor="dp-login-remember">
+                  <input
+                    id="dp-login-remember"
+                    type="checkbox"
+                    checked={remember}
+                    onChange={() => setRemember((prev) => !prev)}
+                  />
+                  <span>Ghi nhớ đăng nhập</span>
+                </label>
+              </div>
+              <div className="form-login">
+                <button className="btn btn-login" type="submit" disabled={isLoading}>
+                  {isLoading ? "Đang đăng nhập…" : "Đăng nhập"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div className="login-img">
+          <img src={loginImage} alt="" />
+        </div>
+      </div>
+    </div>
   );
 }

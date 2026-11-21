@@ -13,13 +13,13 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState, useEffect, useMemo, useCallback, useDeferredValue } from "react";
+import { useState, useEffect, useMemo, useCallback, useDeferredValue, useRef } from "react";
 
 // react-router components
 import { useLocation, Link, useNavigate } from "react-router-dom";
 
 // redux
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -64,15 +64,19 @@ import {
   setTransparentNavbar,
   setMiniSidenav,
   setOpenConfigurator,
+  setDarkMode,
 } from "context";
 
 // auth
 import { toast } from "react-toastify";
 import { logout as clearAuth } from "slices/authSlice";
+import Feather from "dreamspos/Feather";
+import { findRouteMeta } from "dreamspos/routeMeta";
+import brandLogo from "assets/images/pickletour-logo.png";
 import { useLogoutMutation } from "slices/authApiSlice";
 import { apiSlice } from "slices/apiSlice";
 
-const SIDENAV_COMMAND_SELECTOR = ".MuiDrawer-root .MuiList-root a[href]";
+const SIDENAV_COMMAND_SELECTOR = "#sidebar .sidebar-menu a[href]:not([data-no-command])";
 const DASHBOARD_CONTENT_SELECTOR = "[data-dashboard-content='true']";
 const SECTION_SELECTOR = [
   "h1",
@@ -143,7 +147,10 @@ const normalizeSearchText = (value = "") =>
     .trim()
     .toLowerCase();
 
-const compactText = (value = "") => String(value || "").replace(/\s+/g, " ").trim();
+const compactText = (value = "") =>
+  String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
 const stripRouteAriaPrefix = (value = "") =>
   compactText(value)
     .replace(/^Đi tới\s+/i, "")
@@ -256,6 +263,10 @@ const getAnchorCommandLabel = (anchor) => {
 const getAnchorSectionLabel = (anchor) => {
   if (!(anchor instanceof HTMLElement)) return "";
 
+  // Thanh bên DreamsPOS: tên nhóm nằm ở tiêu đề .submenu-hdr của khối chứa mục
+  const groupTitle = anchor.closest("li.submenu-open")?.querySelector(".submenu-hdr");
+  if (groupTitle) return compactText(groupTitle.textContent);
+
   let sibling = anchor.previousElementSibling;
   let depth = 0;
 
@@ -286,10 +297,9 @@ const getFieldLabel = (element, root) => {
   const containerLabel = container?.querySelector(
     "label, .MuiFormLabel-root, legend, .MuiInputLabel-root"
   );
-  const inputChild =
-    element.matches("input, textarea, select")
-      ? element
-      : element.querySelector("input, textarea, select");
+  const inputChild = element.matches("input, textarea, select")
+    ? element
+    : element.querySelector("input, textarea, select");
 
   return compactText(
     explicitLabel?.textContent ||
@@ -357,6 +367,56 @@ function DashboardNavbar({ absolute, light, isMini }) {
     () => setOpenConfigurator(dispatchCtrl, !openConfigurator),
     [dispatchCtrl, openConfigurator]
   );
+
+  // ── Đầu trang DreamsPOS ──
+  const userInfo = useSelector((state) => state.auth?.userInfo || null);
+  const userName = userInfo?.nickname || userInfo?.name || userInfo?.email || "Quản trị viên";
+  const userInitial = String(userName).trim().charAt(0).toUpperCase() || "A";
+  const userRole =
+    userInfo?.isSuperUser || userInfo?.isSuperAdmin
+      ? "Super Admin"
+      : userInfo?.role === "admin"
+      ? "Quản trị viên"
+      : userInfo?.role || "Thành viên";
+  const pageMeta = findRouteMeta(location.pathname);
+  const pageTitle = pageMeta?.name || route[route.length - 1] || "Tổng quan";
+  // tên nhóm menu của trang (đọc từ thanh bên) để làm đường dẫn: Trang chủ / Nhóm / Trang
+  const [pageGroup, setPageGroup] = useState("");
+  useEffect(() => {
+    const active = document.querySelector("#sidebar .sidebar-menu li.active");
+    const group =
+      active?.closest("li.submenu-open")?.querySelector(".submenu-hdr")?.textContent || "";
+    setPageGroup(group.trim());
+  }, [location.pathname]);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+  useEffect(() => {
+    if (!userMenuOpen) return undefined;
+    const onDown = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target))
+        setUserMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [userMenuOpen]);
+  const handleToggleDark = useCallback(() => {
+    try {
+      localStorage.setItem("pt-admin-theme", darkMode ? "light" : "dark");
+    } catch (_) {
+      // bỏ qua khi trình duyệt chặn localStorage
+    }
+    setDarkMode(dispatchCtrl, !darkMode);
+  }, [darkMode, dispatchCtrl]);
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }, []);
+  // Điện thoại/tablet: thanh bên trượt ra kèm lớp phủ (cách làm của DreamsPOS)
+  const toggleMobileSidebar = useCallback(() => {
+    document.querySelector(".main-wrapper")?.classList.toggle("slide-nav");
+    document.querySelector(".sidebar-overlay")?.classList.toggle("opened");
+    document.documentElement.classList.toggle("menu-opened");
+  }, []);
 
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
@@ -454,10 +514,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
         if (seen.has(key)) return null;
         seen.add(key);
 
-        const inputChild =
-          element.matches("input, textarea, select")
-            ? element
-            : element.querySelector("input, textarea, select");
+        const inputChild = element.matches("input, textarea, select")
+          ? element
+          : element.querySelector("input, textarea, select");
         const placeholder = compactText(
           inputChild?.getAttribute("placeholder") || element.getAttribute("placeholder") || ""
         );
@@ -466,8 +525,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
             .closest(
               ".MuiFormControl-root, .MuiGrid-item, .MuiStack-root, .MuiBox-root, .MuiPaper-root"
             )
-            ?.querySelector(".MuiFormHelperText-root")
-            ?.textContent
+            ?.querySelector(".MuiFormHelperText-root")?.textContent
         );
 
         return {
@@ -517,7 +575,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
         if (seen.has(key)) return null;
         seen.add(key);
 
-        const isLink = element instanceof HTMLAnchorElement && Boolean(element.getAttribute("href"));
+        const isLink =
+          element instanceof HTMLAnchorElement && Boolean(element.getAttribute("href"));
 
         return {
           id: `action-${index}-${key}`,
@@ -544,7 +603,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
     setSectionCommands(collectSectionCommands());
     setFieldCommands(collectFieldCommands());
     setPageActionCommands(collectPageActionCommands());
-  }, [collectFieldCommands, collectPageActionCommands, collectRouteCommands, collectSectionCommands]);
+  }, [
+    collectFieldCommands,
+    collectPageActionCommands,
+    collectRouteCommands,
+    collectSectionCommands,
+  ]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -693,8 +757,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
     const currentLabel =
       routeCommands.find((item) => item.path === location.pathname)?.label ||
       compactText(
-        document.querySelector(".MuiBreadcrumbs-root li:last-child, .MuiBreadcrumbs-root p:last-child")
-          ?.textContent
+        document.querySelector(
+          ".MuiBreadcrumbs-root li:last-child, .MuiBreadcrumbs-root p:last-child"
+        )?.textContent
       ) ||
       getPathLabelFallback(location.pathname);
 
@@ -848,141 +913,218 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   return (
     <>
-      <AppBar
-        position={absolute ? "absolute" : navbarType}
-        color="inherit"
-        sx={(theme) => navbar(theme, { transparentNavbar, absolute, light, darkMode })}
-      >
-        <Toolbar sx={(theme) => navbarContainer(theme)}>
-          <MDBox
-            color="inherit"
-            mb={{ xs: 1, md: 0 }}
-            sx={(theme) => navbarRow(theme, { isMini })}
+      {/* Đầu trang DreamsPOS (cố định phía trên) */}
+      <div className="header">
+        <div className={`header-left ${miniSidenav ? "" : "active"}`}>
+          <Link
+            to="/dashboard"
+            className="logo logo-normal dp-brand"
+            aria-label="Về trang tổng quan"
           >
-            <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
-          </MDBox>
-          {isMini ? null : (
-            <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
-              <MDBox pr={1}>
-                <MDInput
-                  placeholder="Tìm nhanh mọi thứ..."
-                  onClick={handleOpenCommandPalette}
-                  inputProps={{ readOnly: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Icon
-                          fontSize="small"
-                          sx={{
-                            color: "primary.main",
-                          }}
-                        >
-                          search
-                        </Icon>
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end" sx={{ gap: 0.5 }}>
-                        <Chip
-                          label="Ctrl"
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            height: 24,
-                            borderRadius: 1.5,
-                            fontWeight: 700,
-                            bgcolor: "rgba(255,255,255,0.14)",
-                          }}
-                        />
-                        <Chip
-                          label="K"
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            height: 24,
-                            borderRadius: 1.5,
-                            fontWeight: 700,
-                            bgcolor: "rgba(255,255,255,0.14)",
-                          }}
-                        />
-                      </InputAdornment>
-                    ),
+            <img src={brandLogo} alt="PickleTour" />
+            <span>PickleTour</span>
+          </Link>
+          <Link
+            to="/dashboard"
+            className="logo logo-white dp-brand"
+            aria-label="Về trang tổng quan"
+          >
+            <img src={brandLogo} alt="PickleTour" />
+            <span>PickleTour</span>
+          </Link>
+          <Link to="/dashboard" className="logo-small" aria-label="Về trang tổng quan">
+            <img src={brandLogo} alt="PickleTour" />
+          </Link>
+          <a
+            id="toggle_btn"
+            href="#thu-gon"
+            onClick={(e) => {
+              e.preventDefault();
+              handleMiniSidenav();
+            }}
+            aria-label={miniSidenav ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
+            title={miniSidenav ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
+          >
+            <Feather icon="chevrons-left" size={16} className="feather-16" />
+          </a>
+        </div>
+        <a
+          id="mobile_btn"
+          className="mobile_btn"
+          href="#sidebar"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleMobileSidebar();
+          }}
+          aria-label="Mở thanh điều hướng"
+        >
+          <span className="bar-icon">
+            <span />
+            <span />
+            <span />
+          </span>
+        </a>
+        <ul className="nav user-menu">
+          <li className="nav-item nav-searchinputs">
+            <div className="top-nav-search">
+              <form action="#" onSubmit={(e) => e.preventDefault()}>
+                <div className="searchinputs">
+                  <input
+                    type="text"
+                    readOnly
+                    placeholder="Tìm nhanh mọi thứ…  (Ctrl K)"
+                    onClick={handleOpenCommandPalette}
+                    onFocus={(e) => e.target.blur()}
+                    aria-label="Mở bảng tìm nhanh"
+                  />
+                  <div className="search-addon">
+                    <span>
+                      <Feather icon="search" size={14} className="feather-14" />
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </li>
+          <li className="nav-item nav-item-box">
+            <a
+              href="#toan-man-hinh"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleFullscreen();
+              }}
+              title="Toàn màn hình"
+              aria-label="Toàn màn hình"
+            >
+              <Feather icon="maximize" />
+            </a>
+          </li>
+          <li className="nav-item nav-item-box">
+            <a
+              href="#giao-dien"
+              onClick={(e) => {
+                e.preventDefault();
+                handleToggleDark();
+              }}
+              title={darkMode ? "Chuyển giao diện sáng" : "Chuyển giao diện tối"}
+              aria-label={darkMode ? "Chuyển giao diện sáng" : "Chuyển giao diện tối"}
+            >
+              <Feather icon={darkMode ? "sun" : "moon"} />
+            </a>
+          </li>
+          <li
+            className={`nav-item dropdown has-arrow main-drop${userMenuOpen ? " show" : ""}`}
+            ref={userMenuRef}
+          >
+            <a
+              href="#tai-khoan"
+              className="dropdown-toggle nav-link userset"
+              onClick={(e) => {
+                e.preventDefault();
+                setUserMenuOpen((v) => !v);
+              }}
+              aria-haspopup="true"
+              aria-expanded={userMenuOpen}
+            >
+              <span className="user-info">
+                <span className="user-letter">
+                  {userInfo?.avatar ? (
+                    <img src={userInfo.avatar} alt="" className="img-fluid" />
+                  ) : (
+                    <span className="dp-user-initial">{userInitial}</span>
+                  )}
+                </span>
+                <span className="user-detail">
+                  <span className="user-name">{userName}</span>
+                  <span className="user-role">{userRole}</span>
+                </span>
+              </span>
+            </a>
+            <div
+              className={`dropdown-menu menu-drop-user${userMenuOpen ? " show" : ""}`}
+              style={{ right: 0, left: "auto" }}
+            >
+              <div className="profilename">
+                <div className="profileset">
+                  <span className="user-img">
+                    {userInfo?.avatar ? (
+                      <img src={userInfo.avatar} alt="" />
+                    ) : (
+                      <span className="dp-user-initial dp-user-initial-lg">{userInitial}</span>
+                    )}
+                    <span className="status online" />
+                  </span>
+                  <div className="profilesets">
+                    <h6>{userName}</h6>
+                    <h5>{userRole}</h5>
+                  </div>
+                </div>
+                <hr className="m-0" />
+                <a
+                  className="dropdown-item"
+                  href="#tim-nhanh"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setUserMenuOpen(false);
+                    handleOpenCommandPalette();
                   }}
-                  sx={{
-                    minWidth: { xs: 220, md: 340 },
-                    "& .MuiOutlinedInput-root": {
-                      cursor: "pointer",
-                      borderRadius: 999,
-                      background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
-                      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
-                      transition: "transform 0.18s ease, box-shadow 0.18s ease",
-                      "& fieldset": {
-                        borderColor: "rgba(32, 200, 255, 0.28)",
-                      },
-                      "&:hover": {
-                        transform: "translateY(-1px)",
-                        boxShadow: "0 14px 34px rgba(37, 99, 235, 0.14)",
-                        "& fieldset": {
-                          borderColor: "rgba(59, 130, 246, 0.3)",
-                        },
-                      },
-                    },
-                    "& input": {
-                      cursor: "pointer",
-                      fontWeight: 600,
-                    },
-                    "& input::placeholder": {
-                      color: "text.primary",
-                      opacity: 0.82,
-                    },
+                >
+                  <Feather icon="search" size={16} className="me-2" /> Tìm nhanh
+                </a>
+                <hr className="m-0" />
+                <a
+                  className="dropdown-item logout pb-0"
+                  href="#dang-xuat"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setUserMenuOpen(false);
+                    handleLogout();
                   }}
-                />
-              </MDBox>
-              <MDBox color={light ? "white" : "inherit"}>
-                <Link to="/authentication/sign-in/basic">
-                  <IconButton sx={navbarIconButton} size="small" disableRipple>
-                    <Icon sx={iconsStyle}>account_circle</Icon>
-                  </IconButton>
-                </Link>
-                <IconButton
-                  size="small"
-                  disableRipple
-                  color="inherit"
-                  sx={navbarMobileMenu}
-                  onClick={handleMiniSidenav}
                 >
-                  <Icon sx={iconsStyle} fontSize="medium">
-                    {miniSidenav ? "menu_open" : "menu"}
-                  </Icon>
-                </IconButton>
-                <IconButton
-                  size="small"
-                  disableRipple
-                  color="inherit"
-                  sx={navbarIconButton}
-                  onClick={handleConfiguratorOpen}
-                >
-                  <Icon sx={iconsStyle}>settings</Icon>
-                </IconButton>
-                <IconButton
-                  size="small"
-                  disableRipple
-                  color="inherit"
-                  sx={navbarIconButton}
-                  aria-controls="notification-menu"
-                  aria-haspopup="true"
-                  variant="contained"
-                  onClick={handleOpenMenu}
-                >
-                  <Icon sx={iconsStyle}>notifications</Icon>
-                </IconButton>
-                {renderMenu()}
-              </MDBox>
-            </MDBox>
-          )}
-        </Toolbar>
-      </AppBar>
+                  <Feather icon="log-out" size={16} className="me-2" /> Đăng xuất
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+        {/* Màn hẹp: nút tìm nhanh + đổi sáng/tối (menu tài khoản đầy đủ chỉ có ở màn rộng) */}
+        <div className="dp-mobile-actions">
+          <a
+            href="#tim-nhanh"
+            onClick={(e) => {
+              e.preventDefault();
+              handleOpenCommandPalette();
+            }}
+            aria-label="Tìm nhanh"
+          >
+            <Feather icon="search" />
+          </a>
+          <a
+            href="#giao-dien"
+            onClick={(e) => {
+              e.preventDefault();
+              handleToggleDark();
+            }}
+            aria-label={darkMode ? "Chuyển giao diện sáng" : "Chuyển giao diện tối"}
+          >
+            <Feather icon={darkMode ? "sun" : "moon"} />
+          </a>
+        </div>
+      </div>
+
+      {/* Tiêu đề trang theo mẫu DreamsPOS */}
+      {isMini ? null : (
+        <div className="page-header">
+          <div className="page-title">
+            <h4>{pageTitle}</h4>
+            <h6>
+              <Link to="/dashboard">Trang chủ</Link>
+              {pageGroup ? <span> / {pageGroup}</span> : null}
+              <span> / {pageTitle}</span>
+            </h6>
+          </div>
+        </div>
+      )}
 
       <Dialog
         open={commandPaletteOpen}
@@ -999,10 +1141,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
           sx: {
             borderRadius: 4,
             overflow: "hidden",
-            border: "1px solid rgba(32, 200, 255, 0.18)",
+            border: "1px solid rgba(255, 159, 67, 0.18)",
             boxShadow: "0 30px 80px rgba(0, 0, 0, 0.5)",
-            background:
-              "linear-gradient(180deg, #0b2541 0%, #071d38 100%)",
+            background: "var(--dp-card)",
           },
         }}
       >
@@ -1013,7 +1154,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
             pb={2}
             sx={{
               background:
-                "linear-gradient(180deg, rgba(32,200,255,0.08) 0%, rgba(11,37,65,0) 100%)",
+                "linear-gradient(180deg, rgba(255,159,67,0.10) 0%, rgba(255,159,67,0) 100%)",
             }}
           >
             <Box
@@ -1040,7 +1181,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   icon={<Icon sx={{ fontSize: "0.95rem !important" }}>keyboard_command_key</Icon>}
                   label="Ctrl K"
                   sx={{
-                    bgcolor: "rgba(37, 99, 235, 0.1)",
+                    bgcolor: "rgba(255, 159, 67, 0.1)",
                     color: "primary.main",
                     fontWeight: 700,
                   }}
@@ -1049,7 +1190,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   size="small"
                   label="↑ ↓ Di chuyển"
                   sx={{
-                    bgcolor: "rgba(255,255,255,0.08)",
+                    bgcolor: "var(--dp-soft)",
                     fontWeight: 600,
                   }}
                 />
@@ -1057,7 +1198,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   size="small"
                   label="Enter Chạy"
                   sx={{
-                    bgcolor: "rgba(255,255,255,0.08)",
+                    bgcolor: "var(--dp-soft)",
                     fontWeight: 600,
                   }}
                 />
@@ -1124,10 +1265,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 3,
-                  bgcolor: "rgba(255,255,255,0.06)",
-                  boxShadow: "0 12px 34px rgba(37, 99, 235, 0.08)",
+                  bgcolor: "var(--dp-soft)",
+                  boxShadow: "0 12px 34px rgba(255, 159, 67, 0.08)",
                   "& fieldset": {
-                    borderColor: "rgba(59, 130, 246, 0.18)",
+                    borderColor: "rgba(255, 159, 67, 0.18)",
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "primary.main",
@@ -1147,7 +1288,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               display: "flex",
               flexWrap: "wrap",
               gap: 1,
-              bgcolor: "rgba(255,255,255,0.03)",
+              bgcolor: "var(--dp-soft)",
             }}
           >
             <Chip size="small" variant="outlined" label="Trang" />
@@ -1187,7 +1328,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     borderRadius: "50%",
                     display: "grid",
                     placeItems: "center",
-                    bgcolor: "rgba(37, 99, 235, 0.1)",
+                    bgcolor: "rgba(255, 159, 67, 0.1)",
                     color: "primary.main",
                   }}
                 >
@@ -1197,8 +1338,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   Không tìm thấy kết quả phù hợp
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Thử theo tên trang, tên field, placeholder, nút trên trang, hoặc lệnh nhanh
-                  như reload, back, copy URL, đăng xuất.
+                  Thử theo tên trang, tên field, placeholder, nút trên trang, hoặc lệnh nhanh như
+                  reload, back, copy URL, đăng xuất.
                 </Typography>
               </MDBox>
             ) : (
@@ -1220,16 +1361,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
                       border: "1px solid transparent",
                       transition: "all 0.16s ease",
                       "&:hover": {
-                        bgcolor: "rgba(59, 130, 246, 0.08)",
-                        borderColor: "rgba(59, 130, 246, 0.18)",
+                        bgcolor: "rgba(255, 159, 67, 0.08)",
+                        borderColor: "rgba(255, 159, 67, 0.18)",
                       },
                       "&.Mui-selected": {
-                        bgcolor: "rgba(37, 99, 235, 0.1)",
-                        borderColor: "rgba(37, 99, 235, 0.22)",
-                        boxShadow: "0 10px 28px rgba(37, 99, 235, 0.12)",
+                        bgcolor: "rgba(255, 159, 67, 0.1)",
+                        borderColor: "rgba(255, 159, 67, 0.22)",
+                        boxShadow: "0 10px 28px rgba(255, 159, 67, 0.12)",
                       },
                       "&.Mui-selected:hover": {
-                        bgcolor: "rgba(37, 99, 235, 0.14)",
+                        bgcolor: "rgba(255, 159, 67, 0.14)",
                       },
                       [theme.breakpoints.down("sm")]: {
                         px: 1.25,

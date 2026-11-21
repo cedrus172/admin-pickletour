@@ -484,7 +484,7 @@ export default function AlgoSettingsPage() {
                 component="pre"
                 sx={{
                   fontSize: 12,
-                  bgcolor: "rgba(255,255,255,0.03)",
+                  bgcolor: "var(--dp-soft)",
                   p: 1,
                   borderRadius: 1,
                   maxHeight: 220,

@@ -940,7 +940,7 @@ function StaticPreviewSeedCard({ seed }) {
         <Typography
           variant="caption"
           sx={{
-            color: "rgba(255,255,255,0.72)",
+            color: "var(--dp-sub)",
             fontWeight: 700,
             textAlign: "center",
             lineHeight: `${DOUBLE_ELIM_CUSTOM_CARD_HEADER_HEIGHT}px`,
@@ -2536,7 +2536,7 @@ export default function TournamentBlueprintPage() {
             <SeedItem data-seed-id={seedCode || undefined}>
               <div style={{ display: "grid", gap: 4 }}>
                 {seedCode ? (
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.72)" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--dp-sub)" }}>
                     {seedCode}
                   </div>
                 ) : null}
@@ -2552,7 +2552,7 @@ export default function TournamentBlueprintPage() {
           <SeedItem data-seed-id={seedCode || undefined}>
             <div style={{ display: "grid", gap: 4 }}>
               {seedCode ? (
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.72)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--dp-sub)" }}>
                   {seedCode}
                 </div>
               ) : null}

@@ -23,6 +23,10 @@ import { MaterialUIControllerProvider } from "context";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { ToastContainer } from "react-toastify";
+// Giao diện DreamsPOS: Bootstrap 5 + style.css của theme, rồi lớp tương thích với các trang MUI
+import "assets/dreamspos/css/bootstrap.min.css";
+import "assets/dreamspos/css/style.css";
+import "dreamspos/compat.css";
 import "react-toastify/dist/ReactToastify.css";
 import { SocketProvider } from "context/SocketContext";
 import "react-quill/dist/quill.snow.css";

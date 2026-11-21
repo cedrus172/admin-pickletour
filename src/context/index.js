@@ -81,7 +81,14 @@ function MaterialUIControllerProvider({ children }) {
     openConfigurator: false,
     direction: "ltr",
     layout: "dashboard",
-    darkMode: true,
+    // Giao diện DreamsPOS: mặc định bản sáng; nút mặt trăng ở đầu trang lưu lựa chọn vào localStorage
+    darkMode: (() => {
+      try {
+        return localStorage.getItem("pt-admin-theme") === "dark";
+      } catch (_) {
+        return false;
+      }
+    })(),
   };
 
   const [controller, dispatch] = useReducer(reducer, initialState);

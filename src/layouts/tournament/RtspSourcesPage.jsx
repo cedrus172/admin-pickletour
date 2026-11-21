@@ -380,7 +380,7 @@ export default function RtspSourcesPage() {
               <CircularProgress color="info" />
             </MDBox>
           ) : rows.length === 0 ? (
-            <MDBox textAlign="center" py={6} sx={{ color: "rgba(255,255,255,0.7)" }}>
+            <MDBox textAlign="center" py={6} sx={{ color: "var(--dp-sub)" }}>
               <VideocamIcon sx={{ fontSize: 48, opacity: 0.5 }} />
               <MDTypography variant="body2" color="text" mt={1}>
                 Chưa có nguồn video nào. Bấm “Thêm nguồn” để lưu link dùng lại.
@@ -430,7 +430,7 @@ export default function RtspSourcesPage() {
                           <Typography
                             component="span"
                             variant="caption"
-                            sx={{ ml: 1, color: "rgba(255,255,255,0.6)" }}
+                            sx={{ ml: 1, color: "var(--dp-sub)" }}
                           >
                             {g.items.length} nguồn
                           </Typography>
@@ -464,7 +464,7 @@ export default function RtspSourcesPage() {
                               sx={{
                                 fontFamily: "monospace",
                                 wordBreak: "break-all",
-                                color: "rgba(255,255,255,0.75)",
+                                color: "var(--dp-sub)",
                               }}
                             >
                               {s.url}
@@ -475,13 +475,13 @@ export default function RtspSourcesPage() {
                           </TableCell>
                           <TableCell>{renderResult(s._id)}</TableCell>
                           <TableCell>
-                            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)" }}>
+                            <Typography variant="caption" sx={{ color: "var(--dp-sub)" }}>
                               {cornerLabel(s.layout?.scoreboard)} · {cornerLabel(s.layout?.brand)} ·{" "}
                               {cornerLabel(s.layout?.sponsor)}
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ maxWidth: 200 }}>
-                            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+                            <Typography variant="caption" sx={{ color: "var(--dp-sub)" }}>
                               {s.note || "—"}
                             </Typography>
                           </TableCell>
@@ -512,7 +512,7 @@ export default function RtspSourcesPage() {
           )}
 
           {err ? (
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", mt: 1, display: "block" }}>
+            <Typography variant="caption" sx={{ color: "var(--dp-text)", mt: 1, display: "block" }}>
               {err}
             </Typography>
           ) : null}
@@ -597,7 +597,7 @@ export default function RtspSourcesPage() {
       <Dialog open={bulkOpen} onClose={() => setBulkOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Đổi user / pass / ip / port ({selected.length} nguồn)</DialogTitle>
         <DialogContent dividers>
-          <Typography variant="body2" sx={{ mb: 2, color: "rgba(255,255,255,0.75)" }}>
+          <Typography variant="body2" sx={{ mb: 2, color: "var(--dp-sub)" }}>
             Áp dụng cho {selected.length} nguồn đã chọn, chỉ đổi 4 thông tin dưới — giữ nguyên
             channel / path. Field để trống = giữ giá trị cũ của từng nguồn. Mật khẩu có ký tự đặc
             biệt (@, :, …) sẽ được tự mã hoá trong link RTSP.

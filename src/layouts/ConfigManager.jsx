@@ -736,7 +736,7 @@ function ImportDialog({ open, onClose, fileName, items, progress, importing, don
                 overflow: "auto",
                 fontFamily: "monospace",
                 fontSize: 12,
-                background: "rgba(255,255,255,0.05)",
+                background: "var(--dp-soft)",
                 color: "text.primary",
               }}
             >

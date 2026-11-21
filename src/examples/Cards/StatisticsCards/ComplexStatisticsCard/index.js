@@ -1,77 +1,45 @@
-/**
-=========================================================
-* PickleTour React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// prop-types is a library for typechecking of props
+// Thẻ thống kê theo mẫu "dash-widget" của DreamsPOS (ô biểu tượng tròn + số + nhãn).
+// Giữ nguyên props của bản Material Dashboard cũ nên các trang đang dùng không phải sửa.
 import PropTypes from "prop-types";
-
-// @mui material components
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
 import Icon from "@mui/material/Icon";
 
-// PickleTour React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
+export const DP_TONES = {
+  primary: "#FF9F43",
+  info: "#FF9F43",
+  secondary: "#637381",
+  success: "#28C76F",
+  warning: "#FFB400",
+  error: "#EA5455",
+  dark: "#1B2850",
+  light: "#637381",
+  white: "#637381",
+};
 
 function ComplexStatisticsCard({ color, title, count, percentage, icon }) {
+  const tone = DP_TONES[color] || DP_TONES.primary;
+  const pctTone = DP_TONES[percentage?.color] || DP_TONES.success;
   return (
-    <Card>
-      <MDBox display="flex" justifyContent="space-between" pt={1} px={2}>
-        <MDBox
-          variant="gradient"
-          bgColor={color}
-          color={color === "light" ? "dark" : "white"}
-          coloredShadow={color}
-          borderRadius="xl"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width="4rem"
-          height="4rem"
-          mt={-3}
-        >
+    <div className="dash-widget dp-stat w-100" style={{ marginBottom: 0 }}>
+      <div className="dash-widgetimg">
+        <span style={{ background: `${tone}1F`, color: tone }}>
           <Icon fontSize="medium" color="inherit">
             {icon}
           </Icon>
-        </MDBox>
-        <MDBox textAlign="right" lineHeight={1.25}>
-          <MDTypography variant="button" fontWeight="light" color="text">
-            {title}
-          </MDTypography>
-          <MDTypography variant="h4">{count}</MDTypography>
-        </MDBox>
-      </MDBox>
-      <Divider />
-      <MDBox pb={2} px={2}>
-        <MDTypography component="p" variant="button" color="text" display="flex">
-          <MDTypography
-            component="span"
-            variant="button"
-            fontWeight="bold"
-            color={percentage.color}
-          >
-            {percentage.amount}
-          </MDTypography>
-          &nbsp;{percentage.label}
-        </MDTypography>
-      </MDBox>
-    </Card>
+        </span>
+      </div>
+      <div className="dash-widgetcontent">
+        <h5>{count}</h5>
+        <h6>{title}</h6>
+        {percentage?.amount || percentage?.label ? (
+          <p className="dp-stat-note">
+            <strong style={{ color: pctTone }}>{percentage.amount}</strong> {percentage.label}
+          </p>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
-// Setting default values for the props of ComplexStatisticsCard
 ComplexStatisticsCard.defaultProps = {
   color: "info",
   percentage: {
@@ -81,7 +49,6 @@ ComplexStatisticsCard.defaultProps = {
   },
 };
 
-// Typechecking props for the ComplexStatisticsCard
 ComplexStatisticsCard.propTypes = {
   color: PropTypes.oneOf([
     "primary",

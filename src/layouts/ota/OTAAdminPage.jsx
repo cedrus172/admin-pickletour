@@ -508,7 +508,7 @@ export default function OTAAdminPage() {
                 cursor: "pointer",
               },
               "& .MuiDataGrid-columnHeaders": {
-                bgcolor: "rgba(255,255,255,0.03)",
+                bgcolor: "var(--dp-soft)",
               },
               "& .MuiDataGrid-row:hover": {
                 bgcolor: "action.hover",

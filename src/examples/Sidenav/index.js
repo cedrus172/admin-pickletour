@@ -4,39 +4,15 @@ import { useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-// @mui material
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import Link from "@mui/material/Link";
-import Icon from "@mui/material/Icon";
+import { useMaterialUIController, setMiniSidenav } from "context";
 
-// Components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
-import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
-import SidenavRoot from "examples/Sidenav/SidenavRoot";
-import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
-
-// Context
-import {
-  useMaterialUIController,
-  setMiniSidenav,
-  setTransparentSidenav,
-  setWhiteSidenav,
-} from "context";
-
-// Redux
 import { useDispatch, useSelector } from "react-redux";
 import { logout as clearAuth } from "slices/authSlice";
 import { useLogoutMutation } from "slices/authApiSlice";
 import { apiSlice } from "slices/apiSlice";
 import { getUserRoles, isStrictSuperAdminUser, normalizeRole } from "utils/authz";
+import Feather from "dreamspos/Feather";
 
-// Icons
-import LogoutIcon from "@mui/icons-material/Logout";
-
-/* ───────────────── helpers ───────────────── */
 function clearAllCookies() {
   document.cookie.split(";").forEach((cookie) => {
     const name = cookie.split("=")[0].trim();
@@ -181,111 +157,46 @@ const KEY_GROUP = {
 };
 
 /* ───────────────── component ───────────────── */
-function Sidenav({ color, brand, brandName, routes, ...rest }) {
+function Sidenav({ routes }) {
   const [controller, dispatchCtrl] = useMaterialUIController();
-  const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
-
+  const { miniSidenav } = controller;
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [logoutApi] = useLogoutMutation();
-
-  // lấy user để lọc menu theo role
   const { userInfo } = useSelector((s) => s.auth || {});
 
-  // màu chữ theo nền
-  let textColor = "white";
-  if (transparentSidenav || (whiteSidenav && !darkMode)) {
-    textColor = "dark";
-  } else if (whiteSidenav && darkMode) {
-    textColor = "inherit";
-  }
-
-  const closeSidenav = () => setMiniSidenav(dispatchCtrl, true);
-
-  // phản ứng theo độ rộng màn hình
+  // Màn 992–1199px: tự thu gọn thanh bên (bản rút gọn của DreamsPOS). Dưới 992px thanh bên trượt ra/vào.
   useEffect(() => {
-    function handleMiniSidenav() {
-      const isNarrow = window.innerWidth < 1200;
-      setMiniSidenav(dispatchCtrl, isNarrow);
-      setTransparentSidenav(dispatchCtrl, isNarrow ? false : transparentSidenav);
-      setWhiteSidenav(dispatchCtrl, isNarrow ? false : whiteSidenav);
+    function handleResize() {
+      setMiniSidenav(dispatchCtrl, window.innerWidth < 1200);
     }
-    window.addEventListener("resize", handleMiniSidenav);
-    handleMiniSidenav();
-    return () => window.removeEventListener("resize", handleMiniSidenav);
-  }, [dispatchCtrl, transparentSidenav, whiteSidenav]);
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, [dispatchCtrl]);
 
-  // Build menu items (lọc theo role + private + show)
-  // Render 1 mục collapse (Link ngoài hoặc NavLink nội bộ)
-  const renderCollapseItem = (cfg) => {
-    const { name, icon, noCollapse, key, href, route } = cfg;
-    const active = route ? location.pathname.startsWith(route) : false;
-    return href ? (
-      <Link
-        href={href}
-        key={key}
-        target="_blank"
-        rel="noreferrer"
-        sx={{ textDecoration: "none" }}
-        aria-label={`Mở ${name} trong tab mới`}
-      >
-        <SidenavCollapse name={name} icon={icon} active={active} noCollapse={noCollapse} />
-      </Link>
-    ) : (
-      <NavLink key={key} to={route} style={{ textDecoration: "none" }} aria-label={`Đi tới ${name}`}>
-        <SidenavCollapse name={name} icon={icon} active={active} noCollapse={noCollapse} />
-      </NavLink>
-    );
-  };
+  // DreamsPOS điều khiển bố cục thu gọn bằng lớp trên <body>
+  useEffect(() => {
+    document.body.classList.toggle("mini-sidebar", Boolean(miniSidenav));
+    return () => document.body.classList.remove("mini-sidebar");
+  }, [miniSidenav]);
 
-  // Gom các mục collapse hiển thị được vào nhóm rồi render theo GROUP_ORDER
-  const visibleCollapses = routes.filter(
-    (r) => r.type === "collapse" && r.show !== false && canView(r, userInfo)
-  );
-  const buckets = new Map();
-  visibleCollapses.forEach((r) => {
-    const g = KEY_GROUP[r.key] || "Khác";
-    if (!buckets.has(g)) buckets.set(g, []);
-    buckets.get(g).push(r);
-  });
-  const orderedGroups = [
-    ...GROUP_ORDER.filter((g) => buckets.has(g)),
-    ...[...buckets.keys()].filter((g) => !GROUP_ORDER.includes(g)),
-  ];
-  const renderRoutes = orderedGroups.map((group, gi) => (
-    <MDBox key={`grp-${group}`}>
-      {gi > 0 && (
-        <Divider
-          light={
-            (!darkMode && !whiteSidenav && !transparentSidenav) ||
-            (darkMode && !transparentSidenav && whiteSidenav)
-          }
-        />
-      )}
-      <MDTypography
-        color={textColor}
-        display="block"
-        variant="caption"
-        fontWeight="bold"
-        textTransform="uppercase"
-        pl={3}
-        mt={gi === 0 ? 1 : 2}
-        mb={1}
-        ml={1}
-      >
-        {group}
-      </MDTypography>
-      {buckets.get(group).map((cfg) => renderCollapseItem(cfg))}
-    </MDBox>
-  ));
+  // Đổi trang → đóng thanh bên dạng trượt (điện thoại)
+  useEffect(() => {
+    document.querySelector(".main-wrapper")?.classList.remove("slide-nav");
+    document.querySelector(".sidebar-overlay")?.classList.remove("opened");
+    document.documentElement.classList.remove("menu-opened");
+  }, [location.pathname]);
 
-  // Đăng xuất
+  const expandMenuOpen = () => document.body.classList.add("expand-menu");
+  const expandMenu = () => document.body.classList.remove("expand-menu");
+
   const handleLogout = async () => {
     try {
       await logoutApi().unwrap();
-    } catch {
-      // bỏ qua lỗi logout server
+    } catch (_) {
+      // bỏ qua lỗi đăng xuất phía máy chủ
     }
     clearAllCookies();
     localStorage.removeItem("userInfo");
@@ -294,87 +205,86 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     navigate("/authentication/sign-in", { replace: true });
   };
 
+  // Gom các mục hiển thị được vào nhóm rồi xếp theo GROUP_ORDER
+  const visible = routes.filter(
+    (r) => r.type === "collapse" && r.show !== false && canView(r, userInfo)
+  );
+  const buckets = new Map();
+  visible.forEach((r) => {
+    const g = KEY_GROUP[r.key] || "Khác";
+    if (!buckets.has(g)) buckets.set(g, []);
+    buckets.get(g).push(r);
+  });
+  const orderedGroups = [
+    ...GROUP_ORDER.filter((g) => buckets.has(g)),
+    ...[...buckets.keys()].filter((g) => !GROUP_ORDER.includes(g)),
+  ];
+
+  const renderItem = ({ name, icon, key, href, route }) => {
+    const active = route
+      ? location.pathname === route || location.pathname.startsWith(`${route}/`)
+      : false;
+    return (
+      <li key={key} className={active ? "active" : ""}>
+        {href ? (
+          <a href={href} target="_blank" rel="noreferrer" aria-label={`Mở ${name} trong tab mới`}>
+            {icon}
+            <span>{name}</span>
+          </a>
+        ) : (
+          <NavLink to={route} className={active ? "active" : ""} aria-label={`Đi tới ${name}`}>
+            {icon}
+            <span>{name}</span>
+          </NavLink>
+        )}
+      </li>
+    );
+  };
+
   return (
-    <SidenavRoot
-      {...rest}
-      variant="permanent"
-      ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
-    >
-      {/* Logo & Brand */}
-      <MDBox pt={3} pb={1} px={4} textAlign="center">
-        <MDBox
-          display={{ xs: "block", xl: "none" }}
-          position="absolute"
-          top={0}
-          right={0}
-          p={1.625}
-          onClick={closeSidenav}
-          sx={{ cursor: "pointer" }}
-          aria-label="Đóng thanh điều hướng"
-          title="Đóng"
+    <div className="sidebar" id="sidebar">
+      <div className="sidebar-inner slimscroll">
+        <div
+          id="sidebar-menu"
+          className="sidebar-menu"
+          onMouseOver={expandMenuOpen}
+          onFocus={expandMenuOpen}
+          onMouseLeave={expandMenu}
+          onBlur={expandMenu}
         >
-          {/* lưu ý: Icon dùng tên biểu tượng, không phải text hiển thị */}
-          <Icon sx={{ fontWeight: "bold" }}>close</Icon>
-        </MDBox>
-
-        <MDBox
-          component={NavLink}
-          to="/"
-          display="flex"
-          alignItems="center"
-          aria-label="Về trang chủ"
-          title="Trang chủ"
-          style={{ textDecoration: "none" }}
-        >
-          {brand && <MDBox component="img" src={brand} alt="Logo" width="2rem" />}
-          <MDBox
-            width={!brandName && "100%"}
-            sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
-          >
-            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
-              {brandName}
-            </MDTypography>
-          </MDBox>
-        </MDBox>
-      </MDBox>
-
-      <Divider
-        light={
-          (!darkMode && !whiteSidenav && !transparentSidenav) ||
-          (darkMode && !transparentSidenav && whiteSidenav)
-        }
-      />
-
-      {/* Menu */}
-      <List>{renderRoutes}</List>
-
-      {/* Nút đăng xuất */}
-      <MDBox p={2} mt="auto">
-        <MDButton
-          variant="gradient"
-          color={sidenavColor}
-          fullWidth
-          onClick={handleLogout}
-          startIcon={<LogoutIcon />}
-          aria-label="Đăng xuất"
-          title="Đăng xuất"
-        >
-          Đăng xuất
-        </MDButton>
-      </MDBox>
-    </SidenavRoot>
+          <ul>
+            {orderedGroups.map((group) => (
+              <li className="submenu-open" key={`grp-${group}`}>
+                <h6 className="submenu-hdr">{group}</h6>
+                <ul>{buckets.get(group).map(renderItem)}</ul>
+              </li>
+            ))}
+            <li className="submenu-open">
+              <ul>
+                <li>
+                  <a
+                    href="#dang-xuat"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
+                    data-no-command="true"
+                    aria-label="Đăng xuất"
+                  >
+                    <Feather icon="log-out" />
+                    <span>Đăng xuất</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }
 
-Sidenav.defaultProps = {
-  color: "info",
-  brand: "",
-};
-
 Sidenav.propTypes = {
-  color: PropTypes.oneOf(["primary", "secondary", "info", "success", "warning", "error", "dark"]),
-  brand: PropTypes.string,
-  brandName: PropTypes.string.isRequired,
   routes: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 

@@ -93,10 +93,10 @@ function UpcomingCard({ items = [], loading = false }) {
           </MDBox>
         ) : (
           <table
-            style={{ width: "100%", borderCollapse: "collapse", color: "rgba(255,255,255,0.88)" }}
+            style={{ width: "100%", borderCollapse: "collapse", color: "var(--dp-text)" }}
           >
             <thead>
-              <tr style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>
+              <tr style={{ color: "var(--dp-sub)", fontSize: 12 }}>
                 <th align="left">Tên</th>
                 <th align="left">Ngày</th>
                 <th align="right">Đã ĐK / Tối đa</th>
@@ -160,13 +160,13 @@ function TodosCard({ todos, loading = false }) {
                 alignItems="center"
                 justifyContent="space-between"
                 py={1}
-                sx={{ color: "rgba(255,255,255,0.88)" }}
+                sx={{ color: "var(--dp-text)" }}
               >
                 <MDBox display="flex" alignItems="center" gap={1}>
                   <Icon fontSize="small">{r.icon}</Icon>
                   <span>{r.label}</span>
                 </MDBox>
-                <MDBox fontWeight="bold" sx={{ color: "#fff" }}>
+                <MDBox fontWeight="bold" sx={{ color: "var(--dp-text)" }}>
                   {r.value}
                 </MDBox>
               </MDBox>
@@ -184,7 +184,7 @@ function FinanceMiniStat({ label, value, color }) {
       minWidth={140}
       p={1.5}
       borderRadius="lg"
-      sx={{ border: "1px solid", borderColor: "rgba(255,255,255,0.12)", bgcolor: "rgba(255,255,255,0.05)" }}
+      sx={{ border: "1px solid", borderColor: "var(--dp-line)", bgcolor: "var(--dp-soft)" }}
     >
       <MDBox fontSize={13} color="text" mb={0.5}>
         {label}
@@ -244,9 +244,9 @@ function FinanceOverviewCard({ summary, loading = false }) {
             <MDBox fontSize={13} fontWeight="bold" color="text" mb={1}>
               Lợi nhuận theo giải (Top 5)
             </MDBox>
-            <table style={{ width: "100%", borderCollapse: "collapse", color: "rgba(255,255,255,0.9)" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", color: "var(--dp-text)" }}>
               <thead>
-                <tr style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
+                <tr style={{ fontSize: 12, color: "var(--dp-sub)" }}>
                   <th align="left" style={{ padding: "4px 0" }}>
                     Giải
                   </th>
@@ -263,7 +263,7 @@ function FinanceOverviewCard({ summary, loading = false }) {
               </thead>
               <tbody>
                 {tops.map((t) => (
-                  <tr key={t.name} style={{ fontSize: 13, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                  <tr key={t.name} style={{ fontSize: 13, borderTop: "1px solid var(--dp-line)" }}>
                     <td style={{ padding: "6px 0" }}>{t.name}</td>
                     <td align="right" style={{ color: "#16a34a" }}>
                       {fmtVND(t.revenue)}

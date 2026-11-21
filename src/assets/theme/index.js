@@ -15,6 +15,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import { createTheme } from "@mui/material/styles";
+import { dreamsposComponents, dreamsposPalette, DP_FONT } from "dreamspos/muiOverrides";
 
 // PickleTour React base styles
 import colors from "assets/theme/base/colors";
@@ -83,7 +84,7 @@ import dialogContent from "assets/theme/components/dialog/dialogContent";
 import dialogContentText from "assets/theme/components/dialog/dialogContentText";
 import dialogActions from "assets/theme/components/dialog/dialogActions";
 
-export default createTheme({
+const baseTheme = createTheme({
   breakpoints: { ...breakpoints },
   palette: { ...colors },
   typography: { ...typography },
@@ -154,4 +155,11 @@ export default createTheme({
     MuiDialogContentText: { ...dialogContentText },
     MuiDialogActions: { ...dialogActions },
   },
+});
+
+// Lớp phủ DreamsPOS: gộp sau cùng để thắng các override gốc của Material Dashboard.
+export default createTheme(baseTheme, {
+  palette: dreamsposPalette("light"),
+  typography: { fontFamily: DP_FONT },
+  components: dreamsposComponents("light"),
 });

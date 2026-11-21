@@ -1,0 +1,160 @@
+/* ============================================================================
+   Lớp tương thích giữa DreamsPOS (Bootstrap 5 + style.css) và các trang MUI sẵn có.
+   Nạp SAU bootstrap.min.css và style.css (xem src/index.js).
+   ========================================================================== */
+
+/* Bootstrap "reboot" làm vỡ khe nhãn của ô nhập viền MUI (legend bị float + rộng 100%) */
+.MuiOutlinedInput-notchedOutline legend {
+  float: unset;
+  width: auto;
+  margin-bottom: 0;
+  font-size: 0.75em;
+  line-height: 11px;
+}
+/* Bootstrap gạch chân + tô xanh mọi thẻ a; trang MUI tự lo màu liên kết */
+a { text-decoration: none; color: inherit; }
+a:hover { color: #fe820e; }
+p { margin-bottom: 0; }
+label { margin-bottom: 0; }
+img { max-width: none; height: revert-layer; }
+.header img, .sidebar img, .page-wrapper .card > img { max-width: 100%; }
+/* style.css bỏ dấu đầu dòng của mọi danh sách; nội dung soạn thảo (tin tức, hướng dẫn) cần lại */
+.ql-editor ul, .dp-rich ul { list-style: disc; }
+.ql-editor ol, .dp-rich ol { list-style: decimal; }
+/* Bootstrap đặt h1–h6 nhỏ lề dưới; Typography của MUI tự đặt lề */
+.MuiTypography-root { margin-bottom: 0; }
+
+/* ── Khung: đầu trang ── */
+.header .header-left .dp-brand { display: flex; align-items: center; gap: 10px; height: 60px; }
+.header .header-left .dp-brand img { width: 40px; height: 40px; object-fit: contain; }
+.header .header-left .dp-brand span { font-size: 20px; font-weight: 800; color: #1b2850; letter-spacing: -0.3px; }
+.header .header-left .logo-small img { width: 38px; height: 38px; object-fit: contain; }
+body[data-theme="dark"] .header .header-left .dp-brand span { color: #fff; }
+.header .header-left .logo.logo-white { display: none; }
+body[data-theme="dark"] .header .header-left .logo.logo-normal { display: none; }
+body[data-theme="dark"] .header .header-left .logo.logo-white { display: flex !important; }
+.header .top-nav-search .searchinputs input { cursor: pointer; width: 280px; }
+.header .user-menu .nav-item-box > a { cursor: pointer; }
+.header .user-menu .dp-user-initial {
+  width: 100%; height: 100%; min-width: 34px; min-height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; background: #ff9f43; color: #fff; font-weight: 800; font-size: 15px;
+}
+.header .user-menu .dp-user-initial-lg { width: 40px; height: 40px; font-size: 17px; }
+.header .user-menu .menu-drop-user .dropdown-item { cursor: pointer; display: flex; align-items: center; }
+.header .user-menu .user-letter img { object-fit: cover; }
+.header .user-menu .user-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Khung: thanh bên (dùng biểu tượng Material sẵn có của từng mục) ── */
+.sidebar .sidebar-inner { height: 100%; overflow-y: auto; overflow-x: hidden; background: #fff; }
+body[data-theme="dark"] .sidebar .sidebar-inner { background: #141432; }
+.sidebar .sidebar-inner::-webkit-scrollbar { width: 5px; }
+.sidebar .sidebar-inner::-webkit-scrollbar-thumb { background: rgba(99, 115, 129, 0.35); border-radius: 5px; }
+.sidebar .sidebar-menu > ul > li.submenu-open ul li a { font-size: 14.5px; cursor: pointer; }
+.sidebar .sidebar-menu > ul > li.submenu-open ul li a .MuiIcon-root,
+.sidebar .sidebar-menu > ul > li.submenu-open ul li a svg {
+  width: 18px; height: 18px; font-size: 18px !important; margin-right: 10px; flex-shrink: 0; color: inherit;
+}
+.sidebar .sidebar-menu > ul > li.submenu-open ul li a span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar .sidebar-menu > ul > li.submenu-open ul li.active > a,
+.sidebar .sidebar-menu > ul > li.submenu-open ul li > a.active {
+  background: rgba(254, 159, 67, 0.08); color: #fe9f43; border-radius: 5px;
+}
+.sidebar .sidebar-menu > ul > li.submenu-open ul li.active > a span,
+.sidebar .sidebar-menu > ul > li.submenu-open ul li > a.active span { color: #fe9f43; }
+.sidebar .sidebar-menu > ul > li.submenu-open .submenu-hdr { text-transform: none; }
+/* thu gọn: ẩn chữ, chỉ còn biểu tượng (mở lại khi rê chuột — lớp expand-menu) */
+@media (min-width: 992px) {
+  .mini-sidebar:not(.expand-menu) .sidebar .sidebar-menu > ul > li.submenu-open ul li a span:not(.MuiIcon-root),
+  .mini-sidebar:not(.expand-menu) .sidebar .submenu-hdr { display: none; }
+  .mini-sidebar:not(.expand-menu) .sidebar .sidebar-menu > ul > li.submenu-open ul li a { justify-content: center; }
+  .mini-sidebar:not(.expand-menu) .sidebar .sidebar-menu > ul > li.submenu-open ul li a .MuiIcon-root,
+  .mini-sidebar:not(.expand-menu) .sidebar .sidebar-menu > ul > li.submenu-open ul li a svg { margin-right: 0; }
+  .mini-sidebar:not(.expand-menu) .header .header-left .dp-brand { display: none !important; }
+}
+
+/* ── Khung: vùng nội dung ── */
+.page-wrapper { min-height: 100vh; }
+.page-wrapper .content { min-width: 0; }
+.page-header .page-title h4 { font-weight: 700; font-size: 18px; color: #212b36; text-transform: none; margin-bottom: 4px; }
+.page-header .page-title h6 { font-size: 14px; color: #637381; font-weight: 400; margin-bottom: 0; }
+.page-header .page-title h6 a { color: #ff9f43; }
+body[data-theme="dark"] .page-header .page-title h4 { color: #fff; }
+body[data-theme="dark"] .page-header .page-title h6 { color: #97a2d2; }
+.sidebar-overlay.opened { display: block; }
+
+/* ── Bảng dữ liệu dùng chung (examples/Tables/DataTable) theo mẫu bảng DreamsPOS ── */
+.dp-table-wrap .table-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.dp-table-wrap .table-top .search-input input { height: 38px; border: 1px solid #e9ecef; border-radius: 5px; padding: 0 12px 0 34px; min-width: 220px; font-size: 14px; background: transparent; color: inherit; }
+.dp-table-wrap .table-top .search-input { position: relative; }
+.dp-table-wrap .table-top .search-input svg { position: absolute; left: 11px; top: 11px; color: #637381; }
+.dp-table-wrap table.table { margin-bottom: 0; }
+.dp-table-wrap table.table thead th { white-space: nowrap; font-weight: 600; color: #212b36; background: #fafbfe; padding: 12px; border-bottom: 1px solid #e9ecef; cursor: default; }
+.dp-table-wrap table.table thead th.dp-sortable { cursor: pointer; user-select: none; }
+.dp-table-wrap table.table tbody td { padding: 10px 12px; color: #637381; vertical-align: middle; border-bottom: 1px solid #e9ecef; }
+.dp-table-wrap table.table tbody tr:hover td { background: rgba(255, 159, 67, 0.04); }
+.dp-table-wrap .dp-table-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 14px 4px 2px; color: #637381; font-size: 14px; }
+.dp-table-wrap .pagination { margin: 0; gap: 4px; }
+.dp-table-wrap .pagination .page-link { border-radius: 5px !important; border: 1px solid #e9ecef; color: #637381; min-width: 34px; text-align: center; cursor: pointer; background: transparent; }
+.dp-table-wrap .pagination .page-item.active .page-link { background: #ff9f43; border-color: #ff9f43; color: #fff; }
+.dp-table-wrap .pagination .page-item.disabled .page-link { opacity: 0.5; cursor: default; }
+.dp-table-wrap select.dp-page-size { height: 34px; border: 1px solid #e9ecef; border-radius: 5px; padding: 0 8px; background: transparent; color: inherit; }
+body[data-theme="dark"] .dp-table-wrap table.table thead th { background: #1d1d42; color: #fff; border-color: #353570; }
+body[data-theme="dark"] .dp-table-wrap table.table tbody td { color: #97a2d2; border-color: #353570; }
+body[data-theme="dark"] .dp-table-wrap .table-top .search-input input,
+body[data-theme="dark"] .dp-table-wrap .pagination .page-link,
+body[data-theme="dark"] .dp-table-wrap select.dp-page-size { border-color: #353570; color: #97a2d2; }
+body[data-theme="dark"] .card { background: #1d1d42; border-color: #353570; }
+
+/* ── Trang đăng nhập ── */
+.login-wrapper .login-content .dp-login-logo { display: flex; align-items: center; gap: 12px; }
+.login-wrapper .login-content .dp-login-logo img { width: 56px; height: 56px; max-width: none; object-fit: contain; }
+.login-wrapper .login-content .dp-login-logo span { font-size: 26px; font-weight: 800; color: #1b2850; }
+.login-wrapper .login-img img { width: 100%; height: 100vh; object-fit: cover; max-width: none; }
+.login-wrapper .pass-group { position: relative; }
+.login-wrapper .dp-toggle-password { position: absolute; right: 12px; top: 8px; border: 0; background: transparent; color: #637381; font-weight: 600; font-size: 13px; padding: 4px 6px; }
+.login-wrapper .dp-remember { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #637381; font-weight: 500; }
+.login-wrapper .dp-remember input { width: 16px; height: 16px; accent-color: #ff9f43; }
+.login-wrapper .btn-login:disabled { opacity: 0.7; }
+.login-wrapper .form-login .dp-remember input[type="checkbox"] { width: 16px !important; height: 16px !important; min-height: 0; padding: 0; flex: none; }
+.login-wrapper .form-login .dp-remember { width: auto; }
+
+/* Lớp phủ của thanh bên trượt chỉ dành cho màn hẹp; màn rộng không bao giờ hiện */
+@media (min-width: 992px) {
+  .sidebar-overlay { display: none !important; }
+}
+
+/* ── Thẻ thống kê + thẻ biểu đồ (examples/Cards, examples/Charts) theo mẫu DreamsPOS ── */
+.dash-widget.dp-stat { display: flex; align-items: center; height: 100%; }
+.dash-widget.dp-stat .dash-widgetimg span { width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; }
+.dash-widget.dp-stat .dash-widgetcontent { margin-left: 16px; min-width: 0; }
+.dash-widget.dp-stat .dash-widgetcontent h5 { font-size: 20px; font-weight: 700; color: #212b36; margin-bottom: 2px; }
+.dash-widget.dp-stat .dash-widgetcontent h6 { font-size: 14px; font-weight: 400; color: #637381; margin-bottom: 0; }
+.dash-widget.dp-stat .dp-stat-note { font-size: 12.5px; color: #637381; margin: 4px 0 0; }
+.dp-chart-card .card-header { background: transparent; border-bottom: 1px solid #e8ebed; padding: 16px 20px; }
+.dp-chart-card .card-title { font-size: 16px; font-weight: 700; color: #212b36; margin: 0 !important; text-transform: none; }
+.dp-chart-card .card-header { display: block; }
+.dp-chart-card .dp-chart-desc { font-size: 13px; color: #637381; margin-top: 2px; }
+.dp-chart-card .dp-chart-date { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 13px; color: #637381; }
+body[data-theme="dark"] .dash-widget { background: #1d1d42; border-color: #353570; }
+body[data-theme="dark"] .dash-widget.dp-stat .dash-widgetcontent h5,
+body[data-theme="dark"] .dp-chart-card .card-title { color: #fff; }
+body[data-theme="dark"] .dp-chart-card .card-header { border-color: #353570; }
+
+/* ── Biến màu theo giao diện, dùng thay các màu viết cứng dành cho nền tối trước đây ── */
+:root { --dp-text: #212b36; --dp-sub: #637381; --dp-soft: rgba(27, 40, 80, 0.04); --dp-line: #e8ebed; --dp-card: #ffffff; }
+body[data-theme="dark"] { --dp-text: #e4e7f5; --dp-sub: #97a2d2; --dp-soft: rgba(255, 255, 255, 0.05); --dp-line: #353570; --dp-card: #1d1d42; }
+
+/* Biểu tượng Material của mục menu cũng là thẻ span → luôn hiện, kể cả khi thanh bên thu gọn */
+.sidebar .sidebar-menu a .MuiIcon-root { display: inline-block !important; }
+
+/* ── Đầu trang trên màn hẹp (< 992px) ── */
+.header .dp-mobile-actions { display: none; }
+@media (max-width: 991.98px) {
+  .header .header-left .dp-brand { justify-content: center; }
+  .header .dp-mobile-actions { display: flex; align-items: center; gap: 6px; position: absolute; right: 10px; top: 0; height: 60px; z-index: 11; }
+  .header .dp-mobile-actions a { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; color: #67748e; background: #fafbfe; }
+  body[data-theme="dark"] .header .dp-mobile-actions a { background: #1d1d42; color: #97a2d2; }
+  .page-wrapper .content { padding: 16px; }
+  .page-header .page-title { text-align: left; }
+}
