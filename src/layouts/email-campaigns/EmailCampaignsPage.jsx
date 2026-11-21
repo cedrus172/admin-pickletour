@@ -30,7 +30,7 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { Delete, Send, Cancel, Edit, Email as EmailIcon, Refresh, People } from "@mui/icons-material";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";

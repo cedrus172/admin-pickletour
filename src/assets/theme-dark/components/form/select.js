@@ -14,37 +14,10 @@ Coded by www.creative-tim.com
 */
 
 // PickleTour React base styles
-import colors from "assets/theme-dark/base/colors";
 
 // PickleTour React helper functions
-import pxToRem from "assets/theme-dark/functions/pxToRem";
 
-const { transparent } = colors;
-
-const select = {
-  styleOverrides: {
-    select: {
-      display: "grid",
-      alignItems: "center",
-      // Khớp chiều cao với OutlinedInput (padding 12px) để select không thấp hơn input.
-      padding: `${pxToRem(12)} ${pxToRem(12)} !important`,
-
-      "& .Mui-selected": {
-        backgroundColor: transparent.main,
-      },
-    },
-
-    selectMenu: {
-      background: "none",
-      height: "none",
-      minHeight: "none",
-      overflow: "unset",
-    },
-
-    icon: {
-      display: "none",
-    },
-  },
-};
+// Ô chọn dùng khung .form-select của DreamsPOS (dreamspos/ui) nên không cần kiểu riêng ở đây
+const select = {};
 
 export default select;

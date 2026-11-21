@@ -13,7 +13,7 @@ import {
   TableBody,
   Stack,
   Paper,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { useGetBracketQuery, useListMatchesQuery } from "slices/tournamentsApiSlice";
 
 export default function BracketViewPage() {

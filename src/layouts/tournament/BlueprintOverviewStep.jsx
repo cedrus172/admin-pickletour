@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Alert, Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Grid, Paper, Stack, Typography } from "dreamspos/ui";
 import StageStatusCard from "./StageStatusCard";
 
 export default function BlueprintOverviewStep({

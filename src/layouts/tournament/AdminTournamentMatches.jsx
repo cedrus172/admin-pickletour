@@ -24,7 +24,7 @@ import {
   TableCell,
   TableBody,
   Paper,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   ArrowBack,
   Info as InfoIcon,

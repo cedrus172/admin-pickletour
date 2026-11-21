@@ -14,8 +14,8 @@ Coded by www.creative-tim.com
 */
 
 // @mui material components
-import Card from "@mui/material/Card";
-// import Divider from "@mui/material/Divider";
+import { Card } from "dreamspos/ui";
+// import { Divider } from "dreamspos/ui";
 import Icon from "@mui/material/Icon";
 
 // PickleTour React components

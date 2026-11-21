@@ -20,7 +20,7 @@ import {
   Autocomplete,
   IconButton,
   Chip,
-} from "@mui/material";
+} from "dreamspos/ui";
 import ClearIcon from "@mui/icons-material/Clear";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";

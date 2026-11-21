@@ -19,9 +19,9 @@ import { useState, useEffect } from "react";
 import GitHubButton from "react-github-btn";
 
 // @mui material components
-import Divider from "@mui/material/Divider";
-import Switch from "@mui/material/Switch";
-import IconButton from "@mui/material/IconButton";
+import { Divider } from "dreamspos/ui";
+import { Switch } from "dreamspos/ui";
+import { IconButton } from "dreamspos/ui";
 import Link from "@mui/material/Link";
 import Icon from "@mui/material/Icon";
 

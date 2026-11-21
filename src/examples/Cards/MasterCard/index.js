@@ -17,7 +17,7 @@ Coded by www.creative-tim.com
 import PropTypes from "prop-types";
 
 // @mui material components
-import Card from "@mui/material/Card";
+import { Card } from "dreamspos/ui";
 import Icon from "@mui/material/Icon";
 
 // PickleTour React components

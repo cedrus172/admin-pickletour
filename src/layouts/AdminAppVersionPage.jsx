@@ -26,7 +26,7 @@ import {
   ListItemText,
   ListItemIcon,
   Drawer,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SaveIcon from "@mui/icons-material/Save";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SecurityIcon from "@mui/icons-material/Security";
@@ -50,7 +50,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import PropTypes from "prop-types";
 
 // DataGrid
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "dreamspos/ui/DataGrid";
 
 import { useGetAppVersionQuery, useUpsertAppVersionMutation } from "slices/versionApiSlice";
 import { useGetVersionStatsQuery, useGetUsersVersionQuery } from "slices/adminVersionsApiSlice";

@@ -20,7 +20,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";

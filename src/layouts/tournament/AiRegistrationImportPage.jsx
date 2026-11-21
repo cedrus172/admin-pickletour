@@ -24,14 +24,14 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import { skipToken } from "@reduxjs/toolkit/query";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";

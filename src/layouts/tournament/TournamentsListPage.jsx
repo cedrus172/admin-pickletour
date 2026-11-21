@@ -20,7 +20,7 @@ import {
   LinearProgress,
   Switch,
   Card as MuiCard,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   AccountTree as AccountTreeIcon,
   AutoStories as AutoStoriesIcon,
@@ -48,7 +48,7 @@ import { toast } from "react-toastify";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import Card from "@mui/material/Card";
+import { Card } from "dreamspos/ui";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";

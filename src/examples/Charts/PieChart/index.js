@@ -23,7 +23,7 @@ import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 // @mui material components
-import Card from "@mui/material/Card";
+import { Card } from "dreamspos/ui";
 import Icon from "@mui/material/Icon";
 
 // PickleTour React components

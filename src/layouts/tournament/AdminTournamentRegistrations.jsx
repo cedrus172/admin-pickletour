@@ -25,7 +25,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   Add as AddIcon,
   ArrowBack,

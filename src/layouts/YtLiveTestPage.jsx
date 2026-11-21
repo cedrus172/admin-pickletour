@@ -2,7 +2,7 @@ import React from "react";
 import {
   Box, Card, CardContent, Stack, Typography, Button, Alert, Divider, Chip,
   TextField, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow, Link, Tooltip,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";

@@ -11,7 +11,7 @@ import {
   DialogContent, DialogActions, TextField, MenuItem, Select, InputLabel,
   FormControl, FormHelperText, Alert, Box, Stack, Tooltip, Divider, Collapse,
   FormControlLabel, Checkbox,
-} from "@mui/material";
+} from "dreamspos/ui";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";

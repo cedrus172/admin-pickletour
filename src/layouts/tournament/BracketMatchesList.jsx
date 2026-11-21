@@ -1,6 +1,6 @@
 // src/components/BracketMatchesList.jsx
 import React from "react";
-import { Box, Card, Typography, CircularProgress, Alert, Stack, IconButton } from "@mui/material";
+import { Box, Card, Typography, CircularProgress, Alert, Stack, IconButton } from "dreamspos/ui";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import { useListMatchesQuery, useDeleteMatchMutation } from "slices/tournamentsApiSlice";
 

@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -28,7 +28,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import LinkIcon from "@mui/icons-material/Link";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "dreamspos/ui/DataGrid";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

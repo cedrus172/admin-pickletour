@@ -20,8 +20,8 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // @mui material components
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
+import { Card } from "dreamspos/ui";
+import { Divider } from "dreamspos/ui";
 import Tooltip from "@mui/material/Tooltip";
 import Icon from "@mui/material/Icon";
 

@@ -16,7 +16,7 @@ import {
   LinearProgress,
   IconButton,
   Paper,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { Close, CloudUpload, InsertDriveFile } from "@mui/icons-material";
 import { useUploadOtaBundleMutation } from "../../../slices/otaApiSlice";
 

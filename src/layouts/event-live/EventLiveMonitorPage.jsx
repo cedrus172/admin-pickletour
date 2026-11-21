@@ -23,7 +23,7 @@ import {
   Tabs,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   Chat,
   Delete,

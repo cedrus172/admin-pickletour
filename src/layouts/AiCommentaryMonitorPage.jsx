@@ -17,8 +17,8 @@ import {
   Switch,
   TextField,
   Typography,
-} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+} from "dreamspos/ui";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";

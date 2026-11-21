@@ -32,7 +32,7 @@ import {
   TableCell,
   Divider,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
@@ -76,7 +76,7 @@ import {
   useRestoreUserMutation,
 } from "slices/adminApiSlice";
 import { PcoinAdjustDialog, PcoinPanel } from "layouts/pcoin/PcoinPage";
-import { Tab as MuiTab, Tabs as MuiTabs } from "@mui/material";
+import { Tab as MuiTab, Tabs as MuiTabs } from "dreamspos/ui";
 import { useSearchParams } from "react-router-dom";
 import { useResetNicknameCooldownMutation } from "slices/nicknameRequestsApiSlice";
 

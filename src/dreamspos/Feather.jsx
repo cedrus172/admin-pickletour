@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 // Biểu tượng Feather (bộ icon DreamsPOS dùng) vẽ thẳng bằng SVG — không cần thêm thư viện.
 import PropTypes from "prop-types";
 
@@ -43,6 +44,21 @@ const PATHS = {
     "M10 14L21 3",
   ],
   x: ["M18 6L6 18", "M6 6l12 12"],
+  info: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 16v-4", "M12 8h.01"],
+  "alert-circle": ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 8v4", "M12 16h.01"],
+  "alert-triangle": [
+    "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z",
+    "M12 9v4",
+    "M12 17h.01",
+  ],
+  "check-circle": ["M22 11.08V12a10 10 0 1 1-5.93-9.14", "M22 4L12 14.01l-3-3"],
+  "chevron-down": ["M6 9l6 6 6-6"],
+  "chevron-up": ["M18 15l-6-6-6 6"],
+  "chevrons-right": ["M13 17l5-5-5-5", "M6 17l5-5-5-5"],
+  inbox: [
+    "M22 12h-6l-2 3h-4l-2-3H2",
+    "M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z",
+  ],
 };
 
 export default function Feather({ icon, size, className, ...rest }) {

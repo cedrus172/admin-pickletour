@@ -15,7 +15,7 @@ Coded by www.creative-tim.com
 
 // @mui material components
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
+import { Divider } from "dreamspos/ui";
 
 // @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";

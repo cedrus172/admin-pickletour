@@ -17,11 +17,11 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import HubIcon from "@mui/icons-material/Hub";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";

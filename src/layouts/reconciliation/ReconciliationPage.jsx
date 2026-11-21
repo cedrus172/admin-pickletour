@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Box, Card, Grid, TextField, Typography, Table, TableBody, TableCell, TableHead, TableRow,
   Chip, LinearProgress, Alert, Stack, IconButton, Tooltip,
-} from "@mui/material";
+} from "dreamspos/ui";
 import EditIcon from "@mui/icons-material/Edit";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";

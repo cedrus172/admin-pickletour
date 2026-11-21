@@ -11,7 +11,7 @@ import {
   Typography,
   IconButton,
   Grid
-} from "@mui/material";
+} from "dreamspos/ui";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 

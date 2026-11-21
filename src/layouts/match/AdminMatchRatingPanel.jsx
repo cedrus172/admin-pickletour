@@ -1,8 +1,8 @@
 // src/layouts/match/AdminMatchRatingPanel.jsx
 import * as React from "react";
 import PropTypes from "prop-types";
-import { Box, Paper, Stack, Typography, Chip } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { Box, Paper, Stack, Typography, Chip } from "dreamspos/ui";
+import { DataGrid, GridToolbar } from "dreamspos/ui/DataGrid";
 
 const fmt3 = (v) => (typeof v === "number" ? v.toFixed(3) : "—");
 const fmtPct1 = (v) => (typeof v === "number" ? `${(v * 100).toFixed(1)}%` : "—");

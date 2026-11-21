@@ -23,8 +23,8 @@ import {
   LinearProgress,
   Autocomplete,
   Checkbox,
-} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+} from "dreamspos/ui";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import {
   Add,
   Delete,

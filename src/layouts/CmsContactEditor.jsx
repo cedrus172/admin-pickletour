@@ -13,7 +13,7 @@ import {
   Alert,
   Skeleton,
   // LinearProgress, // nếu muốn dùng thì bật lại
-} from "@mui/material";
+} from "dreamspos/ui";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 

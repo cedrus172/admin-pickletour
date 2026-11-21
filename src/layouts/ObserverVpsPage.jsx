@@ -17,7 +17,7 @@ import {
   Switch,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";

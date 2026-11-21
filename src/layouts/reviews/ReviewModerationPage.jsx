@@ -21,7 +21,7 @@ import {
   Pagination,
   Typography,
   LinearProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";

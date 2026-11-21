@@ -15,7 +15,7 @@ import {
   FormControlLabel,
   Switch,
   Alert,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   useGenerateNewsArticlesMutation,
   useGetNewsListQuery,

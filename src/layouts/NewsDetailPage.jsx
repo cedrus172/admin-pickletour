@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Chip, Stack, IconButton, CircularProgress } from "@mui/material";
+import { Box, Typography, Chip, Stack, IconButton, CircularProgress } from "dreamspos/ui";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useGetNewsBySlugQuery } from "slices/newsApiSlice";

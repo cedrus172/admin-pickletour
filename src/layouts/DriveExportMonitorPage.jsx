@@ -20,7 +20,7 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -29,7 +29,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import SearchIcon from "@mui/icons-material/Search";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import { toast } from "react-toastify";
 import { Link as RouterLink } from "react-router-dom";
 

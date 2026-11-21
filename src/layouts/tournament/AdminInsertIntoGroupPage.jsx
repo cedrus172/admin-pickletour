@@ -21,7 +21,7 @@ import {
   CircularProgress,
   FormControlLabel,
   Switch,
-} from "@mui/material";
+} from "dreamspos/ui";
 import ReplayIcon from "@mui/icons-material/Replay";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SportsKabaddiIcon from "@mui/icons-material/SportsKabaddi";

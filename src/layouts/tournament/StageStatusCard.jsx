@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Paper, Stack, Typography, Chip, Button } from "@mui/material";
+import { Paper, Stack, Typography, Chip, Button } from "dreamspos/ui";
 
 const STATUS_LABEL = {
   draftable: "Chưa khóa",

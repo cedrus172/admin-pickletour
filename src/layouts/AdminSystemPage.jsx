@@ -23,8 +23,8 @@ import {
   Alert,
   useTheme,
   useMediaQuery,
-} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+} from "dreamspos/ui";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 
 import RefreshIcon from "@mui/icons-material/Refresh";
 import MemoryIcon from "@mui/icons-material/Memory";

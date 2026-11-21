@@ -15,7 +15,7 @@ import {
   Typography,
   Button,
   CircularProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";

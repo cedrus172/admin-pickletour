@@ -3,7 +3,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import { Alert, Box, Button, Chip, CircularProgress, LinearProgress, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Chip, CircularProgress, LinearProgress, Paper, Stack, TextField, Typography } from "dreamspos/ui";
 import SportsTennisIcon from "@mui/icons-material/SportsTennis";
 import { toast } from "react-toastify";
 

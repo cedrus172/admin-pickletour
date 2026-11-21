@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Alert, Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
+import { Alert, Button, CircularProgress, Paper, Stack, Typography } from "dreamspos/ui";
 
 const TYPE_LABEL = {
   unchanged: "Giữ nguyên",

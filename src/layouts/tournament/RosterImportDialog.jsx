@@ -21,7 +21,7 @@ import {
   TableRow,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import * as XLSX from "xlsx";
 import { useImportRosterMutation } from "slices/tournamentsApiSlice";
 

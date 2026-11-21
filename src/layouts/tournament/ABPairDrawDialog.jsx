@@ -23,7 +23,7 @@ import {
   TableRow,
   Chip,
   Autocomplete,
-} from "@mui/material";
+} from "dreamspos/ui";
 import CasinoIcon from "@mui/icons-material/Casino";
 import { useImportRosterMutation } from "slices/tournamentsApiSlice";
 import { useLazySearchUsersQuery } from "slices/adminUsersApiSlice";

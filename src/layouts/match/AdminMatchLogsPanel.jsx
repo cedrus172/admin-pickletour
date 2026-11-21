@@ -12,8 +12,8 @@ import {
   Switch,
   FormControlLabel,
   Chip,
-} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+} from "dreamspos/ui";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import dayjs from "dayjs";

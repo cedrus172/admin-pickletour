@@ -17,7 +17,7 @@ import {
   Tooltip,
   Divider,
   GlobalStyles,
-} from "@mui/material";
+} from "dreamspos/ui";
 import ColorLensIcon from "@mui/icons-material/ColorLens";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";

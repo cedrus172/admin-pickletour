@@ -12,7 +12,7 @@ import {
   Skeleton,
   LinearProgress,
   Divider,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { toast } from "react-toastify";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";

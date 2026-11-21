@@ -30,7 +30,7 @@ import {
   Badge,
   Fade,
   Zoom,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { useTheme, alpha, styled } from "@mui/material/styles";
 
 import SearchIcon from "@mui/icons-material/Search";

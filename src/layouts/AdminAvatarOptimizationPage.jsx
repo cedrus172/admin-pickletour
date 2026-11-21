@@ -17,7 +17,7 @@ import {
   Stack,
   Switch,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";

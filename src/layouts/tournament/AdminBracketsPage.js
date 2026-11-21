@@ -30,9 +30,9 @@ import {
   AccordionDetails,
   FormGroup,
   LinearProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SportsTennisIcon from "@mui/icons-material/SportsTennis";
-import { Paper } from "@mui/material";
+import { Paper } from "dreamspos/ui";
 import { AccountTree as AccountTreeIcon } from "@mui/icons-material";
 
 import {

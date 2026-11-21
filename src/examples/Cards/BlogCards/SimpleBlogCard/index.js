@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // @mui material components
-import Card from "@mui/material/Card";
+import { Card } from "dreamspos/ui";
 import MuiLink from "@mui/material/Link";
 
 // PickleTour React components

@@ -19,7 +19,7 @@ import {
   Switch,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import DragIndicatorRoundedIcon from "@mui/icons-material/DragIndicatorRounded";

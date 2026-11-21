@@ -12,7 +12,7 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { BugReport } from "@mui/icons-material";
 import { useGetOtaAnalyticsQuery } from "../../../slices/otaApiSlice";
 

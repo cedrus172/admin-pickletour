@@ -2,37 +2,35 @@
 =========================================================
 * PickleTour React - v2.2.0
 =========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+// Ảnh đại diện của Material Dashboard → ảnh đại diện DreamsPOS
+/* eslint-disable react/prop-types */
 import { forwardRef } from "react";
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
-// Custom styles for MDAvatar
-import MDAvatarRoot from "components/MDAvatar/MDAvatarRoot";
+import { Avatar } from "dreamspos/ui";
 
-const MDAvatar = forwardRef(({ bgColor, size, shadow, ...rest }, ref) => (
-  <MDAvatarRoot ref={ref} ownerState={{ shadow, bgColor, size }} {...rest} />
+const SIZES = { xs: 24, sm: 36, md: 48, lg: 58, xl: 74, xxl: 110 };
+
+const MDAvatar = forwardRef(({ bgColor, size, shadow, sx, ...rest }, ref) => (
+  <Avatar
+    ref={ref}
+    {...rest}
+    sx={[
+      { width: SIZES[size] || 48, height: SIZES[size] || 48 },
+      bgColor && bgColor !== "transparent" && { bgcolor: `${bgColor}.main`, color: "#fff" },
+      ...(Array.isArray(sx) ? sx : [sx]),
+    ]}
+  />
 ));
 
-// Setting default values for the props of MDAvatar
 MDAvatar.defaultProps = {
   bgColor: "transparent",
   size: "md",
   shadow: "none",
 };
 
-// Typechecking props for the MDAvatar
 MDAvatar.propTypes = {
   bgColor: PropTypes.oneOf([
     "transparent",

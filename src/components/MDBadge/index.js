@@ -2,39 +2,41 @@
 =========================================================
 * PickleTour React - v2.2.0
 =========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+// Nhãn của Material Dashboard → nhãn trạng thái DreamsPOS (.badges)
 import { forwardRef } from "react";
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
-// Custom styles for the MDBadge
-import MDBadgeRoot from "components/MDBadge/MDBadgeRoot";
+import { Chip } from "dreamspos/ui";
 
 const MDBadge = forwardRef(
-  ({ color, variant, size, circular, indicator, border, container, children, ...rest }, ref) => (
-    <MDBadgeRoot
+  (
+    {
+      color,
+      variant,
+      size,
+      circular,
+      indicator,
+      border,
+      container,
+      children,
+      badgeContent,
+      ...rest
+    },
+    ref
+  ) => (
+    <Chip
       {...rest}
-      ownerState={{ color, variant, size, circular, indicator, border, container, children }}
       ref={ref}
-      color="default"
-    >
-      {children}
-    </MDBadgeRoot>
+      label={badgeContent ?? children}
+      color={color === "dark" || color === "light" ? "secondary" : color}
+      size={size === "md" || size === "lg" ? "medium" : "small"}
+      sx={circular ? { borderRadius: "50px" } : undefined}
+    />
   )
 );
 
-// Setting default values for the props of MDBadge
 MDBadge.defaultProps = {
   color: "info",
   variant: "gradient",
@@ -44,9 +46,9 @@ MDBadge.defaultProps = {
   border: false,
   children: false,
   container: false,
+  badgeContent: undefined,
 };
 
-// Typechecking props of the MDBadge
 MDBadge.propTypes = {
   color: PropTypes.oneOf([
     "primary",
@@ -65,6 +67,7 @@ MDBadge.propTypes = {
   border: PropTypes.bool,
   children: PropTypes.node,
   container: PropTypes.bool,
+  badgeContent: PropTypes.node,
 };
 
 export default MDBadge;

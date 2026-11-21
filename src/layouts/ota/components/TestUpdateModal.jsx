@@ -15,7 +15,7 @@ import {
   Divider,
   Chip,
   CircularProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { Close, PlayArrow, CheckCircle, Info } from "@mui/icons-material";
 import { useLazyCheckOtaUpdateQuery } from "../../../slices/otaApiSlice";
 

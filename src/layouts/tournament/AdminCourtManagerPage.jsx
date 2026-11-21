@@ -31,13 +31,13 @@ import {
   List,
   ListItem,
   ListItemText,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SaveIcon from "@mui/icons-material/Save";
 import QueuePlayNextIcon from "@mui/icons-material/QueuePlayNext";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 

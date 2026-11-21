@@ -40,7 +40,7 @@ import {
   Autocomplete,
   DialogActions,
   Switch,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SaveIcon from "@mui/icons-material/Save";
 import QueuePlayNextIcon from "@mui/icons-material/QueuePlayNext";
@@ -52,7 +52,7 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { toast } from "react-toastify";

@@ -24,7 +24,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { Delete, People, UploadFile, Visibility, Add } from "@mui/icons-material";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";

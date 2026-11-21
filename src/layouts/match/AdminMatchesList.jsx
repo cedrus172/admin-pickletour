@@ -34,7 +34,7 @@ import {
   Select,
   Pagination,
   Tooltip,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   ExpandMore as ExpandMoreIcon,
   Edit as EditIcon,

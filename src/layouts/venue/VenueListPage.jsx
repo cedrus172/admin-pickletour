@@ -15,7 +15,7 @@ import {
   Stack,
   Pagination,
   CircularProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import LockIcon from "@mui/icons-material/Lock";

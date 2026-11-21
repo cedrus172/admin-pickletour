@@ -15,7 +15,7 @@ import {
   Stack,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";

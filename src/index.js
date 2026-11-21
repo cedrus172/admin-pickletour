@@ -23,10 +23,13 @@ import { MaterialUIControllerProvider } from "context";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { ToastContainer } from "react-toastify";
+import { CacheProvider } from "@emotion/react";
+import emotionCache from "dreamspos/emotionCache";
 // Giao diện DreamsPOS: Bootstrap 5 + style.css của theme, rồi lớp tương thích với các trang MUI
 import "assets/dreamspos/css/bootstrap.min.css";
 import "assets/dreamspos/css/style.css";
 import "dreamspos/compat.css";
+import "dreamspos/ui/ui.css";
 import "react-toastify/dist/ReactToastify.css";
 import { SocketProvider } from "context/SocketContext";
 import "react-quill/dist/quill.snow.css";
@@ -34,24 +37,26 @@ const container = document.getElementById("app");
 const root = createRoot(container);
 
 root.render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <SocketProvider>
-        <MaterialUIControllerProvider>
-          <App />
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            pauseOnHover
-            draggable
-            theme="colored"
-            limit={3}
-          />
-        </MaterialUIControllerProvider>
-      </SocketProvider>
-    </BrowserRouter>
-  </Provider>
+  <CacheProvider value={emotionCache}>
+    <Provider store={store}>
+      <BrowserRouter>
+        <SocketProvider>
+          <MaterialUIControllerProvider>
+            <App />
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              pauseOnHover
+              draggable
+              theme="colored"
+              limit={3}
+            />
+          </MaterialUIControllerProvider>
+        </SocketProvider>
+      </BrowserRouter>
+    </Provider>
+  </CacheProvider>
 );

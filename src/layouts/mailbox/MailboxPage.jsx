@@ -23,7 +23,7 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   Search,
   Refresh,

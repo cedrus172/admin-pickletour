@@ -24,7 +24,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import CheckIcon from "@mui/icons-material/CheckCircle";
 import RejectIcon from "@mui/icons-material/Cancel";
 import RefreshIcon from "@mui/icons-material/Refresh";

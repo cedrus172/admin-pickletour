@@ -22,7 +22,7 @@ import {
   Tabs,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import RefreshIcon from "@mui/icons-material/Refresh";

@@ -1,50 +1,40 @@
 /**
 =========================================================
-* PickleTour React - v1.0.0
+* PickleTour React - v2.2.0
 =========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-pro-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+// Nút của Material Dashboard → nút DreamsPOS (giữ nguyên props cũ: color, variant, size, circular, iconOnly)
+/* eslint-disable react/prop-types */
 import { forwardRef } from "react";
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
-// Custom styles for MDButton
-import MDButtonRoot from "components/MDButton/MDButtonRoot";
-
-// PickleTour React contexts
-import { useMaterialUIController } from "context";
+import { Button } from "dreamspos/ui";
 
 const MDButton = forwardRef(
-  ({ color, variant, size, circular, iconOnly, children, ...rest }, ref) => {
-    const [controller] = useMaterialUIController();
-    const { darkMode } = controller;
-
-    return (
-      <MDButtonRoot
-        {...rest}
-        ref={ref}
-        color="primary"
-        variant={variant === "gradient" ? "contained" : variant}
-        size={size}
-        ownerState={{ color, variant, size, circular, iconOnly, darkMode }}
-      >
-        {children}
-      </MDButtonRoot>
-    );
-  }
+  ({ color, variant, size, circular, iconOnly, children, sx, ...rest }, ref) => (
+    <Button
+      {...rest}
+      ref={ref}
+      color={color === "white" || color === "light" ? "inherit" : color}
+      variant={variant === "gradient" ? "contained" : variant}
+      size={size}
+      sx={[
+        circular && { borderRadius: "50px" },
+        iconOnly && {
+          minWidth: 0,
+          width: size === "small" ? 30 : 38,
+          height: size === "small" ? 30 : 38,
+          p: 0,
+        },
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
+    >
+      {children}
+    </Button>
+  )
 );
 
-// Setting default values for the props of MDButton
 MDButton.defaultProps = {
   size: "medium",
   variant: "contained",
@@ -53,7 +43,6 @@ MDButton.defaultProps = {
   iconOnly: false,
 };
 
-// Typechecking props for the MDButton
 MDButton.propTypes = {
   size: PropTypes.oneOf(["small", "medium", "large"]),
   variant: PropTypes.oneOf(["text", "contained", "outlined", "gradient"]),

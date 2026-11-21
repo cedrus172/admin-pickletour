@@ -7,7 +7,7 @@ import {
   Fab,
   Stack,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SaveIcon from "@mui/icons-material/Save";
 import { toast } from "react-toastify";
 import {

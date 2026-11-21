@@ -13,7 +13,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-} from "@mui/material";
+} from "dreamspos/ui";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 

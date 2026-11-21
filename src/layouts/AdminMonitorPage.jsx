@@ -30,7 +30,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PeopleIcon from "@mui/icons-material/People";
 import WifiIcon from "@mui/icons-material/Wifi";

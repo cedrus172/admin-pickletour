@@ -1,6 +1,6 @@
 // src/layouts/dashboard/index.jsx
 import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
+import { Card } from "dreamspos/ui";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -9,8 +9,8 @@ import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import Icon from "@mui/material/Icon";
-import Skeleton from "@mui/material/Skeleton";
-import LinearProgress from "@mui/material/LinearProgress";
+import { Skeleton } from "dreamspos/ui";
+import { LinearProgress } from "dreamspos/ui";
 import { useMemo } from "react";
 
 import { useGetDashboardMetricsQuery, useGetDashboardSeriesQuery } from "slices/dashboardApiSlice";

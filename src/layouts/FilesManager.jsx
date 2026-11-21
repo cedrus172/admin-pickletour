@@ -21,7 +21,7 @@ import {
   Divider,
   CircularProgress,
   Grid,
-} from "@mui/material";
+} from "dreamspos/ui";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -37,7 +37,7 @@ import UpdateIcon from "@mui/icons-material/Update";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DownloadIcon from "@mui/icons-material/Download";
 
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "dreamspos/ui/DataGrid";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";

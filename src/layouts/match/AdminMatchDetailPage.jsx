@@ -12,7 +12,7 @@ import {
   Tab,
   Divider,
   Tooltip,
-} from "@mui/material";
+} from "dreamspos/ui";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BoltIcon from "@mui/icons-material/Bolt";

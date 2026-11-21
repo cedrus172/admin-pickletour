@@ -20,7 +20,7 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";

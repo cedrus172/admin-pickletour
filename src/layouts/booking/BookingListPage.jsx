@@ -12,7 +12,7 @@ import {
   Stack,
   Pagination,
   CircularProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";

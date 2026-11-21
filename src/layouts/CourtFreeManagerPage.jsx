@@ -21,7 +21,7 @@ import {
   Switch,
   TextField,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import LockOpenRoundedIcon from "@mui/icons-material/LockOpenRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";

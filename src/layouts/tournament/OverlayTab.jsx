@@ -29,7 +29,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import PaletteIcon from "@mui/icons-material/Palette";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";

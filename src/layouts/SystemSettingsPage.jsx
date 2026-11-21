@@ -18,7 +18,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SaveIcon from "@mui/icons-material/Save";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import DeleteIcon from "@mui/icons-material/Delete";

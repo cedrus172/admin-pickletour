@@ -23,7 +23,7 @@ import {
   CircularProgress,
   Divider,
   LinearProgress as MUILinearProgress,
-} from "@mui/material";
+} from "dreamspos/ui";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import VisibilityIcon from "@mui/icons-material/Visibility";

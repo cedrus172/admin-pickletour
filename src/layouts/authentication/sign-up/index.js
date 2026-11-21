@@ -17,8 +17,8 @@ Coded by www.creative-tim.com
 import { Link } from "react-router-dom";
 
 // @mui material components
-import Card from "@mui/material/Card";
-import Checkbox from "@mui/material/Checkbox";
+import { Card } from "dreamspos/ui";
+import { Checkbox } from "dreamspos/ui";
 
 // PickleTour React components
 import MDBox from "components/MDBox";

@@ -27,7 +27,7 @@ import {
   Tooltip,
   Typography,
   Checkbox,
-} from "@mui/material";
+} from "dreamspos/ui";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";

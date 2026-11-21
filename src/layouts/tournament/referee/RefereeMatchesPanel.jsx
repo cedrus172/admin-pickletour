@@ -21,7 +21,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { useEffect, useMemo, useState } from "react";
 import { useGetRefereeTournamentsQuery } from "slices/tournamentsApiSlice";
 import {

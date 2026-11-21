@@ -21,7 +21,7 @@ import {
   Avatar,
   CircularProgress,
   Autocomplete, // 🆕
-} from "@mui/material";
+} from "dreamspos/ui";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import LinkIcon from "@mui/icons-material/Link";
 import SendIcon from "@mui/icons-material/Send";

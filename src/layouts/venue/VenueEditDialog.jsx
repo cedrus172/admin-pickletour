@@ -11,7 +11,7 @@ import {
   FormControlLabel,
   Switch,
   Divider,
-} from "@mui/material";
+} from "dreamspos/ui";
 
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";

@@ -11,7 +11,7 @@ import {
   LinearProgress,
   Stack,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useParams } from "react-router-dom";

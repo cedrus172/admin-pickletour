@@ -21,7 +21,7 @@ import {
   Tooltip,
   Typography,
   alpha,
-} from "@mui/material";
+} from "dreamspos/ui";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CloseIcon from "@mui/icons-material/Close";
 import InboxIcon from "@mui/icons-material/Inbox";

@@ -17,7 +17,7 @@ import {
   Paper,
   Stack,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ReplayIcon from "@mui/icons-material/Replay";
 import FaceRetouchingNaturalIcon from "@mui/icons-material/FaceRetouchingNatural";

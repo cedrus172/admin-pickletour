@@ -22,7 +22,7 @@ import {
   Tabs,
   Tab,
   Alert,
-} from "@mui/material";
+} from "dreamspos/ui";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -52,7 +52,7 @@ import { toast } from "react-toastify";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Autocomplete from "@mui/material/Autocomplete";
-import Chip from "@mui/material/Chip";
+import { Chip } from "dreamspos/ui";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);

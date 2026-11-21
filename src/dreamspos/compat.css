@@ -15,6 +15,8 @@
 a { text-decoration: none; color: inherit; }
 a:hover { color: #fe820e; }
 p { margin-bottom: 0; }
+/* Bootstrap tô hồng mọi thẻ code; trang quản trị dùng code cho mã/ID nên giữ màu chữ thường */
+code { color: inherit; }
 label { margin-bottom: 0; }
 img { max-width: none; height: revert-layer; }
 .header img, .sidebar img, .page-wrapper .card > img { max-width: 100%; }

@@ -18,7 +18,7 @@ import {
   Typography,
   LinearProgress,
   Box,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";

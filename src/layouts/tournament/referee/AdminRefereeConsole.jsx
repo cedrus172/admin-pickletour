@@ -25,7 +25,7 @@ import {
   DialogActions,
   RadioGroup,
   Radio,
-} from "@mui/material";
+} from "dreamspos/ui";
 import {
   PlayArrow,
   Stop,

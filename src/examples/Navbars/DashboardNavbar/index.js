@@ -27,17 +27,17 @@ import PropTypes from "prop-types";
 // @material-ui core components
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
+import { IconButton } from "dreamspos/ui";
 import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
+import { Dialog } from "dreamspos/ui";
+import { DialogContent } from "dreamspos/ui";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import InputAdornment from "@mui/material/InputAdornment";
-import Chip from "@mui/material/Chip";
-import Divider from "@mui/material/Divider";
+import { InputAdornment } from "dreamspos/ui";
+import { Chip } from "dreamspos/ui";
+import { Divider } from "dreamspos/ui";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 

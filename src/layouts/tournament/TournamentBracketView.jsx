@@ -17,7 +17,7 @@ import {
   TableContainer,
   Paper,
   Divider,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { ExpandMore as ExpandMoreIcon, EmojiEvents as TrophyIcon } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import {

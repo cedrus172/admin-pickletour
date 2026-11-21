@@ -2,7 +2,7 @@
 // Admin gọi lại, cập nhật trạng thái (người gửi nhận thông báo) và ghi chú.
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Button, Chip, CircularProgress, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Chip, CircularProgress, Paper, Stack, TextField, Typography } from "dreamspos/ui";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { toast } from "react-toastify";

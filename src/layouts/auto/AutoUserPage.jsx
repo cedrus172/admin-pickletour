@@ -34,8 +34,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+} from "dreamspos/ui";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";

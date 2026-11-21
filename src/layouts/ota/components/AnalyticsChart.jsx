@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { Box, Paper, Skeleton, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Box, Paper, Skeleton, ToggleButton, ToggleButtonGroup, Typography } from "dreamspos/ui";
 import {
   Bar,
   BarChart,

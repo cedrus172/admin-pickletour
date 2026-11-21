@@ -26,7 +26,7 @@ import {
   AlertTitle,
   Tooltip,
   IconButton,
-} from "@mui/material";
+} from "dreamspos/ui";
 import { useNavigate, useParams } from "react-router-dom";
 import { Bracket, Seed, SeedItem, SeedTeam } from "react-brackets";
 import { toast } from "react-toastify";

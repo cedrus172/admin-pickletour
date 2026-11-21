@@ -16,8 +16,8 @@ Coded by www.creative-tim.com
 import { useState } from "react";
 
 // @mui material components
-import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
+import { Card } from "dreamspos/ui";
+import { Switch } from "dreamspos/ui";
 
 // PickleTour React components
 import MDBox from "components/MDBox";

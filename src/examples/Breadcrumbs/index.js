@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // @mui material components
-import { Breadcrumbs as MuiBreadcrumbs } from "@mui/material";
+import { Breadcrumbs as MuiBreadcrumbs } from "dreamspos/ui";
 import Icon from "@mui/material/Icon";
 
 // PickleTour React components

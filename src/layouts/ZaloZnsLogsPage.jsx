@@ -18,7 +18,7 @@ import {
   Button,
   Snackbar,
   Alert,
-} from "@mui/material";
+} from "dreamspos/ui";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import {

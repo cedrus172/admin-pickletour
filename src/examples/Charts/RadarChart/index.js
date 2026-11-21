@@ -31,7 +31,7 @@ import {
 import { Radar } from "react-chartjs-2";
 
 // @mui material components
-import Card from "@mui/material/Card";
+import { Card } from "dreamspos/ui";
 import Icon from "@mui/material/Icon";
 
 // PickleTour React components

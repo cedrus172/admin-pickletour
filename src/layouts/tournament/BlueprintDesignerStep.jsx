@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Button, Paper, Stack, Tabs, Tab } from "@mui/material";
+import { Button, Paper, Stack, Tabs, Tab } from "dreamspos/ui";
 
 export default function BlueprintDesignerStep({
   tab,

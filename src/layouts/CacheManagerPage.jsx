@@ -23,9 +23,9 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import PropTypes from "prop-types";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid } from "dreamspos/ui/DataGrid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";

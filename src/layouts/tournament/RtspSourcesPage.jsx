@@ -24,7 +24,7 @@ import {
   Checkbox,
   CircularProgress,
   Typography,
-} from "@mui/material";
+} from "dreamspos/ui";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
