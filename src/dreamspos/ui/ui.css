@@ -381,8 +381,14 @@ body[data-theme="dark"] .dp-field input[type="date"], body[data-theme="dark"] .d
 .dp-modal .modal-header { flex: none; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--dp-line); }
 .dp-modal .modal-title { flex: 1; min-width: 0; margin: 0; font-size: 18px; font-weight: 700; line-height: 1.4; color: var(--dp-text); }
 .dp-modal .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 20px; }
-.dp-modal .modal-footer { flex: none; flex-wrap: wrap; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--dp-line); }
+.dp-modal .modal-content > .modal-footer { flex: none; flex-wrap: wrap; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--dp-line); }
 .dp-modal .modal-footer > * { margin: 0; }
+/* theme canh trái + nới rộng nút ở chân hộp thoại; các hộp thoại sẵn có nhiều nút nhỏ nên giữ canh phải, cỡ nút thường */
+.dp-modal .modal-footer { justify-content: flex-end; }
+.dp-modal .modal-footer .btn.dp-btn { min-width: 0; padding: 7px 15px; }
+.dp-modal .modal-footer .btn.dp-btn.btn-sm { padding: 4px 10px; }
+.dp-modal .modal-footer .btn.dp-btn-contained.dp-tone-secondary { background-color: var(--c); }
+.dp-modal .modal-footer .btn.dp-btn-contained.dp-tone-secondary:hover { box-shadow: none; color: #fff; }
 .dp-modal .dp-modal-text { color: var(--dp-sub); margin: 0 0 12px; }
 @keyframes dp-modal-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
 @media (max-width: 575.98px) {
