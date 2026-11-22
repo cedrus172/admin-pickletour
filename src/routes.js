@@ -13,6 +13,7 @@ import UserManagement from "layouts/user/UserListPage";
 import FaceDataPage from "layouts/faceData/FaceDataPage";
 import ShopSettingsPage from "layouts/shop/ShopSettingsPage";
 import OrganizeRequestsPage from "layouts/organize/OrganizeRequestsPage";
+import StudioLicensesPage from "layouts/studio/StudioLicensesPage";
 import VarCourtsPage from "layouts/var/VarCourtsPage";
 import CoachApprovalsPage from "layouts/coaches/CoachApprovalsPage";
 import SelfAssessmentManagementPage from "layouts/user/SelfAssessmentManagementPage";
@@ -363,6 +364,16 @@ const routes = [
     icon: <Icon fontSize="small">emoji_events</Icon>,
     route: "/admin/organize-requests",
     component: <OrganizeRequestsPage />,
+    private: true,
+    roles: ["admin"],
+  },
+  {
+    type: "collapse",
+    name: "Bản quyền Studio",
+    key: "studio-licenses",
+    icon: <Icon fontSize="small">verified_user</Icon>,
+    route: "/admin/studio-licenses",
+    component: <StudioLicensesPage />,
     private: true,
     roles: ["admin"],
   },

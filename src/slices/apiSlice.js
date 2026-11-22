@@ -60,6 +60,8 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery,
   tagTypes: [
+    "StudioLicenses",
+    "StudioPages",
     "FaceSources",
     "ShopConfig",
     "OrganizeRequests",
