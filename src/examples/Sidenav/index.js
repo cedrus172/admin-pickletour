@@ -47,12 +47,13 @@ const GROUP_ORDER = [
   "Nội dung & Truyền thông",
   "Email & Tài chính",
   "Livestream · FB · YouTube",
+  "Camera sân · VAR · Clip",
   "Hệ thống & Cấu hình",
   "Giám sát & Nhật ký",
   "Bảo mật & Hạ tầng",
 ];
 
-// key của route -> nhóm hiển thị. Route không có trong map rơi vào "Khác".
+// key của route -> nhóm hiển thị. Route không có trong map rơi vào "Khác" — thêm trang mới thì nhớ khai nhóm ở đây.
 const KEY_GROUP = {
   dashboard: "Tổng quan",
 
@@ -83,6 +84,8 @@ const KEY_GROUP = {
   "rating-tester": "Giải đấu & Trận đấu",
   "bracket-group-insert": "Giải đấu & Trận đấu",
   "ai-registration-import": "Giải đấu & Trận đấu",
+  "organize-requests": "Giải đấu & Trận đấu",
+  "tournament-auto-live": "Giải đấu & Trận đấu",
 
   "overlay-index": "Trọng tài & Overlay",
   "admin-referee-console-match": "Trọng tài & Overlay",
@@ -100,6 +103,7 @@ const KEY_GROUP = {
   "auto-users": "Người dùng & Điểm trình",
   "sign-in": "Người dùng & Điểm trình",
   "sign-up": "Người dùng & Điểm trình",
+  "face-data": "Người dùng & Điểm trình",
 
   "admin-news": "Nội dung & Truyền thông",
   "admin-blog": "Nội dung & Truyền thông",
@@ -117,6 +121,9 @@ const KEY_GROUP = {
   "admin-email-campaigns": "Email & Tài chính",
   "admin-email-contacts": "Email & Tài chính",
   "admin-finance": "Email & Tài chính",
+  "admin-mailbox": "Email & Tài chính",
+  "admin-mailbox-settings": "Email & Tài chính",
+  "shop-goatwin": "Email & Tài chính",
 
   "fb-live-config": "Livestream · FB · YouTube",
   "fb-page-monitor": "Livestream · FB · YouTube",
@@ -130,6 +137,16 @@ const KEY_GROUP = {
   "live-recording-ai-commentary-monitor": "Livestream · FB · YouTube",
   "drive-video-manager": "Livestream · FB · YouTube",
   "fb-vod-drive-monitor": "Livestream · FB · YouTube",
+  "fb-boot-tokens": "Livestream · FB · YouTube",
+  "fb-to-youtube": "Livestream · FB · YouTube",
+  "fb-live-test": "Livestream · FB · YouTube",
+  "yt-live-test": "Livestream · FB · YouTube",
+  "studio-licenses": "Livestream · FB · YouTube",
+
+  "var-courts": "Camera sân · VAR · Clip",
+  "cam-clip-grants": "Camera sân · VAR · Clip",
+  "clip-split-jobs": "Camera sân · VAR · Clip",
+  "admin-rtsp-sources": "Camera sân · VAR · Clip",
 
   "system-settings": "Hệ thống & Cấu hình",
   "system-config": "Hệ thống & Cấu hình",
@@ -149,6 +166,7 @@ const KEY_GROUP = {
   "auth-log-management": "Giám sát & Nhật ký",
   "admin-peak-runtime": "Giám sát & Nhật ký",
   "admin-observer-vps": "Giám sát & Nhật ký",
+  "access-analytics": "Giám sát & Nhật ký",
 
   "identity-security": "Bảo mật & Hạ tầng",
   "checkpoint-engine": "Bảo mật & Hạ tầng",
