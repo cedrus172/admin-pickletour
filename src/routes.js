@@ -100,6 +100,7 @@ import YtLiveTestPage from "layouts/YtLiveTestPage";
 import NewsAdminPage from "layouts/NewsAdminPage";
 import BlogManagerPage from "layouts/BlogManagerPage";
 import FeedManagerPage from "layouts/FeedManagerPage";
+import FanpageReviewPage from "layouts/FanpageReviewPage";
 import ChatManagerPage from "layouts/ChatManagerPage";
 import AdminAzureConfigPage from "layouts/AdminAzureConfigPage";
 import AzureManagerPage from "layouts/AzureManagerPage";
@@ -272,6 +273,17 @@ const routes = [
     icon: <Icon fontSize="small">dynamic_feed</Icon>,
     route: "/admin/feed",
     component: <FeedManagerPage />,
+    private: true,
+    roles: ["admin"],
+    show: true,
+  },
+  {
+    type: "collapse",
+    name: "Duyệt Fanpage",
+    key: "admin-fanpages",
+    icon: <Icon fontSize="small">verified</Icon>,
+    route: "/admin/fanpages",
+    component: <FanpageReviewPage />,
     private: true,
     roles: ["admin"],
     show: true,

@@ -60,6 +60,7 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery,
   tagTypes: [
+    "AdminFanpages",
     "StudioLicenses",
     "StudioPages",
     "StudioDevices",

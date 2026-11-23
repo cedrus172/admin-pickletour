@@ -108,6 +108,7 @@ const KEY_GROUP = {
   "admin-news": "Nội dung & Truyền thông",
   "admin-blog": "Nội dung & Truyền thông",
   "admin-feed": "Nội dung & Truyền thông",
+  "admin-fanpages": "Nội dung & Truyền thông",
   "admin-chat": "Nội dung & Truyền thông",
   "news-list": "Nội dung & Truyền thông",
   "news-detail": "Nội dung & Truyền thông",
