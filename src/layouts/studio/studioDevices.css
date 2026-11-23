@@ -1,0 +1,178 @@
+/* Thiết bị Studio (layouts/studio/StudioDevicesPage.jsx) — lớp riêng .sdv-*, màu theo biến DreamsPOS. */
+.sdv-page {
+  --sdv-ok: #28c76f;
+  --sdv-warn: #ff9900;
+  --sdv-bad: #ea5455;
+  --sdv-off: #8a94a6;
+  --sdv-ok-bg: rgba(40, 199, 111, 0.12);
+  --sdv-warn-bg: rgba(255, 153, 0, 0.13);
+  --sdv-bad-bg: rgba(234, 84, 85, 0.12);
+  --sdv-off-bg: rgba(138, 148, 166, 0.14);
+}
+
+.sdv-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: center;
+  margin: 16px 0;
+}
+.sdv-toolbar .sdv-search { flex: 1 1 260px; max-width: 420px; min-width: 0; }
+.sdv-filter { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.sdv-filter::-webkit-scrollbar { display: none; }
+.sdv-filter > * { flex-wrap: nowrap !important; white-space: nowrap; }
+.sdv-refresh { display: flex; align-items: center; gap: 8px; margin-left: auto; color: var(--dp-sub); font-size: 13px; }
+
+.sdv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.sdv-card {
+  cursor: pointer;
+  margin-bottom: 0 !important;
+  padding: 16px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  min-width: 0;
+}
+.sdv-card:hover, .sdv-card:focus-visible { box-shadow: var(--dp-shadow); border-color: var(--dp-primary); outline: none; }
+.sdv-card.is-drop { border-color: var(--sdv-bad); }
+.sdv-card.is-offline .sdv-body,
+.sdv-body.is-stale { opacity: 0.62; }
+.sdv-stale { margin-top: 10px; font-size: 12px; color: var(--dp-sub); font-style: italic; }
+
+.sdv-head { display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.sdv-icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 159, 67, 0.13);
+  color: var(--dp-primary);
+}
+.sdv-title { flex: 1; min-width: 0; }
+.sdv-name { font-weight: 700; font-size: 15px; color: var(--dp-text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sdv-sub {
+  font-size: 12.5px;
+  color: var(--dp-sub);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.sdv-status { flex: none; text-align: right; font-size: 12px; color: var(--dp-sub); line-height: 1.35; }
+.sdv-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sdv-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+.sdv-pill.st-online { color: var(--sdv-ok); background: var(--sdv-ok-bg); }
+.sdv-pill.st-online .sdv-dot { box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.25); }
+.sdv-pill.st-unstable { color: var(--sdv-warn); background: var(--sdv-warn-bg); }
+.sdv-pill.st-offline { color: var(--sdv-off); background: var(--sdv-off-bg); }
+
+.sdv-user { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--dp-text); min-width: 0; flex-wrap: wrap; }
+.sdv-user .sdv-uname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%; }
+.sdv-tag { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.sdv-tag.ok { color: var(--sdv-ok); background: var(--sdv-ok-bg); }
+.sdv-tag.warn { color: var(--sdv-warn); background: var(--sdv-warn-bg); }
+.sdv-tag.bad { color: var(--sdv-bad); background: var(--sdv-bad-bg); }
+.sdv-tag.off { color: var(--dp-sub); background: var(--sdv-off-bg); }
+.sdv-tag.live { color: #fff; background: var(--sdv-bad); }
+
+.sdv-alert-drop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -16px -16px 12px;
+  padding: 8px 16px;
+  border-radius: 8px 8px 0 0;
+  background: var(--sdv-bad);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+}
+.sdv-warns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+.sdv-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+@media (max-width: 420px) {
+  .sdv-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.sdv-metric { background: var(--dp-soft); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.sdv-mlabel { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--dp-sub); white-space: nowrap; }
+.sdv-mlabel svg { font-size: 15px !important; }
+.sdv-mvalue { font-size: 14px; font-weight: 700; color: var(--dp-text); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sdv-mvalue small { font-weight: 500; font-size: 11.5px; color: var(--dp-sub); }
+.sdv-mvalue.warn { color: var(--sdv-warn); }
+.sdv-mvalue.bad { color: var(--sdv-bad); }
+.sdv-bar { height: 5px; border-radius: 3px; background: var(--dp-line); margin-top: 5px; overflow: hidden; }
+.sdv-bar > span { display: block; height: 100%; border-radius: 3px; background: var(--sdv-ok); }
+.sdv-bar > span.warn { background: var(--sdv-warn); }
+.sdv-bar > span.bad { background: var(--sdv-bad); }
+
+.sdv-stream { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--dp-line); }
+.sdv-stream-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--dp-text); }
+.sdv-stream-row .sdv-kv { color: var(--dp-sub); white-space: nowrap; }
+.sdv-stream-row .sdv-kv b { color: var(--dp-text); font-weight: 700; }
+.sdv-targets { margin-top: 8px; display: grid; gap: 4px; }
+.sdv-target { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--dp-text); min-width: 0; }
+.sdv-target .sdv-tname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sdv-target .sdv-terr { color: var(--sdv-bad); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45%; }
+.sdv-msg { margin-top: 6px; font-size: 12px; color: var(--dp-sub); font-style: italic; }
+
+.sdv-foot { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 12.5px; color: var(--dp-sub); }
+.sdv-foot > span { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
+.sdv-foot svg { font-size: 15px !important; }
+.sdv-rec { color: var(--sdv-bad); font-weight: 700; }
+
+.sdv-empty { padding: 40px 16px; text-align: center; color: var(--dp-sub); }
+
+@media (max-width: 600px) {
+  .sdv-page .dash-widget.dp-stat { padding: 12px; }
+  .sdv-page .dash-widget.dp-stat .dash-widgetimg span { width: 36px; height: 36px; }
+  .sdv-page .dash-widget.dp-stat .dash-widgetimg span .material-icons-round,
+  .sdv-page .dash-widget.dp-stat .dash-widgetimg span .material-icons { font-size: 20px; }
+  .sdv-page .dash-widget.dp-stat .dash-widgetcontent { margin-left: 10px; }
+  .sdv-page .dash-widget.dp-stat .dash-widgetcontent h6 { font-size: 13px; }
+  .sdv-toolbar .sdv-search { flex-basis: 100%; max-width: none; }
+  .sdv-refresh { margin-left: 0; }
+}
+
+/* ── ngăn chi tiết ── */
+.sdv-drawer { width: 100%; padding: 18px; color: var(--dp-text); background: var(--dp-card); min-height: 100%; }
+.sdv-drawer h6.sdv-sec { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dp-sub); margin: 20px 0 10px; }
+.sdv-spark { margin-bottom: 12px; }
+.sdv-spark-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; color: var(--dp-sub); }
+.sdv-spark-head b { font-size: 14px; color: var(--dp-text); }
+.sdv-spark svg { display: block; width: 100%; height: 52px; margin-top: 4px; background: var(--dp-soft); border-radius: 6px; }
+.sdv-events { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.sdv-events li { display: flex; gap: 10px; align-items: baseline; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--dp-line); }
+.sdv-events time { flex: none; font-variant-numeric: tabular-nums; color: var(--dp-sub); font-size: 12px; min-width: 62px; }
+.sdv-events .sdv-dot { position: relative; top: -1px; }
+.sdv-events .lv-info .sdv-dot { color: var(--dp-sub); }
+.sdv-events .lv-warning .sdv-dot { color: var(--sdv-warn); }
+.sdv-events .lv-danger .sdv-dot { color: var(--sdv-bad); }
+.sdv-events .lv-danger span.sdv-etext { color: var(--sdv-bad); font-weight: 600; }
+.sdv-info { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 6px 12px; font-size: 13px; }
+.sdv-info dt { color: var(--dp-sub); font-weight: 500; }
+.sdv-info dd { margin: 0; color: var(--dp-text); overflow-wrap: anywhere; min-width: 0; }
+.sdv-info code { font-size: 12px; color: var(--dp-text); background: var(--dp-soft); padding: 1px 5px; border-radius: 4px; }

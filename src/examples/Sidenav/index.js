@@ -142,6 +142,7 @@ const KEY_GROUP = {
   "fb-live-test": "Livestream · FB · YouTube",
   "yt-live-test": "Livestream · FB · YouTube",
   "studio-licenses": "Livestream · FB · YouTube",
+  "studio-devices": "Livestream · FB · YouTube",
 
   "var-courts": "Camera sân · VAR · Clip",
   "cam-clip-grants": "Camera sân · VAR · Clip",

@@ -62,6 +62,7 @@ export const apiSlice = createApi({
   tagTypes: [
     "StudioLicenses",
     "StudioPages",
+    "StudioDevices",
     "FaceSources",
     "ShopConfig",
     "OrganizeRequests",

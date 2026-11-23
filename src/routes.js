@@ -14,6 +14,7 @@ import FaceDataPage from "layouts/faceData/FaceDataPage";
 import ShopSettingsPage from "layouts/shop/ShopSettingsPage";
 import OrganizeRequestsPage from "layouts/organize/OrganizeRequestsPage";
 import StudioLicensesPage from "layouts/studio/StudioLicensesPage";
+import StudioDevicesPage from "layouts/studio/StudioDevicesPage";
 import VarCourtsPage from "layouts/var/VarCourtsPage";
 import CoachApprovalsPage from "layouts/coaches/CoachApprovalsPage";
 import SelfAssessmentManagementPage from "layouts/user/SelfAssessmentManagementPage";
@@ -374,6 +375,16 @@ const routes = [
     icon: <Icon fontSize="small">verified_user</Icon>,
     route: "/admin/studio-licenses",
     component: <StudioLicensesPage />,
+    private: true,
+    roles: ["admin"],
+  },
+  {
+    type: "collapse",
+    name: "Thiết bị Studio",
+    key: "studio-devices",
+    icon: <Icon fontSize="small">devices</Icon>,
+    route: "/admin/studio-devices",
+    component: <StudioDevicesPage />,
     private: true,
     roles: ["admin"],
   },

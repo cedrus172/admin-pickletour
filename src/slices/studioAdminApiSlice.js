@@ -1,4 +1,4 @@
-// src/slices/studioAdminApiSlice.js — Bản quyền Pickletour Studio + chia sẻ page Facebook
+// src/slices/studioAdminApiSlice.js — Bản quyền Pickletour Studio + chia sẻ page Facebook + thiết bị Studio
 import { apiSlice } from "./apiSlice";
 
 export const studioAdminApiSlice = apiSlice.injectEndpoints({
@@ -49,6 +49,20 @@ export const studioAdminApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["StudioPages"],
     }),
+    // Thiết bị Studio (nhịp tim từ app)
+    getStudioDevices: builder.query({
+      query: ({ status = "all", q = "" } = {}) =>
+        `/admin/studio/devices?status=${encodeURIComponent(status)}&q=${encodeURIComponent(q)}`,
+      providesTags: ["StudioDevices"],
+    }),
+    getStudioDevice: builder.query({
+      query: (id) => `/admin/studio/devices/${id}`,
+      providesTags: (_r, _e, id) => [{ type: "StudioDevices", id }],
+    }),
+    deleteStudioDevice: builder.mutation({
+      query: (id) => ({ url: `/admin/studio/devices/${id}`, method: "DELETE" }),
+      invalidatesTags: ["StudioDevices"],
+    }),
   }),
 });
 
@@ -62,4 +76,7 @@ export const {
   useGetStudioPagesQuery,
   useAddStudioPageShareMutation,
   useRemoveStudioPageShareMutation,
+  useGetStudioDevicesQuery,
+  useGetStudioDeviceQuery,
+  useDeleteStudioDeviceMutation,
 } = studioAdminApiSlice;
