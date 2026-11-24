@@ -1,5 +1,5 @@
 // layouts/faceData/FaceDataPage.jsx
-// Dữ liệu "Tra cứu ảnh VĐV": kéo & cập nhật dữ liệu từng nguồn (SportConnect, PickleballVN), quét ảnh đại diện,
+// Dữ liệu "Tra cứu ảnh VĐV": kéo & cập nhật dữ liệu từng nguồn (SportConnect, PickleballVN, PVNA, PickleTour), quét ảnh đại diện,
 // reindex lại toàn bộ avatar.
 import React from "react";
 import PropTypes from "prop-types";
@@ -31,7 +31,7 @@ import { useCreateFaceWorkerKeyMutation, useGetFaceSourcesQuery, useRunFaceSourc
 
 const fmt = (n) => Number(n || 0).toLocaleString("vi-VN");
 const fmtDate = (d) => (d ? new Date(d).toLocaleString("vi-VN") : "—");
-const COLOR = { spc: "#2563eb", pbvn: "#16a34a", pt: "#0891b2" };
+const COLOR = { spc: "#2563eb", pbvn: "#16a34a", pvna: "#ea580c", pt: "#0891b2" };
 const STATUS = {
   idle: { label: "Chưa chạy", color: "default" },
   pulling: { label: "Đang kéo dữ liệu", color: "info" },
@@ -193,7 +193,7 @@ export default function FaceDataPage() {
           <Typography variant="h4">Dữ liệu tra cứu ảnh VĐV</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Nguồn dữ liệu cho tính năng &quot;Tra cứu ảnh VĐV&quot; (web + app). Kết quả tra cứu ghi rõ VĐV thuộc SportConnect, PickleballVN hay tài khoản PickleTour (PickleTour quét cả ảnh đại diện lẫn ảnh CCCD).
+          Nguồn dữ liệu cho tính năng &quot;Tra cứu ảnh VĐV&quot; (web + app). Kết quả tra cứu ghi rõ VĐV thuộc SportConnect, PickleballVN, PVNA hay tài khoản PickleTour (PickleTour quét cả ảnh đại diện lẫn ảnh CCCD).
         </Typography>
         {isLoading ? (
           <Box sx={{ py: 6, textAlign: "center" }}>
