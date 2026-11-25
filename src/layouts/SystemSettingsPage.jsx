@@ -575,6 +575,19 @@ function EventLiveSection() {
   const [globalBroadcast, { isLoading: pushing }] = useGlobalBroadcastMutation();
 
   const ev = data?.eventLive || {};
+  // Giờ bắt đầu sự kiện: lưu ISO, ô nhập dùng datetime-local theo giờ máy (VN).
+  const isoToLocalInput = (iso) => {
+    const d = iso ? new Date(iso) : null;
+    if (!d || Number.isNaN(d.getTime())) return "";
+    const p2 = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  };
+  const localInputToIso = (v) => {
+    if (!v) return "";
+    const d = new Date(v);
+    return Number.isNaN(d.getTime()) ? "" : d.toISOString();
+  };
+  const [startAt, setStartAt] = useState("");
   const [enabled, setEnabled] = useState(false);
   const [eventName, setEventName] = useState("");
   const [youtubeChannel, setYoutubeChannel] = useState("");
@@ -624,6 +637,7 @@ function EventLiveSection() {
     setAutoNotify(src.autoNotify === true);
     setAutoNotifyCooldownMinutes(Number(src.autoNotifyCooldownMinutes) || 180);
     setReplayTitleFilter(src.replayTitleFilter || "");
+    setStartAt(isoToLocalInput(src.startAt));
     setSlug(src.slug || "");
     setPinnedToHome(src.pinnedToHome !== false);
     setManualStreams(
@@ -652,6 +666,7 @@ function EventLiveSection() {
             bannerImageUrl: x.bannerImageUrl || "",
             tournamentId: x.tournamentId || "",
             replayTitleFilter: x.replayTitleFilter || "",
+            startAt: isoToLocalInput(x.startAt),
             autoNotify: x.autoNotify === true,
             autoNotifyCooldownMinutes: Number(x.autoNotifyCooldownMinutes) || 180,
             youtubeApiKey: "", // server đã che; để trống = giữ key cũ
@@ -676,6 +691,7 @@ function EventLiveSection() {
         bannerImageUrl: "",
         tournamentId: "",
         replayTitleFilter: "",
+        startAt: "",
         autoNotify: false,
         autoNotifyCooldownMinutes: 180,
         youtubeApiKey: "",
@@ -713,6 +729,7 @@ function EventLiveSection() {
         autoNotifyCooldownMinutes:
           Math.max(5, Number(autoNotifyCooldownMinutes) || 180),
         replayTitleFilter: replayTitleFilter.trim(),
+        startAt: localInputToIso(startAt),
         manualStreams: manualStreams
           .map((m) => ({
             url: (m.url || "").trim(),
@@ -738,6 +755,7 @@ function EventLiveSection() {
               bannerImageUrl: (x.bannerImageUrl || "").trim(),
               tournamentId: (x.tournamentId || "").trim(),
               replayTitleFilter: (x.replayTitleFilter || "").trim(),
+              startAt: localInputToIso(x.startAt),
               autoNotify: x.autoNotify === true,
               autoNotifyCooldownMinutes: Math.max(
                 5,
@@ -840,6 +858,28 @@ function EventLiveSection() {
           <Typography variant="body2">
             Hiển thị banner giải này ở trang chủ (web + app)
           </Typography>
+        </Stack>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ sm: "center" }}>
+          <TextField
+            label="Thời gian sự kiện bắt đầu"
+            type="datetime-local"
+            value={startAt}
+            onChange={(e) => setStartAt(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            sx={{ minWidth: 260 }}
+            helperText={
+              startAt
+                ? new Date(startAt).getTime() > Date.now()
+                  ? "Trước giờ này web + app hiện đồng hồ đếm ngược trên banner và trang xem live."
+                  : "Đã qua giờ bắt đầu — không còn đếm ngược."
+                : "Để trống = không đếm ngược. Giải có giờ bắt đầu sắp tới vẫn hiện banner dù chưa có kênh/luồng."
+            }
+          />
+          {startAt ? (
+            <Button size="small" onClick={() => setStartAt("")}>
+              Xoá giờ
+            </Button>
+          ) : null}
         </Stack>
         <TextField
           label="Kênh YouTube (nhiều kênh — mỗi kênh 1 dòng)"
@@ -1064,6 +1104,15 @@ function EventLiveSection() {
                   fullWidth
                   value={x.eventName}
                   onChange={(e) => updateEvent(idx, { eventName: e.target.value })}
+                />
+                <TextField
+                  label="Bắt đầu (đếm ngược)"
+                  type="datetime-local"
+                  size="small"
+                  value={x.startAt || ""}
+                  onChange={(e) => updateEvent(idx, { startAt: e.target.value })}
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ minWidth: 230 }}
                 />
               </Stack>
               <TextField
