@@ -602,7 +602,17 @@ export default function SupportManagerPage() {
                 </Box>
               </Stack>
               <Divider />
-              <Stack spacing={1} sx={{ p: 1.5, maxHeight: "calc(100vh - 430px)", overflowY: "auto" }}>
+              <Stack
+                spacing={1}
+                sx={{
+                  p: 1.5,
+                  maxHeight: "calc(100vh - 430px)",
+                  minHeight: 240,
+                  overflowY: "auto",
+                  // thẻ trong cột flex có overflow:hidden bị co về ~0px → giữ nguyên chiều cao
+                  "& > *": { flexShrink: 0 },
+                }}
+              >
                 {ticketsQuery.isLoading ? (
                   Array.from({ length: 5 }).map((_, index) => (
                     <Skeleton key={index} variant="rounded" height={142} />
