@@ -34,6 +34,10 @@ export const studioAdminApiSlice = apiSlice.injectEndpoints({
       query: (keyword) => `/admin/studio/pages?keyword=${encodeURIComponent(keyword || "")}`,
       providesTags: ["StudioPages"],
     }),
+    // Số lượt thích / theo dõi + link page (backend đệm 6 giờ). Gọi sau khi có danh sách page.
+    getStudioPageStats: builder.mutation({
+      query: (ids) => ({ url: "/admin/studio/pages/stats", method: "POST", body: { ids } }),
+    }),
     addStudioPageShare: builder.mutation({
       query: ({ connectionId, userId }) => ({
         url: `/admin/studio/pages/${connectionId}/shares`,
@@ -75,6 +79,7 @@ export const {
   useUpdateStudioSettingsMutation,
   useGetStudioPagesQuery,
   useAddStudioPageShareMutation,
+  useGetStudioPageStatsMutation,
   useRemoveStudioPageShareMutation,
   useGetStudioDevicesQuery,
   useGetStudioDeviceQuery,

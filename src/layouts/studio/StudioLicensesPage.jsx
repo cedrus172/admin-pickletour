@@ -38,6 +38,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import {
   useAddStudioPageShareMutation,
+  useGetStudioPageStatsMutation,
   useDeleteStudioLicenseMutation,
   useGetStudioLicensesQuery,
   useGetStudioPagesQuery,
@@ -479,7 +480,12 @@ function LicensesTab() {
   );
 }
 
-function PageCard({ page, onShare }) {
+const fmtCount = (n) => (Number.isFinite(n) ? n.toLocaleString("vi-VN") : null);
+
+function PageCard({ page, onShare, stats }) {
+  const pageUrl = stats?.pageUrl || page.pageUrl || (page.pageId ? `https://www.facebook.com/${page.pageId}` : "");
+  const fanCount = stats ? stats.fanCount : page.fanCount;
+  const followersCount = stats ? stats.followersCount : page.followersCount;
   const [remove, { isLoading }] = useRemoveStudioPageShareMutation();
   const expired = page.expireAt && new Date(page.expireAt).getTime() < Date.now();
   const unshare = async (user) => {
@@ -506,7 +512,20 @@ function PageCard({ page, onShare }) {
           />
           <Box sx={{ minWidth: 0 }}>
             <Typography fontWeight={800} noWrap>
-              {page.pageName}
+              {pageUrl ? (
+                <Box
+                  component="a"
+                  href={pageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Mở fanpage trên Facebook"
+                  sx={{ color: "inherit", textDecoration: "none", "&:hover": { textDecoration: "underline", color: "primary.main" } }}
+                >
+                  {page.pageName} ↗
+                </Box>
+              ) : (
+                page.pageName
+              )}
               {expired ? (
                 <Chip size="small" color="warning" label="Quyền Facebook hết hạn" sx={{ ml: 1 }} />
               ) : null}
@@ -515,6 +534,20 @@ function PageCard({ page, onShare }) {
               Kết nối bởi {userLabel(page.owner)}
               {userContact(page.owner) ? ` · ${userContact(page.owner)}` : ""}
             </Typography>
+            {fmtCount(fanCount) || fmtCount(followersCount) ? (
+              <Stack direction="row" spacing={0.75} sx={{ mt: 0.5 }} flexWrap="wrap" useFlexGap>
+                {fmtCount(fanCount) ? (
+                  <Chip size="small" color="primary" variant="outlined" label={`👍 ${fmtCount(fanCount)} lượt thích`} />
+                ) : null}
+                {fmtCount(followersCount) && followersCount !== fanCount ? (
+                  <Chip size="small" variant="outlined" label={`${fmtCount(followersCount)} người theo dõi`} />
+                ) : null}
+              </Stack>
+            ) : stats === undefined ? null : (
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                Chưa lấy được số lượt thích (quyền Facebook của kết nối có thể đã hết hạn)
+              </Typography>
+            )}
           </Box>
         </Stack>
         <Button
@@ -558,7 +591,7 @@ function PageCard({ page, onShare }) {
     </Paper>
   );
 }
-PageCard.propTypes = { page: PropTypes.object.isRequired, onShare: PropTypes.func.isRequired };
+PageCard.propTypes = { page: PropTypes.object.isRequired, onShare: PropTypes.func.isRequired, stats: PropTypes.object };
 
 function PagesTab() {
   const [keyword, setKeyword] = React.useState("");
@@ -572,6 +605,23 @@ function PagesTab() {
   const [sharePageId, setSharePageId] = React.useState(null);
   const items = data?.items || [];
   const sharePage = items.find((p) => p.id === sharePageId) || null;
+  // Số lượt thích: hỏi riêng sau khi có danh sách (Graph API chậm hơn danh sách).
+  const [loadStats] = useGetStudioPageStatsMutation();
+  const [statsMap, setStatsMap] = React.useState({});
+  const idsKey = items.map((p) => p.id).join(",");
+  React.useEffect(() => {
+    if (!idsKey) return undefined;
+    let alive = true;
+    loadStats(idsKey.split(","))
+      .unwrap()
+      .then((r) => {
+        if (alive) setStatsMap((m) => ({ ...m, ...(r?.stats || {}) }));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [idsKey, loadStats]);
 
   const share = async (user) => {
     try {
@@ -614,7 +664,7 @@ function PagesTab() {
       ) : null}
       <Stack spacing={1.25} sx={{ opacity: isFetching ? 0.6 : 1 }}>
         {items.map((p) => (
-          <PageCard key={p.id} page={p} onShare={(page) => setSharePageId(page.id)} />
+          <PageCard key={p.id} page={p} stats={statsMap[p.id]} onShare={(page) => setSharePageId(page.id)} />
         ))}
       </Stack>
 
